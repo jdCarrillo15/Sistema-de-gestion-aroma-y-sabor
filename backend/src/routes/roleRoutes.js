@@ -1,10 +1,10 @@
 import express from "express";
-import { checkAuth } from "../middleware/auth.js";
-import { assignRole } from "../controllers/rolesController.js";
+import { modifyRole } from "../controllers/rolesController.js";
+import { checkRoleWithAuth } from "../middleware/roles.js";
 
 const router = express.Router();
 
-router.post("/assign-role", checkAuth, assignRole);
+router.post("/modify-role", checkRoleWithAuth("admin"), modifyRole);
 
 export default router;
 
