@@ -42,5 +42,4 @@ build/
 Thumbs.db
 
 # Json
-*.json
 *.txt

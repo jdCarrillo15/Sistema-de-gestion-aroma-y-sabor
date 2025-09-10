@@ -8,7 +8,7 @@ export async function modifyRole(req, res) {
     }
 
     try {
-        await admin.auth().setCustomUserClaims(uid, { rol });
+        await admin.auth().setCustomUserClaims(uid, { role });
         res.json({ message: `Rol '${rol}' asignado al usuario ${uid}` });
     } catch (err) {
         res.status(500).json({ error: err.message });

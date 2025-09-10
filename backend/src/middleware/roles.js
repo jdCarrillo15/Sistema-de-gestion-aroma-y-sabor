@@ -14,7 +14,7 @@ export function checkRoleWithAuth(requiredRole) {
     try {
       // Verificar cookie de sesión
       const decodedClaims = await admin.auth().verifySessionCookie(sessionCookie, true);
-      req.user = decodedClaims;
+      req.user = decodedClaims; 
 
       // Verificar rol
       if (req.user?.role !== requiredRole) {
