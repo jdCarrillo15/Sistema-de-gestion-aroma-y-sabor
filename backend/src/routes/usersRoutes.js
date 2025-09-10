@@ -1,12 +1,13 @@
 import express from "express";
 import { checkAuth } from "../middleware/auth.js";
-import { getUsers, getUsersFromDB } from "../controllers/usersController.js";
+import { createUserAndPerson, getUsers, getUsersFromDB } from "../controllers/usersController.js";
+import { requireRole } from "../middleware/roles.js";
 
 const router = express.Router();
 
-router.get("/getusers", checkAuth, getUsers);
-router.get("/getusersdb", checkAuth, getUsersFromDB);
-
+router.get("/getusers", checkAuth, requireRole("admin"), getUsers);
+router.get("/getusersdb", checkAuth, requireRole("admin"), getUsersFromDB);
+router.post("/createUser", checkAuth, requireRole("admin"), createUserAndPerson)
 
 export default router;
 

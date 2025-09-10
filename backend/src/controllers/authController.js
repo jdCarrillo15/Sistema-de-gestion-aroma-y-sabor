@@ -1,23 +1,3 @@
-import { admin } from "../config/firebase.js";
-
-export async function checkAuth(req, res, next) {
-    const authHeader = req.headers.authorization;
-    if (!authHeader || !authHeader.startsWith("Bearer ")) {
-        return res.status(401).json({ error: "Se requiere un token" });
-    }
-
-    const token = authHeader.split(" ")[1];
-    try {
-        const decodedToken = await admin.auth().verifyIdToken(token);
-        req.user = decodedToken;
-        next();
-    } catch (error) {
-        return res.status(401).json({ error: "Token no válido" });
-    }
-}
-
-
-
 export async function login(req, res) {
     const { email, password } = req.body;
     const expiresIn = 3600000; // 1 dia
@@ -60,5 +40,3 @@ export async function logout(req, res) {
     res.clearCookie("session");
     res.json({ message: "Sesión cerrada" });
 };
-
-

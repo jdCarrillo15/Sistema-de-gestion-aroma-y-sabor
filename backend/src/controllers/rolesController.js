@@ -1,9 +1,9 @@
 import { admin } from "../config/firebase.js";
 
-export async function assignRole(req, res) {
+export async function modifyRole(req, res) {
     const { uid, rol } = req.body;
 
-    if (!req.user || req.user.rol !== "admin") {
+    if (!req.user || req.user.role !== "admin") {
         return res.status(403).json({ error: "No autorizado para asignar roles" });
     }
 
