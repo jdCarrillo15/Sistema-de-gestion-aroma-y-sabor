@@ -6,7 +6,7 @@ const router = express.Router();
 
 router.get("/getusers", checkRoleWithAuth("admin"), getUsers);
 router.get("/getusersdb", checkRoleWithAuth("admin"), getUsersFromDB);
-router.post("/createUser", checkRoleWithAuth("admin"), createUserAndPerson)
+router.post("/createuser", checkRoleWithAuth("admin"), createUserAndPerson)
 
 export default router;
 

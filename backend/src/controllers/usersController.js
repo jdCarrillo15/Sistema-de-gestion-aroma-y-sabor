@@ -42,6 +42,10 @@ export async function createUserAndPerson(req, res) {
     try {
         const data = req.body;
 
+        if (!data.email || !data.password) {
+            return res.status(400).json({ error: "Email y password son obligatorios" });
+        }
+
         // 1. Crear usuario en Firebase Auth
         const userRecord = await admin.auth().createUser({
             email: data.email,
@@ -49,31 +53,31 @@ export async function createUserAndPerson(req, res) {
         });
         const authUid = userRecord.uid;
 
-        //2. Agregar rol a CustomClaims
-        await admin.auth().setCustomUserClaims(authUid, { role: data.role });
+        // 2. Agregar rol a CustomClaims
+        await admin.auth().setCustomUserClaims(authUid, { role: data.role || "user" });
 
-        // 3. crear el documento en "users"
+        // 3. Crear documento en "users"
         await db.collection("users").doc(authUid).set({
-            user_name: data.user_name,
-            role: data.role,
+            user_name: data.user_name || "",
+            role: data.role || "user",
             created_at: admin.firestore.FieldValue.serverTimestamp()
         });
 
-        // 4. Crear documento en "persons" 
+        // 4. Crear documento en "persons"
         await db.collection("persons").add({
-            address: data.address,
-            birthdate: data.birthdate,
-            document_id: data.document_id,
+            address: data.address || "",
+            birthdate: data.birthdate || "",
+            document_id: data.document_id || "",
             email: data.email,
-            first_name: data.first_name,
-            last_name: data.last_name,
-            phone_number: data.phone_number,
+            first_name: data.first_name || "",
+            last_name: data.last_name || "",
+            phone_number: data.phone_number || "",
             user_id: authUid,
             created_at: admin.firestore.FieldValue.serverTimestamp()
         });
 
         res.status(201).json({
-            message: "Usuario registrado correctamente",
+            message: "Usuario creado correctamente",
             userId: authUid
         });
     } catch (error) {
@@ -83,4 +87,6 @@ export async function createUserAndPerson(req, res) {
         });
     }
 }
+
+
 
