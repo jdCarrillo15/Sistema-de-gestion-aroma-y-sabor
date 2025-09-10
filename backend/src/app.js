@@ -3,6 +3,9 @@ import rolesRoutes from "./routes/roleRoutes.js";
 import authRoutes from "./routes/authRoutes.js";
 import usersRoutes from "./routes/usersRoutes.js";
 import cookieParser from "cookie-parser";
+import dotenv from "dotenv";
+dotenv.config();
+
 
 const app = express();
 
