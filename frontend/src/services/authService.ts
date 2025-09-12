@@ -1,7 +1,9 @@
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
+
 export async function loginUser(email: string, password: string) {
-    console.log("Intentando logear con:", { email, password });
+  console.log("Intentando logear con:", { email, password });
   try {
-    const response = await fetch("http://10.4.73.21:3000/auth/login", {
+    const response = await fetch(`${API_BASE_URL}/auth/login`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -14,8 +16,6 @@ export async function loginUser(email: string, password: string) {
     }
 
     const data = await response.json();
-
-
     return data;
   } catch (error) {
     console.error("Error en login:", error);
@@ -26,7 +26,7 @@ export async function loginUser(email: string, password: string) {
 export async function sendRecoveryEmail(email: string) {
   console.log("Enviando recuperación a:", email);
   try {
-    const response = await fetch("http://10.4.73.21:3000/auth/reset-password", {
+    const response = await fetch(`${API_BASE_URL}/auth/reset-password`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
