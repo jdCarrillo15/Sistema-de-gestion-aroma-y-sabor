@@ -28,7 +28,7 @@ const ForgotPasswordModal: React.FC<ForgotPasswordModalProps> = ({
 
     await new Promise((resolve) => setTimeout(resolve, 1500));
     try {
-      let data = await sendRecoveryEmail("xd");
+      let data = await sendRecoveryEmail(email);
       console.log("Respuesta de recuperación:", data);
     } catch (error) {
       alert("Error al solicitar recuperación de contraseña");
