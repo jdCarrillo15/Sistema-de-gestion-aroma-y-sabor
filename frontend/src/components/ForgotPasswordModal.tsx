@@ -85,7 +85,6 @@ const ForgotPasswordModal: React.FC<ForgotPasswordModalProps> = ({
             </button>
           </div>
 
-          {/* Icono y título */}
           <div className="modal-icon">
             <svg
               width="64"
@@ -117,7 +116,7 @@ const ForgotPasswordModal: React.FC<ForgotPasswordModalProps> = ({
                 id="forgot-email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                placeholder="tu@email.com"
+                placeholder="tucorreo@email.com"
                 className="form-input"
                 required
                 autoFocus

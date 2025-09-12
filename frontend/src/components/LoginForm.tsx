@@ -1,7 +1,8 @@
 import React, { useState } from "react";
-import ForgotPasswordModal from "./ForgotPasswordModal";
+import ForgotPasswordModal from "./ForgotPasswordModal.tsx";
 import "../styles/LoginForm.css";
 import { loginUser } from "../services/authService";
+import logo from "../assets/logo.png";
 
 interface LoginFormProps {
   onSubmit?: (email: string, password: string) => void;
@@ -39,7 +40,6 @@ const LoginForm: React.FC<LoginFormProps> = () => {
 
   const handleForgotPasswordSubmit = (forgotEmail: string) => {
     console.log("Password reset requested for:", forgotEmail);
-    // Llamada a tu API para enviar el correo de recuperación
     closeForgotModal();
   };
 
@@ -49,9 +49,8 @@ const LoginForm: React.FC<LoginFormProps> = () => {
         <div className="login-form-card">
           <div className="login-header">
             <div className="logo-container">
-              <img src="/assets/logo.png" alt="Logo" className="logo" />
+              <img src={logo} alt="Logo" className="logo" />
             </div>
-            <h1 className="login-title">Café Aroma y sabor</h1>
             <p className="login-subtitle">El aroma de la perfección</p>
           </div>
 
@@ -65,7 +64,7 @@ const LoginForm: React.FC<LoginFormProps> = () => {
                 id="email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                placeholder="tu@email.com"
+                placeholder="tucorreo@email.com"
                 className="form-input"
                 required
               />
