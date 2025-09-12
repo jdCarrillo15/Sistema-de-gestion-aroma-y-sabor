@@ -1,3 +1,5 @@
+import { admin } from "../config/firebase.js";
+
 export async function login(req, res) {
     const { email, password } = req.body;
     const expiresIn = 3600000; // 1 dia
@@ -22,6 +24,10 @@ export async function login(req, res) {
             return res.status(400).json({ error: data.error.message });
         }
 
+        const decodedToken = await admin.auth().verifyIdToken(data.idToken);
+
+        const role = decodedToken.role || "user";
+
         res.cookie("token", data.idToken, {
             maxAge: expiresIn,
             httpOnly: true, // no accesible desde JS
@@ -29,7 +35,7 @@ export async function login(req, res) {
             sameSite: "strict"
         });
 
-        res.json({ message: "Login exitoso", uid: data.localId, token: data.idToken });
+        res.json({ message: "Login exitoso", uid: data.localId, role });
     } catch (err) {
         console.error(err);
         res.status(500).json({ error: "Error al iniciar sesión" });
