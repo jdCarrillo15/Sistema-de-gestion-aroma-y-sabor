@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import ForgotPasswordModal from "./ForgotPasswordModal.tsx";
+import AlertModal from "./AlertModal";
 import "../styles/LoginForm.css";
 import { loginUser } from "../services/authService";
 import logo from "../assets/logo.png";
@@ -14,14 +15,50 @@ const LoginForm: React.FC<LoginFormProps> = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [rememberMe, setRememberMe] = useState(false);
   const [showForgotModal, setShowForgotModal] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+
+  const [showAlert, setShowAlert] = useState(false);
+  const [alertType, setAlertType] = useState<"success" | "error">("error");
+  const [alertTitle, setAlertTitle] = useState("");
+  const [alertMessage, setAlertMessage] = useState("");
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setIsLoading(true);
+
     try {
       const data = await loginUser(email, password);
       console.log("Retorno de logueo:", data);
+
+      if (data === false || (data && data.success === false) || !data) {
+        setAlertType("error");
+        setAlertTitle("Error de inicio de sesión");
+        setAlertMessage(
+          "El correo electrónico y la contraseña no coinciden. Por favor, verifica tus credenciales e inténtalo de nuevo."
+        );
+        setShowAlert(true);
+      } else {
+        setAlertType("success");
+        setAlertTitle("¡Bienvenido!");
+        setAlertMessage(
+          "Has iniciado sesión correctamente. Serás redirigido en un momento."
+        );
+        setShowAlert(true);
+
+        setTimeout(() => {
+          console.log("Redirigiendo usuario...");
+        }, 2000);
+      }
     } catch (err) {
-      alert("Error al iniciar sesión. Revisa tus credenciales.");
+      setAlertType("error");
+      setAlertTitle("Error de conexión");
+      setAlertMessage(
+        "No pudimos conectar con el servidor. Por favor, verifica tu conexión e inténtalo de nuevo."
+      );
+      setShowAlert(true);
+      console.error("Error al iniciar sesión:", err);
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -41,6 +78,19 @@ const LoginForm: React.FC<LoginFormProps> = () => {
   const handleForgotPasswordSubmit = (forgotEmail: string) => {
     console.log("Password reset requested for:", forgotEmail);
     closeForgotModal();
+  };
+
+  const handleAlertClose = () => {
+    setShowAlert(false);
+
+    if (alertType === "success") {
+    }
+  };
+
+  const handleRetry = () => {
+    setShowAlert(false);
+    const emailInput = document.getElementById("email");
+    if (emailInput) emailInput.focus();
   };
 
   return (
@@ -67,6 +117,7 @@ const LoginForm: React.FC<LoginFormProps> = () => {
                 placeholder="tucorreo@email.com"
                 className="form-input"
                 required
+                disabled={isLoading}
               />
             </div>
 
@@ -83,6 +134,7 @@ const LoginForm: React.FC<LoginFormProps> = () => {
                   placeholder="••••••••"
                   className="form-input password-input"
                   required
+                  disabled={isLoading}
                 />
                 <button
                   type="button"
@@ -91,6 +143,7 @@ const LoginForm: React.FC<LoginFormProps> = () => {
                   aria-label={
                     showPassword ? "Ocultar contraseña" : "Mostrar contraseña"
                   }
+                  disabled={isLoading}
                 >
                   {showPassword ? (
                     <svg
@@ -127,6 +180,7 @@ const LoginForm: React.FC<LoginFormProps> = () => {
                   type="checkbox"
                   checked={rememberMe}
                   onChange={(e) => setRememberMe(e.target.checked)}
+                  disabled={isLoading}
                 />
                 <span className="checkmark"></span>
                 Recordarme
@@ -140,8 +194,15 @@ const LoginForm: React.FC<LoginFormProps> = () => {
               </a>
             </div>
 
-            <button type="submit" className="login-button">
-              Iniciar Sesión
+            <button type="submit" className="login-button" disabled={isLoading}>
+              {isLoading ? (
+                <div className="loading-container">
+                  <div className="spinner"></div>
+                  <span>Iniciando sesión...</span>
+                </div>
+              ) : (
+                "Iniciar Sesión"
+              )}
             </button>
           </form>
         </div>
@@ -153,6 +214,18 @@ const LoginForm: React.FC<LoginFormProps> = () => {
           onSubmit={handleForgotPasswordSubmit}
         />
       )}
+
+      <AlertModal
+        isOpen={showAlert}
+        onClose={handleAlertClose}
+        type={alertType}
+        title={alertTitle}
+        message={alertMessage}
+        buttonText={alertType === "success" ? "Continuar" : "Entendido"}
+        showSecondaryButton={alertType === "error"}
+        secondaryButtonText="Intentar de nuevo"
+        onSecondaryAction={handleRetry}
+      />
     </>
   );
 };
