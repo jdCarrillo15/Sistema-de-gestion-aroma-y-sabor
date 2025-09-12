@@ -1,7 +1,7 @@
 export async function loginUser(email: string, password: string) {
     console.log("Intentando logear con:", { email, password });
   try {
-    const response = await fetch("http://localhost:8080/auth/login", {
+    const response = await fetch("http://10.4.73.21:3000/auth/login", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -26,7 +26,7 @@ export async function loginUser(email: string, password: string) {
 export async function sendRecoveryEmail(email: string) {
   console.log("Enviando recuperación a:", email);
   try {
-    const response = await fetch("http://localhost:8080/api/auth/reset-password", {
+    const response = await fetch("http://10.4.73.21:3000/auth/reset-password", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
