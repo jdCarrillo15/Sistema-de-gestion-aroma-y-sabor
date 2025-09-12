@@ -2,11 +2,6 @@ import { admin, db } from "../config/firebase.js";
 
 export async function getUsers(req, res) {
     try {
-
-        if (req.user.role !== "admin") {
-            return res.status(403).json({ error: "Acceso denegado: Solo administradores" });
-        }
-
         const listUsers = await admin.auth().listUsers(100);
 
         res.json(listUsers);
@@ -17,10 +12,6 @@ export async function getUsers(req, res) {
 
 export async function getUsersFromDB(req, res) {
     try {
-        if (req.user.role !== "admin") {
-            return res.status(403).json({ error: "Acceso denegado: Solo administradores" });
-        }
-
         const snapshot = await db.collection("users").get();
 
         if (snapshot.empty) {
@@ -53,27 +44,21 @@ export async function createUserAndPerson(req, res) {
         });
         const authUid = userRecord.uid;
 
-        // 2. Agregar rol a CustomClaims
-        await admin.auth().setCustomUserClaims(authUid, { role: data.role || "user" });
-
-        // 3. Crear documento en "users"
+        // 2. Crear documento en "users"
         await db.collection("users").doc(authUid).set({
             user_name: data.user_name || "",
             role: data.role || "user",
+            email: data.email,
             created_at: admin.firestore.FieldValue.serverTimestamp()
         });
 
-        // 4. Crear documento en "persons"
+        // 3. Crear documento en "persons"
         await db.collection("persons").add({
-            address: data.address || "",
             birthdate: data.birthdate || "",
             document_id: data.document_id || "",
-            email: data.email,
             first_name: data.first_name || "",
             last_name: data.last_name || "",
-            phone_number: data.phone_number || "",
             user_id: authUid,
-            created_at: admin.firestore.FieldValue.serverTimestamp()
         });
 
         res.status(201).json({
