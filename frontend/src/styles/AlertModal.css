@@ -1,0 +1,208 @@
+.alert-modal-backdrop {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.3);
+  backdrop-filter: blur(8px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1001;
+  animation: alertFadeIn 0.3s ease-out;
+  padding: 20px;
+}
+
+@keyframes alertFadeIn {
+  from {
+    opacity: 0;
+    backdrop-filter: blur(0px);
+  }
+  to {
+    opacity: 1;
+    backdrop-filter: blur(8px);
+  }
+}
+
+.alert-modal-container {
+  position: relative;
+  max-width: 400px;
+  width: 100%;
+  animation: alertSlideIn 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+@keyframes alertSlideIn {
+  from {
+    transform: translateY(-50px) scale(0.9);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0) scale(1);
+    opacity: 1;
+  }
+}
+
+.alert-modal-content {
+  background: white;
+  border-radius: 20px;
+  box-shadow: 
+    0 25px 50px -12px rgba(0, 0, 0, 0.25),
+    0 0 0 1px rgba(255, 255, 255, 0.1),
+    inset 0 1px 0 rgba(255, 255, 255, 0.1);
+  padding: 32px;
+  position: relative;
+  overflow: hidden;
+  text-align: center;
+}
+
+.alert-modal-content::before {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 4px;
+  background-size: 200% 100%;
+  animation: alertShimmer 3s ease-in-out infinite;
+}
+
+@keyframes alertShimmer {
+  0%, 100% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+}
+
+.alert-modal-content::before {
+  background: linear-gradient(90deg, #8B4513, #D2691E, #FF8C00);
+}
+
+.success-icon ~ .alert-modal-content::before,
+.alert-modal-content:has(.success-icon)::before {
+  background: linear-gradient(90deg, #4CAF50, #8BC34A, #CDDC39);
+}
+
+.error-icon ~ .alert-modal-content::before,
+.alert-modal-content:has(.error-icon)::before {
+  background: linear-gradient(90deg, #F44336, #E91E63, #FF5722);
+}
+
+.warning-icon ~ .alert-modal-content::before,
+.alert-modal-content:has(.warning-icon)::before {
+  background: linear-gradient(90deg, #FF9800, #FFC107, #FFEB3B);
+}
+
+.alert-modal-header {
+  display: flex;
+  justify-content: flex-end;
+  margin-bottom: 16px;
+}
+
+.alert-close-button {
+  background: none;
+  border: none;
+  color: #A0A0A0;
+  cursor: pointer;
+  padding: 8px;
+  border-radius: 8px;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.alert-close-button:hover {
+  background: #F5F5F5;
+  color: #8B4513;
+  transform: rotate(90deg);
+}
+
+.alert-modal-icon {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 24px;
+  animation: alertPulse 2s ease-in-out infinite;
+}
+
+@keyframes alertPulse {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.05); }
+}
+
+.alert-modal-icon svg {
+  padding: 16px;
+  border-radius: 20px;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+}
+
+/* Estilos específicos por tipo de alerta */
+.success-icon svg {
+  color: #4CAF50;
+  background: linear-gradient(135deg, #E8F5E8, #F0FFF0);
+  box-shadow: 0 8px 20px rgba(76, 175, 80, 0.2);
+}
+
+.error-icon svg {
+  color: #F44336;
+  background: linear-gradient(135deg, #FFEBEE, #FFCDD2);
+  box-shadow: 0 8px 20px rgba(244, 67, 54, 0.2);
+}
+
+.warning-icon svg {
+  color: #FF9800;
+  background: linear-gradient(135deg, #FFF3E0, #FFE0B2);
+  box-shadow: 0 8px 20px rgba(255, 152, 0, 0.2);
+}
+
+.info-icon svg {
+  color: #2196F3;
+  background: linear-gradient(135deg, #E3F2FD, #BBDEFB);
+  box-shadow: 0 8px 20px rgba(33, 150, 243, 0.2);
+}
+
+.alert-modal-title {
+  color: #2C2C2C;
+  font-size: 24px;
+  font-weight: 700;
+  margin: 0 0 16px 0;
+  letter-spacing: -0.025em;
+}
+
+.alert-modal-message {
+  color: #666;
+  font-size: 16px;
+  line-height: 1.6;
+  margin: 0 0 32px 0;
+}
+
+.alert-modal-buttons {
+  display: flex;
+  gap: 12px;
+  justify-content: center;
+}
+
+.alert-modal-buttons .custom-button {
+  min-width: 120px;
+  flex: none;
+}
+
+@media (max-width: 480px) {
+  .alert-modal-backdrop {
+    padding: 16px;
+  }
+  
+  .alert-modal-content {
+    padding: 24px;
+  }
+  
+  .alert-modal-title {
+    font-size: 20px;
+  }
+  
+  .alert-modal-buttons {
+    flex-direction: column;
+  }
+  
+  .alert-modal-buttons .custom-button {
+    width: 100%;
+    min-width: unset;
+  }
+}
