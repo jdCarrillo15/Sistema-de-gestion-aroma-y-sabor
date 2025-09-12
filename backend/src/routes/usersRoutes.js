@@ -5,11 +5,10 @@ import { authenticate, authorize, authorizeComposite, checkAuth } from "../middl
 
 const router = express.Router();
 
-router.get("/getusers", authenticate, authorize("users", "read"), getUsers);
-router.get("/getusersdb", authenticate, authorize("users", "read"), getUsersFromDB);
-router.post("/createuser", authenticate, authorizeComposite("create_user_and_person"), createUserAndPerson)
+router.get("/getusers", checkAuth, authorize("users", "read"), getUsers);
+router.get("/getusersdb", checkAuth, authorize("users", "read"), getUsersFromDB);
+router.post("/createuser", checkAuth, authorizeComposite("create_user_and_person"), createUserAndPerson)
 
 export default router;
-
 
 
