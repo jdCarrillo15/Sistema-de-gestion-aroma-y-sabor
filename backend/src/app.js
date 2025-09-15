@@ -5,13 +5,14 @@ import usersRoutes from "./routes/usersRoutes.js";
 import cookieParser from "cookie-parser";
 import dotenv from "dotenv";
 import cors from 'cors';
+
 dotenv.config();
 
 const app = express();
 
 app.use(express.json());
 app.use(cookieParser())
-app.use(cors());
+app.use(cors({ credentials: true }));
 
 
 // Rutas del sistema

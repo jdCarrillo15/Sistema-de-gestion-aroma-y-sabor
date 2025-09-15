@@ -1,4 +1,4 @@
-import { db } from "../config/firebase.js";
+import { db, admin } from "../config/firebase.js";
 
 export async function login(req, res) {
     const { email, password } = req.body;
@@ -24,20 +24,22 @@ export async function login(req, res) {
             return res.status(400).json({ error: data.error.message });
         }
 
-        res.cookie("token", data.idToken, {
+        const sessionCookie = await admin.auth().createSessionCookie(data.idToken, { expiresIn });
+
+        res.cookie("session", sessionCookie, {
             maxAge: expiresIn,
-            httpOnly: true, // no accesible desde JS
-            secure: true,   // solo por HTTPS
-            sameSite: "strict"
+            httpOnly: true,
+            secure: false, // true en producción con HTTPS
+            sameSite: "lax"
         });
 
         const userDoc = await db.collection("users").doc(data.localId).get();
         const role = userDoc.exists ? userDoc.data().role : "user";
 
-        res.json({ message: "Login exitoso", uid: data.localId, role, idToken: data.idToken });
+        res.json({ success: true, uid: data.localId, role });
     } catch (err) {
         console.error(err);
-        res.status(500).json({ error: "Error al iniciar sesión" });
+        res.status(500).json({ success: false, error: "Error al iniciar sesión" });
     }
 };
 
@@ -72,9 +74,13 @@ export async function resetPassword(req, res) {
         }
 
         return res.status(200).json({
+            success: true,
             message: "Correo de recuperación enviado correctamente",
         });
     } catch (err) {
-        return res.status(500).json({ error: "Error interno del servidor" });
+        return res.status(500).json({
+            success: false,
+            error: "Error interno del servidor"
+        });
     }
 }

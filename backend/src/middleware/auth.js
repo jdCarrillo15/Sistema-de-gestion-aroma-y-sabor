@@ -1,46 +1,20 @@
 import { admin, db } from "../config/firebase.js";
+import { canAccess } from "../services/authService.js";
 
-//Autenticar con token (sin cookie)
 export async function authenticate(req, res, next) {
-    const authHeader = req.headers.authorization;
-    if (!authHeader || !authHeader.startsWith("Bearer ")) {
-        return res.status(401).json({ error: "Se debe proveer un token" });
-    }
-
-    const token = authHeader.split(" ")[1];
-    try {
-        const decodedToken = await admin.auth().verifyIdToken(token);
-        const userDoc = await db.collection("users").doc(decodedToken.uid).get();
-
-        const userData = userDoc.data();
-
-        req.user = {
-            uid: decodedToken.uid,
-            role: userData?.role || "user",
-            email: userData?.email || ""
-        };
-
-        next();
-    } catch (error) {
-        console.error("Error verificando el token:", error.message);
-        return res.status(401).json({ error: "Token invalido" });
-    }
-}
-
-export async function checkAuth(req, res, next) {
     const sessionCookie = req.cookies.session || "";
     try {
         const decodedClaims = await admin.auth().verifySessionCookie(sessionCookie, true);
-        req.user = decodedClaims;
 
-        const userDoc = await db.collection("users").doc(decodedToken.uid).get();
+        const userDoc = await db.collection("users").doc(decodedClaims.uid).get();
         const userData = userDoc.data();
 
         req.user = {
-            uid: decodedToken.uid,
+            uid: decodedClaims.uid,
             role: userData?.role || "user",
             email: userData?.email || ""
         };
+
         next();
     } catch (error) {
         return res.status(401).json({ error: "Acceso no autorizado" });
@@ -48,17 +22,17 @@ export async function checkAuth(req, res, next) {
 }
 
 //Autorizar una acción sobre un solo recurso (colección de base de datos)
-export function authorize(resource, action) {
+export function authorize(action, resource) {
     return async (req, res, next) => {
         try {
-            const userRole = await db.collection("roles").doc(req.user.role).get();
-            const permissions = userRole.data();
-            const allowed = permissions[resource]?.includes(action);
+            const currentState = req.state || null;
+            const hasAccess = await canAccess(req.user, action, resource, currentState, req.params.id);
 
-            if (!allowed) {
-                return res.status(403).json({ error: "Acceso denegado" });
+            if (!hasAccess) {
+                return res.status(403).json({
+                    error: `Acceso denegado: rol "${req.user.role}" no puede "${action}" en "${resource}" (estado: ${currentState})`
+                });
             }
-
             next();
         } catch (err) {
             res.status(500).json({ error: "Error en autorización", details: err.message });
@@ -71,20 +45,31 @@ export function authorizeComposite(action) {
     return async (req, res, next) => {
         try {
             const userRole = await db.collection("roles").doc(req.user.role).get();
-            if (!userRole.exists) {
-                return res.status(403).json({ error: "Rol no configurado" });
-            }
-
             const permissions = userRole.data();
             // Buscar en recursos compuestos
             const allowed = permissions.composite?.includes(action);
             if (!allowed) {
                 return res.status(403).json({ error: "Acceso denegado" });
             }
-
             next();
         } catch (err) {
             res.status(500).json({ error: "Error de autorización", details: err.message });
+        }
+    };
+}
+
+// Middleware para cargar el estado de un recurso si es necesario un estado específico
+export function loadResourceState(resourceCollection, idParam = "id") {
+    return async (req, res, next) => {
+        try {
+            const docId = req.params[idParam];
+            const doc = await db.collection(resourceCollection).doc(docId).get();
+            const data = doc.data();
+            req.state = data.state || null;
+
+            next();
+        } catch (err) {
+            res.status(500).json({ error: "Error obteniendo estado del recurso" });
         }
     };
 }

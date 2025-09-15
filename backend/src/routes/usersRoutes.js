@@ -1,13 +1,14 @@
 import express from "express";
-import { createUserAndPerson, getUsers, getUsersFromDB } from "../controllers/usersController.js";
-import { checkRoleWithAuth } from "../middleware/roles.js";
-import { authenticate, authorize, authorizeComposite, checkAuth } from "../middleware/auth.js";
+import { createUserAndPerson, getUserById, getUsers, updateUserById, hardDeleteUser } from "../controllers/usersController.js";
+import { authenticate, authorize, loadResourceState } from "../middleware/auth.js";
 
 const router = express.Router();
 
-router.get("/getusers", checkAuth, authorize("users", "read"), getUsers);
-router.get("/getusersdb", checkAuth, authorize("users", "read"), getUsersFromDB);
-router.post("/createuser", checkAuth, authorizeComposite("create_user_and_person"), createUserAndPerson)
+router.get("/getusers", authenticate, authorize("read", "users"), getUsers);
+router.post("/createuser", authenticate, authorize("create_user_and_person", "users"), createUserAndPerson)
+router.get("/getuser/:id", authenticate, authorize("read", "users"), getUserById);
+router.put("/updateuser/:id", authenticate, authorize("update", "users"), updateUserById);
+router.delete("/harddeleteuser/:id", authenticate, authorize("delete", "users"), hardDeleteUser);
 
 export default router;
 
