@@ -18,10 +18,10 @@ export async function login(req, res) {
             }
         );
 
-        const data = await response.json();
+        const data = await response.json({ msg: "hola" });
 
         if (data.error) {
-            return res.status(400).json({ error: data.error.message });
+            return res.status(400).json({ success: false, error: data.error.message });
         }
 
         const sessionCookie = await admin.auth().createSessionCookie(data.idToken, { expiresIn });
@@ -52,9 +52,17 @@ export async function resetPassword(req, res) {
     try {
         const { email } = req.body;
 
-        if (!email) {
-            return res.status(400).json({ error: "El correo es obligatorio" });
+        let user;
+
+        try {
+            user = await admin.auth().getUserByEmail(email);
+        } catch (err) {
+            return res.status(404).json({
+                success: false,
+                error: "El usuario no está registrado en el sistema",
+            });
         }
+
 
         const url = `https://identitytoolkit.googleapis.com/v1/accounts:sendOobCode?key=${process.env.FIREBASE_API_KEY}`;
 
@@ -63,14 +71,16 @@ export async function resetPassword(req, res) {
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({
                 requestType: "PASSWORD_RESET",
-                email: email,
+                email: user.email,
             }),
         });
 
         const data = await response.json();
+        console.log(data);
+
 
         if (data.error) {
-            return res.status(400).json({ error: data.error.message });
+            return res.status(400).json({ success: false, error: data.error.message });
         }
 
         return res.status(200).json({
