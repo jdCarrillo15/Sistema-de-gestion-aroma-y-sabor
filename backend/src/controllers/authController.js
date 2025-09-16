@@ -29,8 +29,8 @@ export async function login(req, res) {
         res.cookie("session", sessionCookie, {
             maxAge: expiresIn,
             httpOnly: true,
-            secure: false, // true en producción con HTTPS
-            sameSite: "lax"
+            secure: true, // true en producción con HTTPS
+            sameSite: "strict"
         });
 
         const userDoc = await db.collection("users").doc(data.localId).get();
@@ -69,7 +69,7 @@ export async function resetPassword(req, res) {
         const data = await response.json();
 
         if (data.error) {
-            return res.status(400).json({ success: false, error: data.error.message });
+            return res.json({ success: false, error: data.error.message });
         }
 
         return res.status(200).json({
@@ -78,7 +78,7 @@ export async function resetPassword(req, res) {
         });
     } catch (err) {
         if (err.code === "auth/user-not-found") {
-            return res.status(404).json({
+            return res.json({
                 success: false,
                 error: "El usuario no está registrado en el sistema",
             });
