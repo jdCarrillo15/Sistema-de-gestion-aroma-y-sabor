@@ -73,7 +73,7 @@ const LoginForm: React.FC<LoginFormProps> = () => {
     setShowForgotModal(false);
   };
 
-  const handleForgotPasswordSubmit = (forgotEmail: string) => {};
+  const handleForgotPasswordSubmit = (_forgotEmail: string) => {};
 
   const handleAlertClose = () => {
     setShowAlert(false);
