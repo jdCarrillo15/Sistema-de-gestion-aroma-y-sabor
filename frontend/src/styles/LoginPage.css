@@ -15,6 +15,7 @@
   right: 0;
   bottom: 0;
   overflow: hidden;
+  box-sizing: border-box; /* Agregado para incluir padding en el cálculo */
 }
 
 @keyframes gradientShift {
@@ -49,4 +50,6 @@
   z-index: 1;
   width: 100%;
   max-width: 400px;
+  margin: 0 auto; /* Centrado adicional */
+  box-sizing: border-box; /* Agregado */
 }

@@ -21,7 +21,7 @@ export async function login(req, res) {
         const data = await response.json();
 
         if (data.error) {
-            return res.status(400).json({ success: false, error: data.error.message });
+            return res.send({ success: false, error: data.error.message });
         }
 
         const sessionCookie = await admin.auth().createSessionCookie(data.idToken, { expiresIn });
@@ -78,7 +78,7 @@ export async function resetPassword(req, res) {
         });
     } catch (err) {
         if (err.code === "auth/user-not-found") {
-            return res.status(404).json({
+            return res.json({
                 success: false,
                 error: "El usuario no está registrado en el sistema",
             });
