@@ -18,7 +18,7 @@ export async function login(req, res) {
             }
         );
 
-        const data = await response.json({ msg: "hola" });
+        const data = await response.json();
 
         if (data.error) {
             return res.status(400).json({ success: false, error: data.error.message });
@@ -52,17 +52,8 @@ export async function resetPassword(req, res) {
     try {
         const { email } = req.body;
 
-        let user;
 
-        try {
-            user = await admin.auth().getUserByEmail(email);
-        } catch (err) {
-            return res.status(404).json({
-                success: false,
-                error: "El usuario no está registrado en el sistema",
-            });
-        }
-
+        await admin.auth().getUserByEmail(email);
 
         const url = `https://identitytoolkit.googleapis.com/v1/accounts:sendOobCode?key=${process.env.FIREBASE_API_KEY}`;
 
@@ -71,13 +62,11 @@ export async function resetPassword(req, res) {
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({
                 requestType: "PASSWORD_RESET",
-                email: user.email,
+                email: email,
             }),
         });
 
         const data = await response.json();
-        console.log(data);
-
 
         if (data.error) {
             return res.status(400).json({ success: false, error: data.error.message });
@@ -88,9 +77,16 @@ export async function resetPassword(req, res) {
             message: "Correo de recuperación enviado correctamente",
         });
     } catch (err) {
+        if (err.code === "auth/user-not-found") {
+            return res.status(404).json({
+                success: false,
+                error: "El usuario no está registrado en el sistema",
+            });
+        }
+
         return res.status(500).json({
             success: false,
-            error: "Error interno del servidor"
+            error: "Error interno del servidor",
         });
     }
 }
