@@ -30,14 +30,14 @@ const ForgotPasswordModal: React.FC<ForgotPasswordModalProps> = ({
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setIsSubmitting(true);
 
     try {
       await new Promise((resolve) => setTimeout(resolve, 1500));
 
       let data = await sendRecoveryEmail(email);
-      console.log("Respuesta de recuperación:", data);
 
-      if (data === true || (data && data.success)) {
+      if (data && data.success) {
         setAlertType("success");
         setAlertTitle("¡Correo enviado!");
         setAlertMessage(
@@ -45,11 +45,10 @@ const ForgotPasswordModal: React.FC<ForgotPasswordModalProps> = ({
         );
         onSubmit(email);
       } else {
-        Error;
         setAlertType("error");
         setAlertTitle("Error al enviar correo");
         setAlertMessage(
-          "No pudimos enviar el correo de recuperación. Por favor, verifica tu dirección de correo e inténtalo de nuevo."
+          "Este correo no se encuentra registrado. Por favor, verifica tu dirección de correo e inténtalo de nuevo."
         );
       }
     } catch (error) {
@@ -58,7 +57,6 @@ const ForgotPasswordModal: React.FC<ForgotPasswordModalProps> = ({
       setAlertMessage(
         "Hubo un problema al procesar tu solicitud. Por favor, inténtalo de nuevo más tarde."
       );
-      console.error("Error al solicitar recuperación de contraseña:", error);
     } finally {
       setIsSubmitting(false);
       setShowAlert(true);
@@ -190,8 +188,6 @@ const ForgotPasswordModal: React.FC<ForgotPasswordModalProps> = ({
         title={alertTitle}
         message={alertMessage}
         buttonText={alertType === "success" ? "Perfecto" : "Entendido"}
-        showSecondaryButton={alertType === "error"}
-        secondaryButtonText="Intentar de nuevo"
         onSecondaryAction={handleRetry}
       />
     </>

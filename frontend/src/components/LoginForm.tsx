@@ -28,7 +28,6 @@ const LoginForm: React.FC<LoginFormProps> = () => {
 
     try {
       const data = await loginUser(email, password);
-      console.log("Retorno de logueo:", data);
 
       if (data === false || (data && data.success === false) || !data) {
         setAlertType("error");
@@ -46,7 +45,7 @@ const LoginForm: React.FC<LoginFormProps> = () => {
         setShowAlert(true);
 
         setTimeout(() => {
-          console.log("Redirigiendo usuario...");
+          // console.log("Redirigiendo usuario...");
         }, 2000);
       }
     } catch (err) {
@@ -56,7 +55,6 @@ const LoginForm: React.FC<LoginFormProps> = () => {
         "No pudimos conectar con el servidor. Por favor, verifica tu conexión e inténtalo de nuevo."
       );
       setShowAlert(true);
-      console.error("Error al iniciar sesión:", err);
     } finally {
       setIsLoading(false);
     }
@@ -75,10 +73,7 @@ const LoginForm: React.FC<LoginFormProps> = () => {
     setShowForgotModal(false);
   };
 
-  const handleForgotPasswordSubmit = (forgotEmail: string) => {
-    console.log("Password reset requested for:", forgotEmail);
-    closeForgotModal();
-  };
+  const handleForgotPasswordSubmit = (forgotEmail: string) => {};
 
   const handleAlertClose = () => {
     setShowAlert(false);
