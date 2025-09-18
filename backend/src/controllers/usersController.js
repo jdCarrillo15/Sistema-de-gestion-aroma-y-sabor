@@ -46,10 +46,16 @@ export async function createUserAndPerson(req, res) {
         if (!data.email || !data.password) {
             return res.status(400).json({ error: "Email y password son obligatorios" });
         }
+        if(data.email && !(await checkEmailUnique(data.email))){
+            return res.status(400).json({ error: "El email ya está en uso" });
+        }
+        if(data.password && data.password.length < 6){
+            return res.status(400).json({ error: "La contraseña debe tener al menos 6 caracteres" });
+        }
 
         // 1. Crear usuario en Firebase Auth
         const userRecord = await admin.auth().createUser({
-            email: data.email,
+            email: data.email, 
             password: data.password
         });
         const authUid = userRecord.uid;
@@ -84,6 +90,12 @@ export async function createUserAndPerson(req, res) {
             details: error.message
         });
     }
+}
+
+//Verificar correo unico y robustes de contraseña
+export async function checkEmailUnique(email) {
+    const userQuery = await db.collection("users").where("email", "==", email).get();
+    return userQuery.empty; // true si el email es único
 }
 
 export async function getUserById(req, res) {
@@ -137,6 +149,22 @@ export async function updateUserById(req, res) {
     }
 }
 
+export async function changeStateUser(req, res){
+    try {
+        const userDoc = await db.collection("users").doc(req.params.id).get();
+
+        if (!userDoc.exists) {
+            return res.status(404).json({ error: "Usuario no encontrado" });
+        }
+
+        const data = req.body;
+
+        await db.collection("users").doc(req.params.id).update(data);
+        res.status(200).json({ message: "Usuario actualizado correctamente" });
+    } catch (error) {
+        
+    }
+}
 export async function hardDeleteUser(req, res) {
     try {
         const { id } = req.params;

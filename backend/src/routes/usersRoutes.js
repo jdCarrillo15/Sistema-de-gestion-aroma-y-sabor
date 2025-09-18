@@ -1,5 +1,5 @@
 import express from "express";
-import { createUserAndPerson, getUserById, getUsers, updateUserById, hardDeleteUser } from "../controllers/usersController.js";
+import { createUserAndPerson, getUserById, getUsers, updateUserById, hardDeleteUser, changeStateUser } from "../controllers/usersController.js";
 import { authenticate, authorize, loadResourceState } from "../middleware/auth.js";
 
 const router = express.Router();
@@ -9,6 +9,7 @@ router.post("/createuser", authenticate, authorize("create_user_and_person", "us
 router.get("/getuser/:id", authenticate, authorize("read", "users"), getUserById);
 router.put("/updateuser/:id", authenticate, authorize("update", "users"), updateUserById);
 router.delete("/harddeleteuser/:id", authenticate, authorize("delete", "users"), hardDeleteUser);
+router.put("/changeState/:id",authenticate, authorize("update","user"),changeStateUser);
 
 export default router;
 
