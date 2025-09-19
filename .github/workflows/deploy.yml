@@ -1,0 +1,22 @@
+name: Test Pipeline
+
+on:
+  push:
+    branches:
+      - deploy   # Se ejecuta cuando hagas push a la rama 'deploy'
+
+jobs:
+  test-job:
+    runs-on: ubuntu-latest
+
+    container: node:18-alpine   # Imagen ligera
+
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v3
+
+      - name: Show Node version
+        run: node -v
+
+      - name: Dummy step
+        run: echo "Pipeline ejecutado correctamente en la rama deploy"
