@@ -1,0 +1,7 @@
+global:
+  scrape_interval: 5s
+
+scrape_configs:
+  - job_name: "backend-monitor"
+    static_configs:
+      - targets: ["185.144.159.8:3000"] #Si se va a probar en local, cambiarlo por su ip
