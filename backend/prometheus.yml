@@ -1,0 +1,7 @@
+global:
+  scrape_interval: 5s
+
+scrape_configs:
+  - job_name: "backend-monitor"
+    static_configs:
+      - targets: ["192.168.1.13:3000"] 

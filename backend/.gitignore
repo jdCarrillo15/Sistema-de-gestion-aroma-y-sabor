@@ -20,8 +20,10 @@ pids
 # Keys o credenciales
 keys/
 
-# Coverage (tests)
+# (tests)
 coverage/
+__tests__
+__mocks__
 
 # Build outputs
 dist/
