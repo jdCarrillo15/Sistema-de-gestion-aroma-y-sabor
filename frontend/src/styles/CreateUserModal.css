@@ -1,0 +1,210 @@
+/* Fondo semi-transparente detrás del modal */
+.modal-backdrop {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.6);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 9999;
+  backdrop-filter: blur(8px);
+}
+
+/* Contenedor principal del modal */
+.modal-container {
+  background: #ffffff;
+  color: #333;
+  border-radius: 24px;
+  padding: 2.5rem;
+  width: 100%;
+  max-width: 420px;
+  max-height: 90vh;
+  overflow-y: auto;
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
+  animation: slideUp 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+  position: relative;
+  max-height: 80vh;
+}
+
+/* Animación de entrada más suave */
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateY(40px) scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+/* Título */
+.modal-container h2 {
+  margin-top: 0;
+  margin-bottom: 2rem;
+  font-size: 1.75rem;
+  font-weight: 700;
+  color: #1a1a1a;
+  text-align: center;
+  letter-spacing: -0.02em;
+}
+
+/* Formulario */
+.modal-form {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+/* Grupo de inputs */
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  position: relative;
+}
+
+/* Label - estilo más sutil */
+.form-group label {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: #4a4a4a;
+  margin-bottom: 0.25rem;
+  letter-spacing: 0.01em;
+}
+
+/* Input y select - estilo moderno */
+.form-group input,
+.form-group select {
+  width: 100%;
+  padding: 0.75rem 1rem;
+  border: 2px solid #e8e8e8;
+  border-radius: 12px;
+  font-size: 1rem;
+  outline: none;
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  background-color: #fafafa;
+  color: #333;
+  font-family: inherit;
+  box-sizing: border-box;
+}
+
+/* Placeholder styling */
+.form-group input::placeholder {
+  color: #999;
+  font-weight: 400;
+}
+
+/* Estilo al enfocar - inspirado en la imagen */
+.form-group input:focus,
+.form-group select:focus {
+  border-color: #f97316;
+  box-shadow: 0 0 0 4px rgba(139, 92, 246, 0.1);
+  background-color: #ffffff;
+  transform: translateY(-2px);
+}
+
+/* Estilo para select específico */
+.form-group select {
+  cursor: pointer;
+  appearance: none;
+  background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23666' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6,9 12,15 18,9'%3e%3c/polyline%3e%3c/svg%3e");
+  background-repeat: no-repeat;
+  background-position: right 0.75rem center;
+  background-size: 1rem;
+  padding-right: 2.5rem;
+}
+
+/* Opciones del select */
+.form-group select option {
+  background-color: #ffffff;
+  color: #333;
+  padding: 0.5rem;
+  border: none;
+  font-size: 0.95rem;
+}
+
+.form-group select option:hover {
+  background-color: #f8fafc;
+}
+
+.form-group select option:checked {
+  background-color: #8B4513;
+  color: white;
+}
+
+/* Estados de validación */
+
+
+.form-group input:valid:not(:focus):not(:placeholder-shown) {
+  border-color: #8B4513;
+  background-color: #fdfffe;
+}
+
+/* Botones */
+.modal-buttons {
+  display: flex;
+  justify-content: center;
+  gap: 1rem;
+  margin-top: 1.5rem;
+  flex-direction: row;
+}
+
+
+.modal-buttons .btn-secondary:hover,
+.modal-buttons button[type="button"]:hover {
+  border-color: #d1d5db;
+  background-color: #f9fafb;
+  color: #f4f6f9;
+}
+
+/* Ajustes para campos específicos */
+.form-group input[type="date"] {
+  color-scheme: light;
+}
+
+.form-group input[type="password"] {
+  font-family: text-security-disc;
+}
+
+/* Scrollbar personalizado para el modal */
+.modal-container::-webkit-scrollbar {
+  width: 6px;
+}
+
+.modal-container::-webkit-scrollbar-track {
+  background: #f1f1f1;
+  border-radius: 10px;
+}
+
+.modal-container::-webkit-scrollbar-thumb {
+  background: #c1c1c1;
+  border-radius: 10px;
+}
+
+.modal-container::-webkit-scrollbar-thumb:hover {
+  background: #ede7e7;
+}
+
+/* Responsive */
+@media (max-width: 480px) {
+  .modal-container {
+    margin: 1rem;
+    padding: 2rem;
+    max-width: none;
+    border-radius: 20px;
+  }
+  
+  .modal-form {
+    gap: 0.875rem;
+  }
+  
+  .form-group input,
+  .form-group select {
+    padding: 0.75rem 1rem;
+    border-radius: 10px;
+  }
+}

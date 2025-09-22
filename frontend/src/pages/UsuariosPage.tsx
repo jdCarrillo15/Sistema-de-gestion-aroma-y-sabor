@@ -1,0 +1,273 @@
+import React, { useState } from "react";
+import { Plus, Edit3, Trash2, Eye } from "lucide-react";
+import "../styles/UsuariosPage.css";
+import Button from "../components/Button";
+import CreateUserModal from "../components/CreateUserModal";
+import EditUserModal from "../components/EditUserModal";
+import ConfirmModal from "../components/ConfirmModal";
+import AlertModal from "../components/AlertModal";
+import ViewUserModal from "../components/ViewUserModal";
+
+export type User = {
+  id: string;
+  user_name: string;
+  email: string;
+  role: string;
+  state: string;
+  created_at: string;
+  person?: {
+    id?: string;
+    first_name: string;
+    last_name: string;
+    birthdate: string;
+    document_id: string;
+  };
+};
+
+const UsuariosPage: React.FC = () => {
+  const [users, setUsers] = useState<User[]>([]);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+  const [selectedUser, setSelectedUser] = useState<User | null>(null);
+  const [isViewModalOpen, setIsViewModalOpen] = useState(false);
+
+  const [isConfirmOpen, setIsConfirmOpen] = useState(false);
+  const [userToDelete, setUserToDelete] = useState<string | null>(null);
+
+  // Estado del AlertModal
+  const [isAlertOpen, setIsAlertOpen] = useState(false);
+  const [alertMessage, setAlertMessage] = useState("");
+
+  const openViewModal = (user: User) => {
+    setSelectedUser(user);
+    setIsViewModalOpen(true);
+  };
+
+  const closeViewModal = () => {
+    setIsViewModalOpen(false);
+    setSelectedUser(null);
+  };
+
+  // Función para normalizar el estado correctamente
+  const normalizeState = (state: string): string => {
+    if (!state) return "Activo"; // Valor por defecto
+    
+    const lowerState = state.toLowerCase().trim();
+    
+    if (lowerState === "activo" || lowerState === "active") {
+      return "Activo";
+    } else if (lowerState === "inactivo" || lowerState === "inactive") {
+      return "Inactivo";
+    }
+    
+    // Si no coincide con ningún valor esperado, usar el valor original capitalizado
+    return state.charAt(0).toUpperCase() + state.slice(1).toLowerCase();
+  };
+
+  // Crear usuario (solo front con validación)
+  const handleAddUser = (user: any) => {
+    try {
+      if (!user.email || !user.user_name) {
+        throw new Error("Faltan campos obligatorios");
+      }
+
+      const newUser: User = {
+        id: String(Date.now()), // ID temporal
+        user_name: user.user_name,
+        email: user.email,
+        role: user.role,
+        state: normalizeState(user.state), // Usar la función de normalización
+        created_at: new Date().toISOString(),
+        person: {
+          first_name: user.first_name,
+          last_name: user.last_name,
+          birthdate: user.birthdate,
+          document_id: user.document_id,
+        },
+      };
+
+      setUsers((prev) => [...prev, newUser]);
+      setIsModalOpen(false); // Cerrar el modal después de crear
+    } catch (err: any) {
+      setAlertMessage(err.message || "No fue posible crear el usuario");
+      setIsAlertOpen(true);
+    }
+  };
+
+  // Editar usuario (solo front con validación)
+  const handleEditUser = (updatedUser: User) => {
+    try {
+      if (!updatedUser.email || !updatedUser.user_name) {
+        throw new Error("Faltan campos obligatorios al editar");
+      }
+
+      const normalizedUser = {
+        ...updatedUser,
+        state: normalizeState(updatedUser.state), // Usar la función de normalización
+      };
+
+      setUsers((prev) =>
+        prev.map((u) => (u.id === updatedUser.id ? normalizedUser : u))
+      );
+
+      setIsEditModalOpen(false);
+      setSelectedUser(null);
+    } catch (err: any) {
+      setAlertMessage(err.message || "No fue posible editar el usuario");
+      setIsAlertOpen(true);
+    }
+  };
+
+  // Abrir modal de edición
+  const openEditModal = (user: User) => {
+    setSelectedUser(user);
+    setIsEditModalOpen(true);
+  };
+
+  // Cerrar modal de edición
+  const closeEditModal = () => {
+    setIsEditModalOpen(false);
+    setSelectedUser(null);
+  };
+
+  // Eliminar usuario (solo front)
+  const handleDeleteUser = (id: string) => {
+    setUsers(users.filter((u) => u.id !== id));
+    setIsConfirmOpen(false); // Cerrar el modal de confirmación
+  };
+
+  // Abrir modal de confirmación
+  const handleDeleteClick = (id: string) => {
+    setUserToDelete(id);
+    setIsConfirmOpen(true);
+  };
+
+  // Confirmar eliminación
+  const handleConfirmDelete = () => {
+    if (userToDelete !== null) {
+      handleDeleteUser(userToDelete);
+      setUserToDelete(null);
+    }
+  };
+
+  return (
+    <div className="usuarios-page">
+      <div className="usuarios-header">
+        <h1>Gestión de Usuarios</h1>
+        <Button className="btn-nuevo" onClick={() => setIsModalOpen(true)}>
+          <Plus className="icono" />
+          Nuevo Usuario
+        </Button>
+      </div>
+
+      <div className="usuarios-tabla-container">
+        <table className="usuarios-tabla">
+          <thead>
+            <tr>
+              <th>Nombre de usuario</th>
+              <th>Email</th>
+              <th>Rol</th>
+              <th>Estado</th>
+              <th>Fecha de inicio</th>
+              <th className="acciones-col">Acciones</th>
+            </tr>
+          </thead>
+          <tbody>
+            {users.map((u) => (
+              <tr key={u.id}>
+                <td className="nombre">{u.user_name}</td>
+                <td>{u.email}</td>
+                <td>{u.role}</td>
+                <td>
+                  <span
+                    className={`estado ${
+                      u.state.toLowerCase() === "activo" ? "activo" : "inactivo"
+                    }`}
+                  >
+                    {u.state}
+                  </span>
+                </td>
+                <td>{new Date(u.created_at).toLocaleDateString("es-ES")}</td>
+                <td className="acciones">
+                  <Button
+                    type="button"
+                    variant="secondary"
+                    className="btn-icon ver"
+                    onClick={() => openViewModal(u)}
+                  >
+                    <Eye size={16} />
+                  </Button>
+                  <Button
+                    type="button"
+                    variant="secondary"
+                    className="btn-icon editar"
+                    onClick={() => openEditModal(u)}
+                  >
+                    <Edit3 size={16} />
+                  </Button>
+                  <Button
+                    type="button"
+                    variant="secondary"
+                    className="btn-icon eliminar"
+                    onClick={() => handleDeleteClick(u.id)}
+                  >
+                    <Trash2 size={16} />
+                  </Button>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+
+      {/* Modal para crear usuario */}
+      <CreateUserModal
+        isOpen={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+        onSubmit={handleAddUser}
+      />
+
+      {/* Modal para editar usuario */}
+      {selectedUser && (
+        <EditUserModal
+          isOpen={isEditModalOpen}
+          onClose={closeEditModal}
+          user={selectedUser}
+          onSubmit={handleEditUser}
+        />
+      )}
+
+      {/* Modal de confirmación para eliminar */}
+      <ConfirmModal
+        isOpen={isConfirmOpen}
+        onClose={() => setIsConfirmOpen(false)}
+        title="Confirmar eliminación"
+        message="¿Estás seguro de que deseas eliminar este usuario?"
+        onConfirm={handleConfirmDelete}
+        confirmText="Eliminar"
+        cancelText="Cancelar"
+      />
+
+      {/* Modal para visualizar usuario */}
+      {selectedUser && (
+        <ViewUserModal
+          isOpen={isViewModalOpen}
+          onClose={closeViewModal}
+          user={selectedUser}
+        />
+      )}
+
+      {/* Modal de alerta para errores */}
+      <AlertModal
+        isOpen={isAlertOpen}
+        onClose={() => setIsAlertOpen(false)}
+        title="Error"
+        message={alertMessage}
+        type="error"
+        buttonText="Cerrar"
+      />
+    </div>
+  );
+};
+
+export default UsuariosPage;

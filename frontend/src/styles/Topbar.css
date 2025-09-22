@@ -1,0 +1,164 @@
+.topbar {
+  display: flex;
+  align-items: center;
+  background: #fff;
+  border-bottom: 1px solid #e5e7eb;
+  height: 60px;
+  padding: 0 1rem;
+  position: sticky;
+  top: 0;
+  z-index: 20;
+}
+
+.topbar-container {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+}
+
+.topbar-menu-button {
+  background: transparent;
+  border: none;
+  padding: 0.5rem;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+}
+
+.topbar-menu-button:hover {
+  background: #f3f4f6;
+}
+
+.topbar-icon {
+  width: 1.25rem;
+  height: 1.25rem;
+  color: #374151;
+}
+
+.topbar-right {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+/* Buscador */
+.topbar-search {
+  flex: 1;                     
+  max-width: 400px;             
+  margin: 0 1rem;
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.topbar-search-icon {
+  position: absolute;
+  left: 0.75rem;
+  color: #9ca3af;
+  width: 1.25rem;
+  height: 1.25rem;
+}
+
+.topbar-search-input {
+  width: 100%;
+  padding: 0.5rem 0.75rem 0.5rem 2.5rem;
+  border: 1px solid #d1d5db;
+  border-radius: 0.5rem;
+  font-size: 0.875rem;
+  color: #111827;
+  outline: none;
+  transition: border 0.2s ease, box-shadow 0.2s ease;
+  background-color: transparent;
+}
+
+.topbar-search-input:focus {
+  border-color: #f97316;
+  box-shadow: 0 0 0 2px rgba(249, 115, 22, 0.3);
+}
+
+.topbar-calendar-button {
+  background: transparent;
+  border: none;
+  padding: 0.5rem;
+  border-radius: 0.5rem;
+  cursor: pointer;
+  color: #4b5563;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  
+}
+
+.topbar-calendar-button:hover {
+  background: #f3f4f6;
+}
+
+.topbar-search-input:focus {
+  border-color: #f97316;
+  box-shadow: 0 0 0 2px rgba(249, 115, 22, 0.3);
+}
+
+.topbar-user {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.topbar-avatar {
+  width: 2rem;
+  height: 2rem;
+  border-radius: 50%;
+  background: linear-gradient(to right, #fb923c, #ea580c);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #fff;
+  font-size: 0.875rem;
+  font-weight: 500;
+}
+
+.topbar-username {
+  font-weight: 500;
+  color: #111827;
+}
+
+.menu-toggle {
+  border: none;
+  font-size: 1rem;
+  cursor: pointer;
+  margin-right: 1rem;
+}
+
+.topbar-title {
+  font-size: 1.25rem;
+  font-weight: 600;
+}
+
+
+
+@media (max-width: 768px) {
+  .topbar-search {
+    display: none;   
+  }
+
+  .topbar-right {
+    gap: 0.5rem;
+  }
+
+  .topbar-username {
+    display: none;   
+  }
+}
+
+@media (max-width: 480px) {
+  .topbar-avatar {
+    width: 1.5rem;
+    height: 1.5rem;
+    font-size: 0.75rem;
+  }
+
+  .topbar-calendar-button {
+    padding: 0.25rem;
+  }
+}

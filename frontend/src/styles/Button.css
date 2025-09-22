@@ -79,3 +79,25 @@
     width: 100%;
   }
 }
+
+.sidebar-footer .logout-btn {
+  width: 100%;
+  background: transparent !important; 
+  border: none !important;
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 12px;
+  font-size: 0.95rem;
+  color: #374151;
+  cursor: pointer;
+  padding: 0.75rem;
+  border-radius: 8px;
+  transition: all 0.3s ease;
+  box-shadow: none !important;
+}
+
+.sidebar-footer .logout-btn:hover {
+  background-color: #f9fafb !important;
+  color: #f97316 !important;
+}
