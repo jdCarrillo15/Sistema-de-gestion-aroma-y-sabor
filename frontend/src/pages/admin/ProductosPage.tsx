@@ -1,6 +1,6 @@
 import React from "react";
 import { Plus, Edit3, Trash2, Eye } from "lucide-react";
-import "../styles/ProductosPage.css";
+import "../../styles/admin/ProductosPage.css";
 
 type Product = {
   id: number;

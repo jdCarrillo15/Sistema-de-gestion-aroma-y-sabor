@@ -1,6 +1,7 @@
 import React from "react";
 import { DollarSign } from "lucide-react";
-import "../styles/RecentProducts.css";
+import "../../styles/admin/RecentProducts.css";
+
 
 type Sale = {
   id: number;
@@ -15,7 +16,7 @@ const sampleSales: Sale[] = [
 ];
 
 const VentasPage: React.FC = () => {
-  const totalToday = "$1,248"; // ejemplo
+  const totalToday = "$1,248"; 
 
   return (
     <div className="ventas-page space-y-6">

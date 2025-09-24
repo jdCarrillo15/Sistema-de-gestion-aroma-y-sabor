@@ -1,5 +1,5 @@
 import React from "react";
-import "../styles/AdminDashboard.css";
+import "../../styles/admin/AdminDashboard.css";
 import { Package, Users, DollarSign, AlertTriangle } from "lucide-react";
 
 interface StatCardProps {

@@ -1,6 +1,6 @@
 import React, { useEffect } from "react";
-import Button from "../components/Button";
-import "../styles/ViewUserModal.css"; // Nuevo archivo de estilos
+import Button from "../common/Button";
+import "../../styles/admin/ViewUserModal.css"; 
 
 interface ViewUserModalProps {
   isOpen: boolean;
@@ -20,12 +20,66 @@ const ViewUserModal: React.FC<ViewUserModalProps> = ({ isOpen, onClose, user }) 
     };
   }, [isOpen]);
 
+  // Función para manejar el cierre con Escape
+  const handleKeyDown = (e: React.KeyboardEvent) => {
+    if (e.key === "Escape") {
+      onClose();
+    }
+  };
+
   if (!isOpen || !user) return null;
 
   return (
-    <div className="viewuser-backdrop" onClick={onClose}>
-      <div className="viewuser-container" onClick={(e) => e.stopPropagation()}>
-        <button className="viewuser-close" onClick={onClose}>✕</button>
+    <div 
+      className="viewuser-backdrop"
+      onKeyDown={handleKeyDown}
+      tabIndex={-1}
+    >
+      <div className="viewuser-container">
+        {/* Botón X mejorado */}
+        <button
+          className="close-button"
+          onClick={onClose}
+          aria-label="Cerrar"
+          style={{
+            position: 'absolute',
+            top: '16px',
+            right: '16px',
+            background: 'none',
+            border: 'none',
+            color: '#A0A0A0',
+            cursor: 'pointer',
+            padding: '8px',
+            borderRadius: '8px',
+            transition: 'all 0.2s ease',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            zIndex: 10
+          }}
+          onMouseOver={(e) => {
+            e.currentTarget.style.background = '#F5F5F5';
+            e.currentTarget.style.color = '#8B4513';
+            e.currentTarget.style.transform = 'rotate(90deg)';
+          }}
+          onMouseOut={(e) => {
+            e.currentTarget.style.background = 'none';
+            e.currentTarget.style.color = '#A0A0A0';
+            e.currentTarget.style.transform = 'rotate(0deg)';
+          }}
+        >
+          <svg
+            width="24"
+            height="24"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="2"
+          >
+            <line x1="18" y1="6" x2="6" y2="18"></line>
+            <line x1="6" y1="6" x2="18" y2="18"></line>
+          </svg>
+        </button>
 
         {/* Avatar + Nombre */}
         <div className="viewuser-header">

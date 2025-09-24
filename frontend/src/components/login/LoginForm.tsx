@@ -1,9 +1,9 @@
 import React, { useState } from "react";
 import ForgotPasswordModal from "./ForgotPasswordModal.tsx";
-import AlertModal from "./AlertModal";
-import "../styles/LoginForm.css";
-import { loginUser } from "../services/authService";
-import logo from "../assets/logo.png";
+import AlertModal from "../common/AlertModal.tsx";
+import { loginUser } from "../../services/login/authService.ts";
+import logo from "../../assets/logo.png";
+import "../../styles/login/LoginForm.css";
 
 interface LoginFormProps {
   onSubmit?: (email: string, password: string) => void;

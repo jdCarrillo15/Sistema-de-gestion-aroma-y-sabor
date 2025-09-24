@@ -1,9 +1,8 @@
 import React, { useState, useEffect } from "react";
-import "../styles/ForgotPasswordModal.css";
-import { sendRecoveryEmail } from "../services/authService";
-import AlertModal from "./AlertModal.tsx";
-import Button from "./Button.tsx";
-
+import "../../styles/login/ForgotPasswordModal.css";
+import { sendRecoveryEmail } from "../../services/login/authService.ts";
+import AlertModal from "../common/AlertModal.tsx";
+import Button from "../common/Button.tsx";
 interface ForgotPasswordModalProps {
   onClose: () => void;
   onSubmit: (email: string) => void;

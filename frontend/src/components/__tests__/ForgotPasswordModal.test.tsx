@@ -1,8 +1,8 @@
 import { describe, it, expect, vi, beforeEach, Mock } from "vitest";
 import { render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
-import ForgotPasswordModal from "../ForgotPasswordModal";
-import * as authService from "../../services/authService";
+import ForgotPasswordModal from "../login/ForgotPasswordModal";
+import * as authService from "../../services/login/authService";
 
 // Mock del CSS
 vi.mock("../styles/ForgotPasswordModal.css", () => ({}));

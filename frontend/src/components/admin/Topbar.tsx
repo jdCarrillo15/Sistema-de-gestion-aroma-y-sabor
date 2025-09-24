@@ -1,6 +1,6 @@
 import React from "react";
 import { Search, Calendar } from "lucide-react";
-import "../../styles/Topbar.css";
+import "../../styles/admin/Topbar.css";
 
 const Topbar: React.FC = () => {
   return (

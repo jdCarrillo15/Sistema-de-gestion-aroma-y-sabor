@@ -1,13 +1,13 @@
 import React from "react";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
-import LoginPage from "./pages/LoginPage";
+import LoginPage from "./pages/login/LoginPage";
 import AdminLayout from "./components/admin/AdminLayout";
-import AdminDashboard from "./pages/AdminDashboard";
-import ProductosPage from "./pages/ProductosPage";
-import UsuariosPage from "./pages/UsuariosPage";
-import InventarioPage from "./pages/InventarioPage";
-import TurnosPage from "./pages/TurnosPage";
-import VentasPage from "./pages/VentasPage";
+import AdminDashboard from "./pages/admin/AdminDashboard";
+import ProductosPage from "./pages/admin/ProductosPage";
+import UsuariosPage from "./pages/admin/UsuariosPage";
+import InventarioPage from "./pages/admin/InventarioPage";
+import TurnosPage from "./pages/admin/TurnosPage";
+import VentasPage from "./pages/admin/VentasPage";
 
 function App() {
   return (

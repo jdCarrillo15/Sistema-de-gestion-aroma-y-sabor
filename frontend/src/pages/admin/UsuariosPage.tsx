@@ -1,12 +1,12 @@
 import React, { useState } from "react";
 import { Plus, Edit3, Trash2, Eye } from "lucide-react";
-import "../styles/UsuariosPage.css";
-import Button from "../components/Button";
-import CreateUserModal from "../components/CreateUserModal";
-import EditUserModal from "../components/EditUserModal";
-import ConfirmModal from "../components/ConfirmModal";
-import AlertModal from "../components/AlertModal";
-import ViewUserModal from "../components/ViewUserModal";
+import Button from "../../components/common/Button";
+import CreateUserModal from "../../components/admin/CreateUserModal";
+import EditUserModal from "../../components/admin/EditUserModal";
+import ConfirmModal from "../../components/admin/ConfirmModal";
+import AlertModal from "../../components/common/AlertModal";
+import ViewUserModal from "../../components/admin/ViewUserModal";
+import "../../styles/admin/UsuariosPage.css";
 
 export type User = {
   id: string;

@@ -1,6 +1,7 @@
 import React, { useEffect } from "react";
 import Button from "./Button";
-import "../styles/AlertModal.css";
+import "../../styles/common/AlertModal.css";
+
 
 interface AlertModalProps {
   isOpen: boolean;

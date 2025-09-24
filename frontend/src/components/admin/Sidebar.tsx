@@ -1,6 +1,7 @@
 import React from "react";
 import { NavLink, Link } from "react-router-dom";
-import Button from "../Button.tsx";
+import Button from "../common/Button.tsx";
+import "../../styles/admin/Sidebar.css";
 import {
   Coffee,
   Users,
@@ -10,7 +11,6 @@ import {
   Activity,
   LogOut,
 } from "lucide-react";
-import "../../styles/Sidebar.css";
 
 const menuItems = [
   { to: "/admin", label: "Dashboard", icon: Activity },

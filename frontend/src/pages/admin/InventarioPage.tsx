@@ -1,6 +1,6 @@
 import React from "react";
 import { Package } from "lucide-react";
-import "../styles/InventarioPage.css";
+import "../../styles/admin/InventarioPage.css";
 
 type Item = {
   id: number;

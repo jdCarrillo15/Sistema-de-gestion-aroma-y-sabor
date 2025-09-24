@@ -1,6 +1,6 @@
 import React, { useEffect } from "react";
-import Button from "./Button";
-import "../styles/ConfirmModal.css";
+import Button from "../common/Button";
+import "../../styles/admin/ConfirmModal.css";
 
 interface ConfirmModalProps {
   isOpen: boolean;
