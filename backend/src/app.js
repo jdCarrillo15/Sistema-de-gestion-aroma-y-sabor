@@ -2,6 +2,7 @@ import express from "express";
 import rolesRoutes from "./routes/roleRoutes.js";
 import authRoutes from "./routes/authRoutes.js";
 import usersRoutes from "./routes/usersRoutes.js";
+import productsRoutes from "./routes/productsRoutes.js";
 import { metricsMiddleware } from "./middleware/metrics.js";
 import metricsRoutes from "./routes/metricsRoutes.js"
 import cookieParser from "cookie-parser";
@@ -21,6 +22,7 @@ app.use(metricsMiddleware);
 app.use("/roles", rolesRoutes);
 app.use("/auth", authRoutes);
 app.use("/users", usersRoutes);
+app.use("/products", productsRoutes);
 app.use(metricsRoutes);
 
 const PORT = process.env.PORT || 3000;
