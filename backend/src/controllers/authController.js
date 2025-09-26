@@ -2,7 +2,7 @@ import { db, admin } from "../config/firebase.js";
 
 export async function login(req, res) {
     const { email, password } = req.body;
-    const expiresIn = 3600000; // 1 dia
+    const expiresIn = 86400000; // 1 dia
 
     if (!email || !password) {
         return res.status(400).json({ error: "Email y contraseña requeridos" });
@@ -30,7 +30,7 @@ export async function login(req, res) {
             maxAge: expiresIn,
             httpOnly: true,
             secure: true, // true en producción con HTTPS
-            sameSite: "strict"
+            sameSite: "none"
         });
 
         const userDoc = await db.collection("users").doc(data.localId).get();
