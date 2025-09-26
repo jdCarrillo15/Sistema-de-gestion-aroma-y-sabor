@@ -26,6 +26,7 @@ export async function getUsers(req, res) {
                     user_name: data.user_name,
                     email: data.email,
                     role: data.role,
+                    state: data.state,
                     person,
                     created_at: new Date(data.created_at._seconds * 1000).toISOString(),
                 };
@@ -119,6 +120,7 @@ export async function getUserById(req, res) {
             user_name: userDoc.user_name,
             email: userDoc.email,
             role: userDoc.role,
+            state: userDoc.state,
             person,
             created_at: new Date(userDoc.created_at._seconds * 1000).toISOString()
         });
