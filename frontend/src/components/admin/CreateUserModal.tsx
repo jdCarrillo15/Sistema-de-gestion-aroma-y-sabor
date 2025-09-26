@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from "react";
 import Button from "../common/Button";
 import "../../styles/admin/CreateUserModal.css";
+import { createUser } from "../../services/admin/userService";
+
 
 interface CreateUserModalProps {
   isOpen: boolean;
@@ -117,7 +119,6 @@ const CreateUserModal: React.FC<CreateUserModalProps> = ({
     return "";
   };
 
-  // Validación de email
   const validateEmail = (email: string) => {
     if (!email.trim()) {
       return "El correo es requerido";
@@ -172,7 +173,7 @@ const CreateUserModal: React.FC<CreateUserModalProps> = ({
     setErrors(prev => ({ ...prev, email: error }));
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
     const firstNameError = validateName(firstName, "firstName");
@@ -205,7 +206,11 @@ const CreateUserModal: React.FC<CreateUserModalProps> = ({
       birthdate,
     });
     onClose();
+    const user = { userName, email, password, role, state, firstName, lastName, documentId, birthdate };
+    const data = await createUser(user);
+    console.log(data);
   };
+
 
   if (!isOpen) return null;
 

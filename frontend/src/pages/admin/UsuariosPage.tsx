@@ -64,7 +64,7 @@ const UsuariosPage: React.FC = () => {
     return state.charAt(0).toUpperCase() + state.slice(1).toLowerCase();
   };
 
-  // Crear usuario (solo front con validación)
+
   const handleAddUser = (user: any) => {
     try {
       if (!user.email || !user.user_name) {
@@ -72,11 +72,11 @@ const UsuariosPage: React.FC = () => {
       }
 
       const newUser: User = {
-        id: String(Date.now()), // ID temporal
+        id: String(Date.now()), 
         user_name: user.user_name,
         email: user.email,
         role: user.role,
-        state: normalizeState(user.state), // Usar la función de normalización
+        state: normalizeState(user.state),
         created_at: new Date().toISOString(),
         person: {
           first_name: user.first_name,

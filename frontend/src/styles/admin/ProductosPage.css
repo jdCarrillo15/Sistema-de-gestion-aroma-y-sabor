@@ -1,92 +1,48 @@
-.productos-page {
-  padding: 1.5rem;
-  background: linear-gradient(to bottom right, #fffdf9, #fff);
-  min-height: 100vh;
+.products-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1rem;
 }
 
-/* Título */
-.productos-page h1 {
+.products-title {
   font-size: 1.5rem;
-  font-weight: 700;
-  color: #1a1a1a;
+  font-weight: bold;
+  color: #111827;
 }
 
-/* Botón "Nuevo Producto" */
-.productos-page button {
-  font-size: 0.9rem;
-  font-weight: 500;
-  transition: all 0.2s ease-in-out;
-  box-shadow: 0 2px 6px rgba(255, 140, 0, 0.2);
+.products-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 1rem;
 }
 
-.productos-page button:hover {
-  transform: translateY(-1px);
-  box-shadow: 0 4px 10px rgba(255, 140, 0, 0.3);
-}
-
-/* Caja principal */
-.productos-page .bg-white {
-  background: #ffffff;
+.product-card {
+  background: #fff;
+  border: 1px solid #e5e7eb;
   border-radius: 12px;
-  padding: 1.5rem;
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
+  padding: 1rem;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.05);
 }
 
-/* Tabla */
-.productos-page table {
-  width: 100%;
-  border-collapse: collapse;
+.product-card h3 {
+  font-size: 1.2rem;
+  margin-bottom: 0.5rem;
 }
 
-.productos-page th {
-  text-align: left;
-  font-size: 0.85rem;
-  font-weight: 600;
-  color: #555;
-  padding-bottom: 0.5rem;
+.product-card .price {
+  font-weight: bold;
+  color: #16a34a;
 }
 
-.productos-page td {
-  padding: 0.75rem 0;
-  font-size: 0.95rem;
-  color: #333;
+.card-actions {
+  display: flex;
+  gap: 0.5rem;
+  margin-top: 0.5rem;
 }
 
-/* Bordes de filas */
-.productos-page tbody tr {
-  border-top: 1px solid #f0f0f0;
-  transition: background 0.2s ease;
-}
-
-.productos-page tbody tr:hover {
-  background: #fafafa;
-}
-
-/* Estado */
-.productos-page .status {
-  display: inline-block;
-  font-size: 0.75rem;
-  font-weight: 500;
-  padding: 0.25rem 0.75rem;
-  border-radius: 9999px;
-}
-
-.productos-page .activo {
-  background: #e6f9ec;
-  color: #2e7d32;
-}
-
-.productos-page .bajo-stock {
-  background: #fde7e7;
-  color: #c62828;
-}
-
-/* Botones de acción */
-.productos-page td button {
-  color: #555;
-  transition: color 0.2s ease;
-}
-
-.productos-page td button:hover {
-  color: #ff6b00;
+.empty-message {
+  text-align: center;
+  padding: 2rem;
+  color: #6b7280;
 }

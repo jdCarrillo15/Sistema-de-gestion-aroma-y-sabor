@@ -1,4 +1,6 @@
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
+//const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
+const API_BASE_URL = "http://localhost:3000";
+import { getCookieUser } from "../admin/userService";
 
 export async function loginUser(email: string, password: string) {
   try {
@@ -8,6 +10,7 @@ export async function loginUser(email: string, password: string) {
         "Content-Type": "application/json",
       },
       body: JSON.stringify({ email, password }),
+      credentials: "include",
     });
 
     if (!response.ok) {
@@ -15,11 +18,17 @@ export async function loginUser(email: string, password: string) {
     }
 
     const data = await response.json();
+    const setCookie = await response.headers.get('set-cookie');
+   // getCookieUser(setCookie);
+    console.log("Cookie in authService:", setCookie);
+    console.log(document.cookie);
     return data;
   } catch (error) {
     throw error;
   }
 }
+
+
 
 export async function sendRecoveryEmail(email: string) {
   try {
