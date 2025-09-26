@@ -23,14 +23,11 @@ export async function createUser(user: any) {
   }
 }
 
-export function getCookieUser(cookiee: string) {
-    cookie = cookiee;
-}
 
 // Obtener lista de usuarios
 export async function getUsers() {
   try {
-    const response = await fetch(`${API_BASE_URL}/users`, {
+    const response = await fetch(`${API_BASE_URL}/users/getusers`, {
       credentials: "include"
     });
     
@@ -47,7 +44,7 @@ export async function getUsers() {
 // Actualizar usuario
 export async function updateUser(userId: string, updatedUser: any) {
   try {
-    const response = await fetch(`${API_BASE_URL}/users/${userId}`, {
+    const response = await fetch(`${API_BASE_URL}/getuser/${userId}`, {
       method: "PUT",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(updatedUser),

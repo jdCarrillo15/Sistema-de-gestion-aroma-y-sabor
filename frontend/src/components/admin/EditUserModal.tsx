@@ -1,12 +1,13 @@
 import React, { useState, useEffect } from "react";
 import Button from "../common/Button";
 import ConfirmModal from "./ConfirmModal";
-import "../../styles/admin/CreateUserModal.css"; 
+import "../../styles/admin/CreateUserModal.css";
+import { updateUser } from "../../services/admin/userService";
 
 interface EditUserModalProps {
   isOpen: boolean;
   onClose: () => void;
-  user: any; 
+  user: any;
   onSubmit: (updatedUser: any) => void;
 }
 
@@ -108,7 +109,7 @@ const EditUserModal: React.FC<EditUserModalProps> = ({
     const birthDate = new Date(date);
     const age = today.getFullYear() - birthDate.getFullYear();
     const monthDiff = today.getMonth() - birthDate.getMonth();
-    
+
     if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birthDate.getDate())) {
       const actualAge = age - 1;
       if (actualAge < 16) {
@@ -171,9 +172,9 @@ const EditUserModal: React.FC<EditUserModalProps> = ({
     setErrors(prev => ({ ...prev, email: error }));
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     // Validar todos los campos
     const firstNameError = validateName(firstName, "firstName");
     const lastNameError = validateName(lastName, "lastName");
@@ -195,6 +196,9 @@ const EditUserModal: React.FC<EditUserModalProps> = ({
     }
 
     setIsConfirmOpen(true);
+    const user = { userName, email, role, state, firstName, lastName, documentId, birthdate };
+    //const data = await updateUser(user);
+    //console.log(data);
   };
 
   const confirmUpdate = () => {
@@ -229,7 +233,7 @@ const EditUserModal: React.FC<EditUserModalProps> = ({
 
   return (
     <>
-      <div 
+      <div
         className="modal-backdrop"
         onKeyDown={handleKeyDown}
         tabIndex={-1}

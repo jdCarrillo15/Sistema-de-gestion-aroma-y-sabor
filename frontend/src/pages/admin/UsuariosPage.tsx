@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Plus, Edit3, Trash2, Eye } from "lucide-react";
 import Button from "../../components/common/Button";
 import CreateUserModal from "../../components/admin/CreateUserModal";
@@ -7,6 +7,7 @@ import ConfirmModal from "../../components/admin/ConfirmModal";
 import AlertModal from "../../components/common/AlertModal";
 import ViewUserModal from "../../components/admin/ViewUserModal";
 import "../../styles/admin/UsuariosPage.css";
+import { getUsers } from "../../services/admin/userService";
 
 export type User = {
   id: string;
@@ -63,8 +64,64 @@ const UsuariosPage: React.FC = () => {
     return state.charAt(0).toUpperCase() + state.slice(1).toLowerCase();
   };
 
+  const getAllUsers = async () => {
+  try {
+    const res = await getUsers(); // puede devolver { users: [...] } o directamente [...]
+    const incoming = Array.isArray(res) ? res : res?.users;
+
+    if (!Array.isArray(incoming)) {
+      throw new Error("Respuesta inválida de getUsers");
+    }
+
+    const mapped: User[] = incoming.map((u: any) => ({
+      id: u.id,
+      user_name: u.user_name,
+      email: u.email,
+      role: u.role,
+      state: normalizeState(u.state ?? ""), // si no viene, normalizeState devuelve "Activo"
+      created_at: u.created_at ?? new Date().toISOString(),
+      person: u.person
+        ? {
+            id: u.person.id,
+            first_name: u.person.first_name,
+            last_name: u.person.last_name,
+            birthdate: u.person.birthdate,
+            document_id: u.person.document_id,
+          }
+        : undefined,
+    }));
+
+    // Opcional: eliminar duplicados si el backend devuelve elementos repetidos
+    const unique = Array.from(new Map(mapped.map((u) => [u.id, u])).values());
+
+    // REEMPLAZO (no concatenación)
+    setUsers(unique);
+  } catch (error) {
+    console.error("Error obteniendo usuarios:", error);
+    setAlertMessage("No fue posible obtener los usuarios");
+    setIsAlertOpen(true);
+  }
+};
+
+
+
 
   const handleAddUser = (user: any) => {
+    const newUser: User = {
+      id: String(Date.now()), 
+      user_name: user.user_name,
+      email: user.email,
+      role: user.role,
+      state: normalizeState(user.state),
+      created_at: new Date().toISOString(),
+      person: {
+        first_name: user.first_name,
+        last_name: user.last_name,
+        birthdate: user.birthdate,
+        document_id: user.document_id,
+      },
+    };
+
     try {
       if (!user.email || !user.user_name) {
         throw new Error("Faltan campos obligatorios");
@@ -148,6 +205,10 @@ const UsuariosPage: React.FC = () => {
       setUserToDelete(null);
     }
   };
+
+  useEffect(() => {
+    getAllUsers();
+  }, []);
 
   return (
     <div className="usuarios-page">

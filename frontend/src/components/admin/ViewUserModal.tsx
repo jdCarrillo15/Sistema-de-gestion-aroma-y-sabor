@@ -1,12 +1,30 @@
 import React, { useEffect } from "react";
 import Button from "../common/Button";
 import "../../styles/admin/ViewUserModal.css"; 
+import { getUsers } from "../../services/admin/userService";
 
 interface ViewUserModalProps {
   isOpen: boolean;
   onClose: () => void;
-  user: any;
+  //user: any;
+  user: [
+    {
+      id: "Gwre9lElB4UCSfDn7lWTZtHCUfQ2",
+      user_name: "mesero tester",
+      email: "mesero1@gmail.com",
+      role: "waiter",
+      state: "Activo",
+      person: {
+        id: "lghaa9pf1iSu6G7sjoDl",
+        birthdate: "2000-01-10T00:00:00Z",
+        document_id: "2025023029",
+        first_name: "Pepito",
+        last_name: "Peréz"
+      },
+      "created_at": "2025-09-15T15:55:31.000Z"
+    }];
 }
+
 
 const ViewUserModal: React.FC<ViewUserModalProps> = ({ isOpen, onClose, user }) => {
   useEffect(() => {
@@ -84,30 +102,30 @@ const ViewUserModal: React.FC<ViewUserModalProps> = ({ isOpen, onClose, user }) 
         {/* Avatar + Nombre */}
         <div className="viewuser-header">
           <div className="viewuser-avatar">
-            <span>{user.user_name?.charAt(0).toUpperCase()}</span>
+            <span>{user[0].user_name?.charAt(0).toUpperCase()}</span>
           </div>
-          <h2>{user.user_name}</h2>
-          <p className={`viewuser-status ${user.state.toLowerCase() === "activo" ? "activo" : "inactivo"}`}>
-            ● {user.state}
+          <h2>{user[0].user_name}</h2>
+          <p className={`viewuser-status ${user[0].state.toLowerCase() === "activo" ? "activo" : "inactivo"}`}>
+            ● {user[0].state}
           </p>
         </div>
 
         {/* Datos principales */}
         <div className="viewuser-section">
           <h3>Información de cuenta</h3>
-          <p><strong>Email:</strong> {user.email}</p>
-          <p><strong>Rol:</strong> {user.role}</p>
-          <p><strong>Fecha de inicio:</strong> {new Date(user.created_at).toLocaleDateString()}</p>
+          <p><strong>Email:</strong> {user[0].email}</p>
+          <p><strong>Rol:</strong> {user[0].role}</p>
+          <p><strong>Fecha de inicio:</strong> {new Date(user[0].created_at).toLocaleDateString()}</p>
         </div>
 
         {/* Datos de persona */}
-        {user.person && (
+        {user[0].person && (
           <div className="viewuser-section">
             <h3>Datos personales</h3>
-            <p><strong>Nombre:</strong> {user.person.first_name}</p>
-            <p><strong>Apellido:</strong> {user.person.last_name}</p>
-            <p><strong>Documento:</strong> {user.person.document_id}</p>
-            <p><strong>Fecha de nacimiento:</strong> {user.person.birthdate}</p>
+            <p><strong>Nombre:</strong> {user[0].person.first_name}</p>
+            <p><strong>Apellido:</strong> {user[0].person.last_name}</p>
+            <p><strong>Documento:</strong> {user[0].person.document_id}</p>
+            <p><strong>Fecha de nacimiento:</strong> {user[0].person.birthdate}</p>
           </div>
         )}
 
