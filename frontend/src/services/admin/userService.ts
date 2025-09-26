@@ -31,7 +31,7 @@ export function getCookieUser(cookiee: string) {
 export async function getUsers() {
   try {
     const response = await fetch(`${API_BASE_URL}/users`, {
-      credentials: "include",
+      credentials: "include"
     });
     
     if (!response.ok) {

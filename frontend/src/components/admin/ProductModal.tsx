@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import Button from "../common/Button";
 import "../../styles/admin/ProductosPage.css";
-import { loginUser } from "../services/authService";
+import { loginUser } from "../../services/login/authService";
 
 interface Product {
   id?: string;

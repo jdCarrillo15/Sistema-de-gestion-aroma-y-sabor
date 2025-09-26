@@ -60,7 +60,6 @@ const UsuariosPage: React.FC = () => {
       return "Inactivo";
     }
     
-    // Si no coincide con ningún valor esperado, usar el valor original capitalizado
     return state.charAt(0).toUpperCase() + state.slice(1).toLowerCase();
   };
 
