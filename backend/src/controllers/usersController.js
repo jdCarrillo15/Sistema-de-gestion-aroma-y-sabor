@@ -74,7 +74,7 @@ export async function createUserAndPerson(req, res) {
         await db.collection("users").doc(authUid).set({
             person_id: personId,
             user_name: data.user_name || "",
-            role: data.role || "user",
+            role: data.role || "",
             email: data.email,
             state: data.state || "active",
             created_at: admin.firestore.FieldValue.serverTimestamp()

@@ -369,10 +369,9 @@ const CreateUserModal: React.FC<CreateUserModalProps> = ({
                 onChange={(e) => setRole(e.target.value)}
                 className="form-input"
               >
-                <option value="admin">Administrador</option>
                 <option value="cocinero">Cocinero</option>
                 <option value="mesero">Mesero</option>
-                <option value="user">Usuario</option>
+                <option value="user">Caja</option>
               </select>
             </div>
 

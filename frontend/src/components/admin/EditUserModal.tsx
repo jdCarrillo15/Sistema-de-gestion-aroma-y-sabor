@@ -19,19 +19,14 @@ const EditUserModal: React.FC<EditUserModalProps> = ({
 }) => {
   const [userName, setUserName] = useState("");
   const [email, setEmail] = useState("");
-  const [role, setRole] = useState("Cliente");
+  const [role, setRole] = useState("");
   const [state, setState] = useState("Activo");
-
-  // Datos de persona
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
   const [birthdate, setBirthdate] = useState("");
   const [documentId, setDocumentId] = useState("");
-
-  // Estado para controlar la alerta de confirmación
   const [isConfirmOpen, setIsConfirmOpen] = useState(false);
 
-  // Estados para errores
   const [errors, setErrors] = useState({
     firstName: "",
     lastName: "",
@@ -44,15 +39,13 @@ const EditUserModal: React.FC<EditUserModalProps> = ({
     if (isOpen && user) {
       setUserName(user.user_name ?? "");
       setEmail(user.email ?? "");
-      setRole(user.role ?? "Cliente");
-      setState(user.state ?? "Activo");
-
+      setRole(user.role ?? "");
+      setState(user.state ?? "");
       setFirstName(user.person?.first_name ?? "");
       setLastName(user.person?.last_name ?? "");
       setBirthdate(user.person?.birthdate ?? "");
       setDocumentId(user.person?.document_id ?? "");
 
-      // Limpiar errores al abrir
       setErrors({
         firstName: "",
         lastName: "",
@@ -70,7 +63,6 @@ const EditUserModal: React.FC<EditUserModalProps> = ({
     };
   }, [isOpen, user]);
 
-  // Validación de nombres (solo letras y espacios)
   const validateName = (name: string, field: "firstName" | "lastName") => {
     const nameRegex = /^[a-zA-ZáéíóúüñÁÉÍÓÚÜÑ\s]+$/;
     if (!name.trim()) {
@@ -85,10 +77,9 @@ const EditUserModal: React.FC<EditUserModalProps> = ({
     return "";
   };
 
-  // Validación de documento (solo números, máximo 10 dígitos)
   const validateDocument = (doc: string) => {
     if (!doc.trim()) {
-      return ""; // Documento es opcional
+      return "";
     }
     const docRegex = /^\d+$/;
     if (!docRegex.test(doc)) {
@@ -100,10 +91,9 @@ const EditUserModal: React.FC<EditUserModalProps> = ({
     return "";
   };
 
-  // Validación de fecha de nacimiento (mínimo 16 años)
   const validateBirthdate = (date: string) => {
     if (!date) {
-      return ""; // Fecha es opcional
+      return "";
     }
     const today = new Date();
     const birthDate = new Date(date);
@@ -112,16 +102,15 @@ const EditUserModal: React.FC<EditUserModalProps> = ({
 
     if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birthDate.getDate())) {
       const actualAge = age - 1;
-      if (actualAge < 16) {
+      if (actualAge < 18) {
         return "Debe ser mayor de 16 años";
       }
-    } else if (age < 16) {
+    } else if (age < 18) {
       return "Debe ser mayor de 16 años";
     }
     return "";
   };
 
-  // Validación de email
   const validateEmail = (email: string) => {
     if (!email.trim()) {
       return "El correo es requerido";
@@ -150,7 +139,6 @@ const EditUserModal: React.FC<EditUserModalProps> = ({
 
   const handleDocumentChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value;
-    // Solo permitir números
     if (value === "" || /^\d+$/.test(value)) {
       setDocumentId(value);
       const error = validateDocument(value);
@@ -172,10 +160,37 @@ const EditUserModal: React.FC<EditUserModalProps> = ({
     setErrors(prev => ({ ...prev, email: error }));
   };
 
+
+  const confirmUpdate = () => {
+    const updatedUser = {
+      ...user, 
+      user_name: userName,
+      email,
+      role,
+      state,
+      person: {
+        ...user.person,
+        first_name: firstName,
+        last_name: lastName,
+        birthdate,
+        document_id: documentId,
+      },
+    };
+
+    onSubmit(updatedUser);
+    setIsConfirmOpen(false);
+    onClose();
+  };
+
+  const handleKeyDown = (e: React.KeyboardEvent) => {
+    if (e.key === "Escape") {
+      onClose();
+    }
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    // Validar todos los campos
     const firstNameError = validateName(firstName, "firstName");
     const lastNameError = validateName(lastName, "lastName");
     const documentError = validateDocument(documentId);
@@ -190,46 +205,18 @@ const EditUserModal: React.FC<EditUserModalProps> = ({
       email: emailError,
     });
 
-    // Si hay errores, no enviar
     if (firstNameError || lastNameError || documentError || birthdateError || emailError) {
       return;
     }
 
     setIsConfirmOpen(true);
-    const user = { userName, email, role, state, firstName, lastName, documentId, birthdate };
-    //const data = await updateUser(user);
-    //console.log(data);
-  };
-
-  const confirmUpdate = () => {
-    const updatedUser = {
-      ...user, // conserva id y demás propiedades no editadas
-      user_name: userName,
-      email,
-      role,
-      state,
-      person: {
-        ...user.person, // conserva otros posibles campos
-        first_name: firstName,
-        last_name: lastName,
-        birthdate,
-        document_id: documentId,
-      },
-    };
-
-    onSubmit(updatedUser);
-    setIsConfirmOpen(false);
-    onClose();
-  };
-
-  // Función para manejar el cierre con Escape
-  const handleKeyDown = (e: React.KeyboardEvent) => {
-    if (e.key === "Escape") {
-      onClose();
-    }
+    const userUpdated = { ...user, userName, email, role, state, firstName, lastName, documentId, birthdate };
+    const data = await updateUser(userUpdated.id, userUpdated);
+    console.log(data);
   };
 
   if (!isOpen) return null;
+
 
   return (
     <>
@@ -240,7 +227,6 @@ const EditUserModal: React.FC<EditUserModalProps> = ({
       >
         <div className="modal-container">
           <div className="modal-content">
-            {/* Header con botón X */}
             <div className="modal-header">
               <button
                 className="close-button"
@@ -261,7 +247,6 @@ const EditUserModal: React.FC<EditUserModalProps> = ({
               </button>
             </div>
 
-            {/* Ícono del modal */}
             <div className="modal-icon">
               <svg
                 width="64"

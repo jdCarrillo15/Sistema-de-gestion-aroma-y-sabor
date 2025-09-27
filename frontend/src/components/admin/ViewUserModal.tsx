@@ -6,23 +6,8 @@ import { getUsers } from "../../services/admin/userService";
 interface ViewUserModalProps {
   isOpen: boolean;
   onClose: () => void;
-  //user: any;
-  user: [
-    {
-      id: "Gwre9lElB4UCSfDn7lWTZtHCUfQ2",
-      user_name: "mesero tester",
-      email: "mesero1@gmail.com",
-      role: "waiter",
-      state: "Activo",
-      person: {
-        id: "lghaa9pf1iSu6G7sjoDl",
-        birthdate: "2000-01-10T00:00:00Z",
-        document_id: "2025023029",
-        first_name: "Pepito",
-        last_name: "Peréz"
-      },
-      "created_at": "2025-09-15T15:55:31.000Z"
-    }];
+  user: any;
+
 }
 
 

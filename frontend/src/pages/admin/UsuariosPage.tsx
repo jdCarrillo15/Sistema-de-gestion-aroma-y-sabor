@@ -8,6 +8,7 @@ import AlertModal from "../../components/common/AlertModal";
 import ViewUserModal from "../../components/admin/ViewUserModal";
 import "../../styles/admin/UsuariosPage.css";
 import { getUsers } from "../../services/admin/userService";
+import { updateUser } from "../../services/admin/userService";
 
 export type User = {
   id: string;
@@ -31,11 +32,8 @@ const UsuariosPage: React.FC = () => {
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [selectedUser, setSelectedUser] = useState<User | null>(null);
   const [isViewModalOpen, setIsViewModalOpen] = useState(false);
-
   const [isConfirmOpen, setIsConfirmOpen] = useState(false);
   const [userToDelete, setUserToDelete] = useState<string | null>(null);
-
-  // Estado del AlertModal
   const [isAlertOpen, setIsAlertOpen] = useState(false);
   const [alertMessage, setAlertMessage] = useState("");
 
@@ -49,66 +47,59 @@ const UsuariosPage: React.FC = () => {
     setSelectedUser(null);
   };
 
-  // Función para normalizar el estado correctamente
   const normalizeState = (state: string): string => {
-    if (!state) return "Activo"; // Valor por defecto
-    
+    if (!state) return "Activo";
+
     const lowerState = state.toLowerCase().trim();
-    
+
     if (lowerState === "activo" || lowerState === "active") {
       return "Activo";
     } else if (lowerState === "inactivo" || lowerState === "inactive") {
       return "Inactivo";
     }
-    
     return state.charAt(0).toUpperCase() + state.slice(1).toLowerCase();
   };
 
   const getAllUsers = async () => {
-  try {
-    const res = await getUsers(); // puede devolver { users: [...] } o directamente [...]
-    const incoming = Array.isArray(res) ? res : res?.users;
+    try {
+      const res = await getUsers();
+      const incoming = Array.isArray(res) ? res : res?.users;
 
-    if (!Array.isArray(incoming)) {
-      throw new Error("Respuesta inválida de getUsers");
-    }
+      if (!Array.isArray(incoming)) {
+        throw new Error("Respuesta inválida de getUsers");
+      }
 
-    const mapped: User[] = incoming.map((u: any) => ({
-      id: u.id,
-      user_name: u.user_name,
-      email: u.email,
-      role: u.role,
-      state: normalizeState(u.state ?? ""), // si no viene, normalizeState devuelve "Activo"
-      created_at: u.created_at ?? new Date().toISOString(),
-      person: u.person
-        ? {
+      const mapped: User[] = incoming.map((u: any) => ({
+        id: u.id,
+        user_name: u.user_name,
+        email: u.email,
+        role: u.role,
+        state: normalizeState(u.state ?? ""),
+        created_at: u.created_at ?? new Date().toISOString(),
+        person: u.person
+          ? {
             id: u.person.id,
             first_name: u.person.first_name,
             last_name: u.person.last_name,
             birthdate: u.person.birthdate,
             document_id: u.person.document_id,
           }
-        : undefined,
-    }));
+          : undefined,
+      }));
 
-    // Opcional: eliminar duplicados si el backend devuelve elementos repetidos
-    const unique = Array.from(new Map(mapped.map((u) => [u.id, u])).values());
+      const unique = Array.from(new Map(mapped.map((u) => [u.id, u])).values());
 
-    // REEMPLAZO (no concatenación)
-    setUsers(unique);
-  } catch (error) {
-    console.error("Error obteniendo usuarios:", error);
-    setAlertMessage("No fue posible obtener los usuarios");
-    setIsAlertOpen(true);
-  }
-};
-
-
-
+      setUsers(unique);
+    } catch (error) {
+      console.error("Error obteniendo usuarios:", error);
+      setAlertMessage("No fue posible obtener los usuarios");
+      setIsAlertOpen(true);
+    }
+  };
 
   const handleAddUser = (user: any) => {
     const newUser: User = {
-      id: String(Date.now()), 
+      id: String(Date.now()),
       user_name: user.user_name,
       email: user.email,
       role: user.role,
@@ -128,7 +119,7 @@ const UsuariosPage: React.FC = () => {
       }
 
       const newUser: User = {
-        id: String(Date.now()), 
+        id: String(Date.now()),
         user_name: user.user_name,
         email: user.email,
         role: user.role,
@@ -143,29 +134,20 @@ const UsuariosPage: React.FC = () => {
       };
 
       setUsers((prev) => [...prev, newUser]);
-      setIsModalOpen(false); // Cerrar el modal después de crear
+      setIsModalOpen(false);
     } catch (err: any) {
       setAlertMessage(err.message || "No fue posible crear el usuario");
       setIsAlertOpen(true);
     }
   };
 
-  // Editar usuario (solo front con validación)
-  const handleEditUser = (updatedUser: User) => {
+
+  const handleEditUser = async (updatedUser: User) => {
     try {
-      if (!updatedUser.email || !updatedUser.user_name) {
-        throw new Error("Faltan campos obligatorios al editar");
-      }
-
-      const normalizedUser = {
-        ...updatedUser,
-        state: normalizeState(updatedUser.state), // Usar la función de normalización
-      };
-
+      const data = await updateUser(updatedUser.id, updatedUser); 
       setUsers((prev) =>
-        prev.map((u) => (u.id === updatedUser.id ? normalizedUser : u))
+        prev.map((u) => (u.id === updatedUser.id ? { ...u, ...data } : u))
       );
-
       setIsEditModalOpen(false);
       setSelectedUser(null);
     } catch (err: any) {
@@ -174,13 +156,12 @@ const UsuariosPage: React.FC = () => {
     }
   };
 
-  // Abrir modal de edición
+
   const openEditModal = (user: User) => {
     setSelectedUser(user);
     setIsEditModalOpen(true);
   };
 
-  // Cerrar modal de edición
   const closeEditModal = () => {
     setIsEditModalOpen(false);
     setSelectedUser(null);
@@ -189,7 +170,7 @@ const UsuariosPage: React.FC = () => {
   // Eliminar usuario (solo front)
   const handleDeleteUser = (id: string) => {
     setUsers(users.filter((u) => u.id !== id));
-    setIsConfirmOpen(false); // Cerrar el modal de confirmación
+    setIsConfirmOpen(false);
   };
 
   // Abrir modal de confirmación
@@ -240,9 +221,8 @@ const UsuariosPage: React.FC = () => {
                 <td>{u.role}</td>
                 <td>
                   <span
-                    className={`estado ${
-                      u.state.toLowerCase() === "activo" ? "activo" : "inactivo"
-                    }`}
+                    className={`estado ${u.state.toLowerCase() === "activo" ? "activo" : "inactivo"
+                      }`}
                   >
                     {u.state}
                   </span>
@@ -308,7 +288,6 @@ const UsuariosPage: React.FC = () => {
         cancelText="Cancelar"
       />
 
-      {/* Modal para visualizar usuario */}
       {selectedUser && (
         <ViewUserModal
           isOpen={isViewModalOpen}

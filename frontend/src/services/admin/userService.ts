@@ -1,8 +1,10 @@
+import { data } from "react-router-dom";
+
 const API_BASE_URL = "http://localhost:3000";
 //const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
 let cookie;
-// Crear usuario
+
 export async function createUser(user: any) {
   console.log("Creating user:", user);
   try {
@@ -23,14 +25,12 @@ export async function createUser(user: any) {
   }
 }
 
-
-// Obtener lista de usuarios
 export async function getUsers() {
   try {
     const response = await fetch(`${API_BASE_URL}/users/getusers`, {
       credentials: "include"
     });
-    
+
     if (!response.ok) {
       throw new Error("Error obteniendo usuarios");
     }
@@ -41,10 +41,9 @@ export async function getUsers() {
   }
 }
 
-// Actualizar usuario
 export async function updateUser(userId: string, updatedUser: any) {
   try {
-    const response = await fetch(`${API_BASE_URL}/getuser/${userId}`, {
+    const response = await fetch(`${API_BASE_URL}/users/updateuser/${userId}`, {
       method: "PUT",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(updatedUser),
