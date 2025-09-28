@@ -74,7 +74,7 @@ const ViewProductModal: React.FC<ViewProductModalProps> = ({
             <div className="detail-row">
               <span className="detail-label">Tipo:</span>
               <span className="detail-value">
-                {product.type === "prepared" ? "Preparado" : "No preparado"}
+                {product.type === "prepared" ? "Preparable" : "No Preparable"}
               </span>
             </div>
             <div className="detail-row">
@@ -92,8 +92,6 @@ const ViewProductModal: React.FC<ViewProductModalProps> = ({
               </div>
             )}
             <div className="detail-row">
-              <span className="detail-label">ID del producto:</span>
-              <span className="detail-value">{product.id}</span>
             </div>
           </div>
         </div>

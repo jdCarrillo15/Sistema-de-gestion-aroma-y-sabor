@@ -1,79 +1,211 @@
-import { data } from "react-router-dom";
-
 const API_BASE_URL = "http://localhost:3000";
 //const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
-let cookie;
+// Tipos para usuarios
+export interface CreateUserRequest {
+  user_name: string;
+  email: string;
+  password: string;
+  role: string;
+  state: string;
+  first_name: string;
+  last_name: string;
+  birthdate: string;
+  document_id: string;
+}
 
-export async function createUser(user: any) {
-  console.log("Creating user:", user);
+export interface UpdateUserRequest {
+  user_name?: string;
+  email?: string;
+  role?: string;
+  state?: string;
+  person_id?: string;
+  // Datos de persona también pueden ser actualizados
+  first_name?: string;
+  last_name?: string;
+  birthdate?: string;
+  document_id?: string;
+}
+
+export interface UserResponse {
+  id: string;
+  user_name: string;
+  email: string;
+  role: string;
+  state: string;
+  created_at: string;
+  person?: {
+    id?: string;
+    first_name: string;
+    last_name: string;
+    birthdate: string;
+    document_id: string;
+  };
+}
+
+// Crear usuario
+export async function createUser(userData: CreateUserRequest): Promise<{ message: string; userId: string }> {
+  console.log("Creating user:", userData);
   try {
     const response = await fetch(`${API_BASE_URL}/users/createuser`, {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(user),
+      headers: { 
+        "Content-Type": "application/json" 
+      },
+      body: JSON.stringify(userData),
       credentials: "include",
     });
 
     if (!response.ok) {
-      throw new Error("Error creando usuario");
+      const errorData = await response.json();
+      throw new Error(errorData.error || "Error creando usuario");
     }
 
     return await response.json();
   } catch (error) {
+    console.error("Error in createUser service:", error);
     throw error;
   }
 }
 
-export async function getUsers() {
+// Obtener todos los usuarios
+export async function getUsers(): Promise<{ users: UserResponse[] }> {
   try {
+    console.log("🔍 Iniciando getUsers request...");
+    
     const response = await fetch(`${API_BASE_URL}/users/getusers`, {
-      credentials: "include"
+      method: "GET",
+      headers: { 
+        "Content-Type": "application/json" 
+      },
+      credentials: "include",
     });
 
+    console.log("📡 Response status:", response.status);
+    console.log("📡 Response ok:", response.ok);
+
     if (!response.ok) {
-      throw new Error("Error obteniendo usuarios");
+      const errorData = await response.json();
+      console.error("❌ Error response:", errorData);
+      throw new Error(errorData.error || "Error obteniendo usuarios");
     }
 
-    return await response.json();
+    const data = await response.json();
+    console.log("✅ Users data received:", data);
+    
+    return data;
   } catch (error) {
+    console.error("💥 Error in getUsers service:", error);
     throw error;
   }
 }
 
-export async function updateUser(userId: string, updatedUser: any) {
+// Obtener usuario por ID
+export async function getUserById(id: string): Promise<UserResponse> {
   try {
-    const response = await fetch(`${API_BASE_URL}/users/updateuser/${userId}`, {
+    const response = await fetch(`${API_BASE_URL}/users/getuser/${id}`, {
+      method: "GET",
+      headers: { 
+        "Content-Type": "application/json" 
+      },
+      credentials: "include",
+    });
+
+    if (!response.ok) {
+      const errorData = await response.json();
+      throw new Error(errorData.error || "Error obteniendo usuario");
+    }
+
+    return await response.json();
+  } catch (error) {
+    console.error("Error in getUserById service:", error);
+    throw error;
+  }
+}
+
+// Actualizar usuario
+export async function updateUser(id: string, userData: UpdateUserRequest): Promise<{ message: string }> {
+  console.log("Updating user:", id, userData);
+  try {
+    const response = await fetch(`${API_BASE_URL}/users/updateuser/${id}`, {
       method: "PUT",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(updatedUser),
+      headers: { 
+        "Content-Type": "application/json" 
+      },
+      body: JSON.stringify(userData),
       credentials: "include",
     });
 
     if (!response.ok) {
-      throw new Error("Error actualizando usuario");
+      const errorData = await response.json();
+      throw new Error(errorData.error || "Error actualizando usuario");
     }
 
     return await response.json();
   } catch (error) {
+    console.error("Error in updateUser service:", error);
     throw error;
   }
 }
 
-// Eliminar usuario
-export async function deleteUser(userId: string) {
+// Cambiar estado del usuario
+export async function changeUserState(id: string, state: string): Promise<{ message: string }> {
+  console.log("Changing user state:", id, state);
   try {
-    const response = await fetch(`${API_BASE_URL}/users/${userId}`, {
-      method: "DELETE",
+    const response = await fetch(`${API_BASE_URL}/users/changeState/${id}`, {
+      method: "PUT",
+      headers: { 
+        "Content-Type": "application/json" 
+      },
+      body: JSON.stringify({ state }),
       credentials: "include",
     });
 
     if (!response.ok) {
-      throw new Error("Error eliminando usuario");
+      const errorData = await response.json();
+      throw new Error(errorData.error || "Error cambiando estado del usuario");
     }
 
     return await response.json();
   } catch (error) {
+    console.error("Error in changeUserState service:", error);
     throw error;
   }
+}
+
+// Eliminar usuario (hard delete)
+export async function hardDeleteUser(id: string): Promise<{ message: string }> {
+  console.log("Deleting user:", id);
+  try {
+    const response = await fetch(`${API_BASE_URL}/users/harddeleteuser/${id}`, {
+      method: "DELETE",
+      headers: { 
+        "Content-Type": "application/json" 
+      },
+      credentials: "include",
+    });
+
+    if (!response.ok) {
+      const errorData = await response.json();
+      throw new Error(errorData.error || "Error eliminando usuario");
+    }
+
+    return await response.json();
+  } catch (error) {
+    console.error("Error in hardDeleteUser service:", error);
+    throw error;
+  }
+}
+
+// Función auxiliar para manejar errores de red
+export function handleApiError(error: any): string {
+  if (error instanceof TypeError && error.message.includes('fetch')) {
+    return "Error de conexión. Verifica que el servidor esté funcionando.";
+  }
+  
+  if (error.message) {
+    return error.message;
+  }
+  
+  return "Ha ocurrido un error inesperado";
 }

@@ -240,8 +240,8 @@ const EditProductModal: React.FC<EditProductModalProps> = ({
                 onChange={(e) => setType(e.target.value as "prepared" | "nonprepared")}
                 className="form-input"
               >
-                <option value="nonprepared">No preparado</option>
-                <option value="prepared">Preparado</option>
+                <option value="nonprepared">No Preparable</option>
+                <option value="prepared">Preparable</option>
               </select>
             </div>
 

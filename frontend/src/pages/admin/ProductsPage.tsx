@@ -7,6 +7,9 @@ import ConfirmModal from "../../components/admin/ConfirmModal";
 import AlertModal from "../../components/common/AlertModal";
 import ViewProductModal from "../../components/admin/ViewProductModal";
 import "../../styles/admin/ProductsPage.css";
+import { getProducts, createProduct, updateProductById, hardDeleteProduct } from "../../services/admin/productService";
+
+
 
 export type Product = {
   id: string;
@@ -30,50 +33,27 @@ const ProductsPage: React.FC = () => {
 
   const [isAlertOpen, setIsAlertOpen] = useState(false);
   const [alertMessage, setAlertMessage] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
+  const totalProducts = products.length;
+
+  const loadProducts = async () => {
+    setIsLoading(true);
+    try {
+      const response = await getProducts();
+      const productsData = Array.isArray(response) ? response : response?.products || [];
+      setProducts(productsData);
+    } catch (error: any) {
+      console.error("Error cargando productos:", error);
+      setAlertMessage(error.message || "Error al cargar los productos");
+      setIsAlertOpen(true);
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   useEffect(() => {
-    const mockProducts: Product[] = [
-//COLOCAR EL COMPONENTE DE VER USUSARIOS AQUI
-
-{
-        id: "1",
-        name: "Hamburguesa Clásica",
-        price: 15000,
-        status: "active",
-        stock: 25,
-        type: "prepared",
-        created_at: new Date().toISOString(),
-      },
-      {
-        id: "2",
-        name: "Pizza Margarita",
-        price: 22000,
-        status: "active",
-        stock: 12,
-        type: "prepared",
-        created_at: new Date().toISOString(),
-      },
-      {
-        id: "3",
-        name: "Coca Cola 350ml",
-        price: 3500,
-        status: "active",
-        stock: 50,
-        type: "nonprepared",
-        created_at: new Date().toISOString(),
-      },
-      {
-        id: "4",
-        name: "Papas Fritas",
-        price: 8000,
-        status: "inactive",
-        stock: 0,
-        type: "prepared",
-        created_at: new Date().toISOString(),
-      },
-    ];
-    setProducts(mockProducts);
-  }, []);
+    loadProducts();
+  }, [])
 
   const openViewModal = (product: Product) => {
     setSelectedProduct(product);
@@ -85,41 +65,66 @@ const ProductsPage: React.FC = () => {
     setSelectedProduct(null);
   };
 
-  const handleAddProduct = (product: any) => {
+  const handleAddProduct = async (productData: any) => {
     try {
-      if (!product.name || !product.price) {
+      setIsLoading(true);
+
+      if (!productData.name || productData.price === undefined || productData.price === null) {
         throw new Error("Faltan campos obligatorios");
       }
 
-      const newProduct: Product = {
-        ...product,
-        id: Date.now().toString(),
-        created_at: new Date().toISOString(),
-      };
+      await createProduct({
+        name: productData.name,
+        price: productData.price,
+        status: productData.status || "active",
+        stock: productData.stock || 0,
+        type: productData.type || "nonprepared"
+      });
 
-      setProducts((prev) => [...prev, newProduct]);
+      await loadProducts();
       setIsModalOpen(false);
-    } catch (err: any) {
-      setAlertMessage(err.message || "No fue posible crear el producto");
+
+      setAlertMessage("Producto creado exitosamente");
       setIsAlertOpen(true);
+
+    } catch (error: any) {
+      console.error("Error creando producto:", error);
+      setAlertMessage(error.message || "No fue posible crear el producto");
+      setIsAlertOpen(true);
+    } finally {
+      setIsLoading(false);
     }
   };
 
-  const handleEditProduct = (updatedProduct: Product) => {
+  const handleEditProduct = async (updatedProduct: Product) => {
     try {
-      if (!updatedProduct.name || !updatedProduct.price) {
+      setIsLoading(true);
+
+      if (!updatedProduct.name || updatedProduct.price === undefined || updatedProduct.price === null) {
         throw new Error("Faltan campos obligatorios al editar");
       }
 
-      setProducts((prev) =>
-        prev.map((p) => (p.id === updatedProduct.id ? updatedProduct : p))
-      );
+      await updateProductById(updatedProduct.id, {
+        name: updatedProduct.name,
+        price: updatedProduct.price,
+        status: updatedProduct.status,
+        stock: updatedProduct.stock,
+        type: updatedProduct.type
+      });
 
+      await loadProducts();
       setIsEditModalOpen(false);
       setSelectedProduct(null);
-    } catch (err: any) {
-      setAlertMessage(err.message || "No fue posible editar el producto");
+
+      setAlertMessage("Producto actualizado exitosamente");
       setIsAlertOpen(true);
+
+    } catch (error: any) {
+      console.error("Error editando producto:", error);
+      setAlertMessage(error.message || "No fue posible editar el producto");
+      setIsAlertOpen(true);
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -133,9 +138,26 @@ const ProductsPage: React.FC = () => {
     setSelectedProduct(null);
   };
 
-  const handleDeleteProduct = (id: string) => {
-    setProducts(products.filter((p) => p.id !== id));
-    setIsConfirmOpen(false);
+  const handleDeleteProduct = async (id: string) => {
+    try {
+      setIsLoading(true);
+
+      await hardDeleteProduct(id);
+
+      await loadProducts();
+      setIsConfirmOpen(false);
+      setProductToDelete(null);
+
+      setAlertMessage("Producto eliminado exitosamente");
+      setIsAlertOpen(true);
+
+    } catch (error: any) {
+      console.error("Error eliminando producto:", error);
+      setAlertMessage(error.message || "No fue posible eliminar el producto");
+      setIsAlertOpen(true);
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   const handleDeleteClick = (id: string) => {
@@ -146,7 +168,6 @@ const ProductsPage: React.FC = () => {
   const handleConfirmDelete = () => {
     if (productToDelete !== null) {
       handleDeleteProduct(productToDelete);
-      setProductToDelete(null);
     }
   };
 
@@ -156,31 +177,62 @@ const ProductsPage: React.FC = () => {
         <div>
           <h1 className="dashboard-title">Gestión de Productos</h1>
         </div>
-        <Button className="primary-btn" onClick={() => setIsModalOpen(true)}>
+        <Button
+          className="primary-btn"
+          onClick={() => setIsModalOpen(true)}
+          disabled={isLoading}
+        >
           <Plus className="icono" />
           Nuevo Producto
         </Button>
       </div>
 
-      {/* Vista de tarjetas de productos */}
+      <div className="stats-grid">
+        <div className="stat-card">
+          <div className="stat-left">
+            <div className="stat-icon productos">
+              <Package size={20} />
+            </div>
+            <div>
+              <div className="stat-value">{totalProducts}</div>
+              <div className="stat-label">Productos Totales</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
       <div className="productos-grid">
+        {isLoading && products.length === 0 && (
+          <div className="loading-state">
+            <Package size={48} className="loading-icon" />
+            <p>Cargando productos...</p>
+          </div>
+        )}
+
         {products.map((product) => (
           <div key={product.id} className="product-card">
             <div className="product-card-header">
               <h3 className="product-name">{product.name}</h3>
+              <span
+                className={`product-status ${product.status === "active" ? "status-active" : "status-inactive"
+                  }`}
+              >
+                {product.status === "active" ? "Activo" : "Inactivo"}
+              </span>
             </div>
-            
+
             <div className="product-card-body">
               <div className="product-price">
                 ${product.price.toLocaleString()}
               </div>
-              
+
               <div className="product-actions">
                 <Button
                   type="button"
                   variant="secondary"
                   className="btn-icon ver"
                   onClick={() => openViewModal(product)}
+                  disabled={isLoading}
                 >
                   <Eye size={16} />
                 </Button>
@@ -189,6 +241,7 @@ const ProductsPage: React.FC = () => {
                   variant="secondary"
                   className="btn-icon editar"
                   onClick={() => openEditModal(product)}
+                  disabled={isLoading}
                 >
                   <Edit3 size={16} />
                 </Button>
@@ -197,6 +250,7 @@ const ProductsPage: React.FC = () => {
                   variant="secondary"
                   className="btn-icon eliminar"
                   onClick={() => handleDeleteClick(product.id)}
+                  disabled={isLoading}
                 >
                   <Trash2 size={16} />
                 </Button>
@@ -204,15 +258,16 @@ const ProductsPage: React.FC = () => {
             </div>
           </div>
         ))}
-        
-        {products.length === 0 && (
+
+        {!isLoading && products.length === 0 && (
           <div className="empty-state">
             <Package size={48} className="empty-icon" />
             <h3>No hay productos</h3>
             <p>Crea tu primer producto para comenzar</p>
-            <Button 
-              className="primary-btn" 
+            <Button
+              className="primary-btn"
               onClick={() => setIsModalOpen(true)}
+              disabled={isLoading}
             >
               <Plus className="icono" />
               Crear Producto
@@ -221,14 +276,12 @@ const ProductsPage: React.FC = () => {
         )}
       </div>
 
-      {/* Modal para crear producto */}
       <CreateProductModal
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
         onSubmit={handleAddProduct}
       />
 
-      {/* Modal para editar producto */}
       {selectedProduct && (
         <EditProductModal
           isOpen={isEditModalOpen}
@@ -238,7 +291,6 @@ const ProductsPage: React.FC = () => {
         />
       )}
 
-      {/* Modal de confirmación para eliminar */}
       <ConfirmModal
         isOpen={isConfirmOpen}
         onClose={() => setIsConfirmOpen(false)}
@@ -249,7 +301,6 @@ const ProductsPage: React.FC = () => {
         cancelText="Cancelar"
       />
 
-      {/* Modal para ver producto */}
       {selectedProduct && (
         <ViewProductModal
           isOpen={isViewModalOpen}
@@ -258,13 +309,12 @@ const ProductsPage: React.FC = () => {
         />
       )}
 
-      {/* Modal de alerta para errores */}
       <AlertModal
         isOpen={isAlertOpen}
         onClose={() => setIsAlertOpen(false)}
-        title="Error"
+        title={alertMessage.includes("exitosamente") ? "Éxito" : "Error"}
         message={alertMessage}
-        type="error"
+        type={alertMessage.includes("exitosamente") ? "success" : "error"}
         buttonText="Cerrar"
       />
     </div>

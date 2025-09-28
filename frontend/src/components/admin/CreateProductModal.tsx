@@ -2,7 +2,6 @@ import React, { useState, useEffect } from "react";
 import Button from "../common/Button";
 import { Package } from "lucide-react";
 import "../../styles/admin/CreateProductModal.css";
-import { createProduct } from "../../services/admin/productService";
 
 export type Product = {
   id?: string;

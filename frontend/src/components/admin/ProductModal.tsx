@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from "react";
 import Button from "../common/Button";
 import "../../styles/admin/ProductosPage.css";
-import { loginUser } from "../../services/login/authService";
 
 interface Product {
   id?: string;
@@ -19,7 +18,7 @@ interface Props {
   onSaved: () => void;
 }
 
-const ProductModal: React.FC<Props> = ({ isOpen, onClose, product, onSaved }) => {
+const ProductModal: React.FC<Props> = ({ isOpen, onClose, product }) => {
   const [name, setName] = useState("");
   const [price, setPrice] = useState<number>(0);
   const [status, setStatus] = useState("active");
@@ -44,7 +43,6 @@ const ProductModal: React.FC<Props> = ({ isOpen, onClose, product, onSaved }) =>
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    const body = { name, price, status, stock, type };
   };
 
   if (!isOpen) return null;
@@ -99,8 +97,8 @@ const ProductModal: React.FC<Props> = ({ isOpen, onClose, product, onSaved }) =>
             <div className="form-group">
               <label>Tipo</label>
               <select value={type} onChange={(e) => setType(e.target.value)}>
-                <option value="prepared">Preparado</option>
-                <option value="nonprepared">No preparado</option>
+                <option value="prepared">Preparable</option>
+                <option value="nonprepared">No Preparable</option>
               </select>
             </div>
 
