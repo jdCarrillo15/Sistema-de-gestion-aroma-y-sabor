@@ -1,17 +1,18 @@
 import React, { useEffect } from "react";
 import Button from "../common/Button";
-import "../../styles/admin/ViewUserModal.css"; 
-import { getUsers } from "../../services/admin/userService";
+import "../../styles/admin/CreateUserModal.css";
 
 interface ViewUserModalProps {
   isOpen: boolean;
   onClose: () => void;
   user: any;
-
 }
 
-
-const ViewUserModal: React.FC<ViewUserModalProps> = ({ isOpen, onClose, user }) => {
+const ViewUserModal: React.FC<ViewUserModalProps> = ({
+  isOpen,
+  onClose,
+  user,
+}) => {
   useEffect(() => {
     if (isOpen) {
       document.body.style.overflow = "hidden";
@@ -23,101 +24,205 @@ const ViewUserModal: React.FC<ViewUserModalProps> = ({ isOpen, onClose, user }) 
     };
   }, [isOpen]);
 
-  // Función para manejar el cierre con Escape
   const handleKeyDown = (e: React.KeyboardEvent) => {
     if (e.key === "Escape") {
       onClose();
     }
   };
 
+  // Si no está abierto o no hay usuario, no renderizar
   if (!isOpen || !user) return null;
 
+  // Función helper para obtener el estado formateado
+  const getFormattedState = (state: string) => {
+    if (!state) return "No especificado";
+    const lowerState = state.toLowerCase();
+    if (lowerState === "active" || lowerState === "activo") {
+      return "Activo";
+    } else if (lowerState === "inactive" || lowerState === "inactivo") {
+      return "Inactivo";
+    }
+    return state;
+  };
+
+  // Función helper para formatear fecha
+  const formatDate = (dateString: string) => {
+    if (!dateString) return "No especificado";
+    try {
+      const date = new Date(dateString);
+      return date.toLocaleDateString("es-ES", {
+        year: "numeric",
+        month: "long",
+        day: "numeric",
+        hour: "2-digit",
+        minute: "2-digit",
+      });
+    } catch {
+      return "Fecha inválida";
+    }
+  };
+
+  // Función helper para formatear rol
+  const getFormattedRole = (role: string) => {
+    if (!role) return "No especificado";
+    const roleMap: { [key: string]: string } = {
+      admin: "Administrador",
+      cocinero: "Cocinero",
+      mesero: "Mesero",
+      waiter: "Mesero",
+      user: "Caja",
+      cashier: "Caja",
+    };
+    return roleMap[role.toLowerCase()] || role;
+  };
+
   return (
-    <div 
-      className="viewuser-backdrop"
+    <div
+      className="modal-backdrop"
       onKeyDown={handleKeyDown}
       tabIndex={-1}
     >
-      <div className="viewuser-container">
-        {/* Botón X mejorado */}
-        <button
-          className="close-button"
-          onClick={onClose}
-          aria-label="Cerrar"
-          style={{
-            position: 'absolute',
-            top: '16px',
-            right: '16px',
-            background: 'none',
-            border: 'none',
-            color: '#A0A0A0',
-            cursor: 'pointer',
-            padding: '8px',
-            borderRadius: '8px',
-            transition: 'all 0.2s ease',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            zIndex: 10
-          }}
-          onMouseOver={(e) => {
-            e.currentTarget.style.background = '#F5F5F5';
-            e.currentTarget.style.color = '#8B4513';
-            e.currentTarget.style.transform = 'rotate(90deg)';
-          }}
-          onMouseOut={(e) => {
-            e.currentTarget.style.background = 'none';
-            e.currentTarget.style.color = '#A0A0A0';
-            e.currentTarget.style.transform = 'rotate(0deg)';
-          }}
-        >
-          <svg
-            width="24"
-            height="24"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth="2"
-          >
-            <line x1="18" y1="6" x2="6" y2="18"></line>
-            <line x1="6" y1="6" x2="18" y2="18"></line>
-          </svg>
-        </button>
-
-        {/* Avatar + Nombre */}
-        <div className="viewuser-header">
-          <div className="viewuser-avatar">
-            <span>{user[0].user_name?.charAt(0).toUpperCase()}</span>
+      <div className="modal-container">
+        <div className="modal-content">
+          <div className="modal-header">
+            <button
+              className="close-button"
+              onClick={onClose}
+              aria-label="Cerrar"
+            >
+              <svg
+                width="24"
+                height="24"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
+              >
+                <line x1="18" y1="6" x2="6" y2="18"></line>
+                <line x1="6" y1="6" x2="18" y2="18"></line>
+              </svg>
+            </button>
           </div>
-          <h2>{user[0].user_name}</h2>
-          <p className={`viewuser-status ${user[0].state.toLowerCase() === "activo" ? "activo" : "inactivo"}`}>
-            ● {user[0].state}
+
+          <div className="modal-icon">
+            <svg
+              width="64"
+              height="64"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="1.5"
+            >
+              <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
+              <circle cx="12" cy="7" r="4" />
+            </svg>
+          </div>
+
+          <h2 className="modal-title">Información del Usuario</h2>
+          <p className="modal-description">
+            Detalles completos del usuario seleccionado.
           </p>
-        </div>
 
-        {/* Datos principales */}
-        <div className="viewuser-section">
-          <h3>Información de cuenta</h3>
-          <p><strong>Email:</strong> {user[0].email}</p>
-          <p><strong>Rol:</strong> {user[0].role}</p>
-          <p><strong>Fecha de inicio:</strong> {new Date(user[0].created_at).toLocaleDateString()}</p>
-        </div>
+          <div className="user-details">
+            {/* Información de Usuario */}
+            <div className="details-section">
+              <h3 className="section-title">Datos de Usuario</h3>
+              
+              <div className="detail-row">
+                <span className="detail-label">Nombre de usuario:</span>
+                <span className="detail-value">{user.user_name || "No especificado"}</span>
+              </div>
 
-        {/* Datos de persona */}
-        {user[0].person && (
-          <div className="viewuser-section">
-            <h3>Datos personales</h3>
-            <p><strong>Nombre:</strong> {user[0].person.first_name}</p>
-            <p><strong>Apellido:</strong> {user[0].person.last_name}</p>
-            <p><strong>Documento:</strong> {user[0].person.document_id}</p>
-            <p><strong>Fecha de nacimiento:</strong> {user[0].person.birthdate}</p>
+              <div className="detail-row">
+                <span className="detail-label">Correo electrónico:</span>
+                <span className="detail-value">{user.email || "No especificado"}</span>
+              </div>
+
+              <div className="detail-row">
+                <span className="detail-label">Rol:</span>
+                <span className="detail-value">{getFormattedRole(user.role)}</span>
+              </div>
+
+              <div className="detail-row">
+                <span className="detail-label">Estado:</span>
+                <span className={`detail-value status ${user.state?.toLowerCase() === "activo" || user.state?.toLowerCase() === "active" ? "active" : "inactive"}`}>
+                  {getFormattedState(user.state)}
+                </span>
+              </div>
+
+              <div className="detail-row">
+
+              </div>
+
+              <div className="detail-row">
+                <span className="detail-label">Fecha de registro:</span>
+                <span className="detail-value">{formatDate(user.created_at)}</span>
+              </div>
+            </div>
+
+            {/* Información Personal */}
+            {user.person && (
+              <div className="details-section">
+                <h3 className="section-title">Información Personal</h3>
+                
+                <div className="detail-row">
+                  <span className="detail-label">Nombre completo:</span>
+                  <span className="detail-value">
+                    {user.person.first_name && user.person.last_name 
+                      ? `${user.person.first_name} ${user.person.last_name}`
+                      : "No especificado"
+                    }
+                  </span>
+                </div>
+
+                <div className="detail-row">
+                  <span className="detail-label">Nombre:</span>
+                  <span className="detail-value">{user.person.first_name || "No especificado"}</span>
+                </div>
+
+                <div className="detail-row">
+                  <span className="detail-label">Apellido:</span>
+                  <span className="detail-value">{user.person.last_name || "No especificado"}</span>
+                </div>
+
+                <div className="detail-row">
+                  <span className="detail-label">Documento:</span>
+                  <span className="detail-value">{user.person.document_id || "No especificado"}</span>
+                </div>
+
+                <div className="detail-row">
+                  <span className="detail-label">Fecha de nacimiento:</span>
+                  <span className="detail-value">
+                    {user.person.birthdate 
+                      ? new Date(user.person.birthdate).toLocaleDateString("es-ES")
+                      : "No especificado"
+                    }
+                  </span>
+                </div>
+
+                {user.person.id && (
+                  <div className="detail-row">
+                  </div>
+                )}
+              </div>
+            )}
+
+            {/* Si no hay información personal */}
+            {!user.person && (
+              <div className="details-section">
+                <h3 className="section-title">Información Personal</h3>
+                <div className="no-data">
+                  <p>No hay información personal registrada para este usuario.</p>
+                </div>
+              </div>
+            )}
           </div>
-        )}
 
-        <div className="viewuser-footer">
-          <Button type="button" variant="primary" onClick={onClose}>
-            Cerrar
-          </Button>
+          <div className="modal-buttons">
+            <Button type="button" variant="primary" onClick={onClose}>
+              Cerrar
+            </Button>
+          </div>
         </div>
       </div>
     </div>

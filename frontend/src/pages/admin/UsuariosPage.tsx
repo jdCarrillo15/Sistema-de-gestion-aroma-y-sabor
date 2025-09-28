@@ -360,7 +360,7 @@ const UsuariosPage: React.FC = () => {
                     </span>
                   </td>
                   <td>{new Date(u.created_at).toLocaleDateString("es-ES")}</td>
-                  <td className="acciones">
+                  <td className="product-actions">
                     <Button
                       type="button"
                       variant="secondary"

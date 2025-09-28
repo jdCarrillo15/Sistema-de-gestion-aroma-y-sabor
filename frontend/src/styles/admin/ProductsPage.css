@@ -162,7 +162,6 @@
     margin: 0 0 24px 0;
   }
 
-  /* Responsividad */
   @media (max-width: 768px) {
     .productos-grid {
       grid-template-columns: 1fr;
