@@ -22,7 +22,6 @@ keys/
 
 # (tests)
 coverage/
-__tests__
 __mocks__
 
 # Build outputs
