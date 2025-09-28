@@ -21,6 +21,7 @@ const ViewUserModal: React.FC<ViewUserModalProps> = ({
     }
     return () => {
       document.body.style.overflow = "unset";
+      console.log("Modal cerrado, overflow restablecido")
     };
   }, [isOpen]);
 
