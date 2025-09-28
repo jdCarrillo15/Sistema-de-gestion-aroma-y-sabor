@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { Plus, Edit3, Trash2, Eye, Package, DollarSign, AlertTriangle, TrendingUp } from "lucide-react";
+import { Plus, Edit3, Trash2, Eye, Package } from "lucide-react";
 import Button from "../../components/common/Button";
 import CreateProductModal from "../../components/admin/CreateProductModal";
 import EditProductModal from "../../components/admin/EditProductModal";
@@ -28,14 +28,14 @@ const ProductsPage: React.FC = () => {
   const [isConfirmOpen, setIsConfirmOpen] = useState(false);
   const [productToDelete, setProductToDelete] = useState<string | null>(null);
 
-  // Estado del AlertModal
   const [isAlertOpen, setIsAlertOpen] = useState(false);
   const [alertMessage, setAlertMessage] = useState("");
 
-  // Datos simulados iniciales
   useEffect(() => {
     const mockProducts: Product[] = [
-      {
+//COLOCAR EL COMPONENTE DE VER USUSARIOS AQUI
+
+{
         id: "1",
         name: "Hamburguesa Clásica",
         price: 15000,
@@ -75,12 +75,6 @@ const ProductsPage: React.FC = () => {
     setProducts(mockProducts);
   }, []);
 
-  // Cálculo de estadísticas
-  const totalProducts = products.length;
-  const activeProducts = products.filter(p => p.status === 'active').length;
-  const totalValue = products.reduce((sum, p) => sum + (p.price * p.stock), 0);
-  const lowStock = products.filter(p => p.stock <= 5).length;
-
   const openViewModal = (product: Product) => {
     setSelectedProduct(product);
     setIsViewModalOpen(true);
@@ -91,7 +85,7 @@ const ProductsPage: React.FC = () => {
     setSelectedProduct(null);
   };
 
-  const handleAddProduct = (product: Product) => {
+  const handleAddProduct = (product: any) => {
     try {
       if (!product.name || !product.price) {
         throw new Error("Faltan campos obligatorios");
@@ -158,11 +152,9 @@ const ProductsPage: React.FC = () => {
 
   return (
     <div className="dashboard-page">
-      {/* Header */}
       <div className="dashboard-header">
         <div>
           <h1 className="dashboard-title">Gestión de Productos</h1>
-          <p className="dashboard-sub">Administra tu inventario y catálogo</p>
         </div>
         <Button className="primary-btn" onClick={() => setIsModalOpen(true)}>
           <Plus className="icono" />
@@ -170,133 +162,73 @@ const ProductsPage: React.FC = () => {
         </Button>
       </div>
 
-      {/* Estadísticas */}
-      <div className="stats-grid">
-        <div className="stat-card">
-          <div className="stat-left">
-            <div className="stat-icon productos">
-              <Package size={20} />
+      {/* Vista de tarjetas de productos */}
+      <div className="productos-grid">
+        {products.map((product) => (
+          <div key={product.id} className="product-card">
+            <div className="product-card-header">
+              <h3 className="product-name">{product.name}</h3>
             </div>
-            <div>
-              <div className="stat-value">{totalProducts}</div>
-              <div className="stat-label">Productos Totales</div>
-            </div>
-          </div>
-          <div className="stat-change positive">+12%</div>
-        </div>
-
-        <div className="stat-card">
-          <div className="stat-left">
-            <div className="stat-icon activos">
-              <TrendingUp size={20} />
-            </div>
-            <div>
-              <div className="stat-value">{activeProducts}</div>
-              <div className="stat-label">Productos Activos</div>
-            </div>
-          </div>
-          <div className="stat-change positive">+8%</div>
-        </div>
-
-        <div className="stat-card">
-          <div className="stat-left">
-            <div className="stat-icon inventario">
-              <DollarSign size={20} />
-            </div>
-            <div>
-              <div className="stat-value">${totalValue.toLocaleString()}</div>
-              <div className="stat-label">Valor Inventario</div>
-            </div>
-          </div>
-          <div className="stat-change positive">+15%</div>
-        </div>
-
-        <div className="stat-card">
-          <div className="stat-left">
-            <div className="stat-icon stock-bajo">
-              <AlertTriangle size={20} />
-            </div>
-            <div>
-              <div className="stat-value">{lowStock}</div>
-              <div className="stat-label">Stock Bajo</div>
+            
+            <div className="product-card-body">
+              <div className="product-price">
+                ${product.price.toLocaleString()}
+              </div>
+              
+              <div className="product-actions">
+                <Button
+                  type="button"
+                  variant="secondary"
+                  className="btn-icon ver"
+                  onClick={() => openViewModal(product)}
+                >
+                  <Eye size={16} />
+                </Button>
+                <Button
+                  type="button"
+                  variant="secondary"
+                  className="btn-icon editar"
+                  onClick={() => openEditModal(product)}
+                >
+                  <Edit3 size={16} />
+                </Button>
+                <Button
+                  type="button"
+                  variant="secondary"
+                  className="btn-icon eliminar"
+                  onClick={() => handleDeleteClick(product.id)}
+                >
+                  <Trash2 size={16} />
+                </Button>
+              </div>
             </div>
           </div>
-          <div className="stat-change negative">-5%</div>
-        </div>
+        ))}
+        
+        {products.length === 0 && (
+          <div className="empty-state">
+            <Package size={48} className="empty-icon" />
+            <h3>No hay productos</h3>
+            <p>Crea tu primer producto para comenzar</p>
+            <Button 
+              className="primary-btn" 
+              onClick={() => setIsModalOpen(true)}
+            >
+              <Plus className="icono" />
+              Crear Producto
+            </Button>
+          </div>
+        )}
       </div>
 
-      {/* Tabla */}
-      <div className="productos-tabla-container">
-        <table className="productos-tabla">
-          <thead>
-            <tr>
-              <th>Nombre del producto</th>
-              <th>Precio</th>
-              <th>Stock</th>
-              <th>Tipo</th>
-              <th>Estado</th>
-              <th>Fecha de creación</th>
-              <th className="acciones-col">Acciones</th>
-            </tr>
-          </thead>
-          <tbody>
-            {products.map((product) => (
-              <tr key={product.id}>
-                <td className="nombre">{product.name}</td>
-                <td>${product.price.toLocaleString()}</td>
-                <td>
-                  <span className={product.stock <= 5 ? 'stock-low' : ''}>
-                    {product.stock}
-                  </span>
-                </td>
-                <td>{product.type === 'prepared' ? 'Preparado' : 'No preparado'}</td>
-                <td>
-                  <span
-                    className={`estado ${
-                      product.status === "active" ? "activo" : "inactivo"
-                    }`}
-                  >
-                    {product.status === "active" ? "Activo" : "Inactivo"}
-                  </span>
-                </td>
-                <td>
-                  {product.created_at 
-                    ? new Date(product.created_at).toLocaleDateString("es-ES")
-                    : "-"}
-                </td>
-                <td className="acciones">
-                  <Button
-                    type="button"
-                    variant="secondary"
-                    className="btn-icon ver"
-                    onClick={() => openViewModal(product)}
-                  >
-                    <Eye size={16} />
-                  </Button>
-                  <Button
-                    type="button"
-                    variant="secondary"
-                    className="btn-icon editar"
-                    onClick={() => openEditModal(product)}
-                  >
-                    <Edit3 size={16} />
-                  </Button>
-                  <Button
-                    type="button"
-                    variant="secondary"
-                    className="btn-icon eliminar"
-                    onClick={() => handleDeleteClick(product.id)}
-                  >
-                    <Trash2 size={16} />
-                  </Button>
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
+      {/* Modal para crear producto */}
+      <CreateProductModal
+        isOpen={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+        onSubmit={handleAddProduct}
+      />
 
- 
+      {/* Modal para editar producto */}
       {selectedProduct && (
         <EditProductModal
           isOpen={isEditModalOpen}
@@ -306,6 +238,7 @@ const ProductsPage: React.FC = () => {
         />
       )}
 
+      {/* Modal de confirmación para eliminar */}
       <ConfirmModal
         isOpen={isConfirmOpen}
         onClose={() => setIsConfirmOpen(false)}
@@ -316,6 +249,7 @@ const ProductsPage: React.FC = () => {
         cancelText="Cancelar"
       />
 
+      {/* Modal para ver producto */}
       {selectedProduct && (
         <ViewProductModal
           isOpen={isViewModalOpen}
@@ -324,6 +258,7 @@ const ProductsPage: React.FC = () => {
         />
       )}
 
+      {/* Modal de alerta para errores */}
       <AlertModal
         isOpen={isAlertOpen}
         onClose={() => setIsAlertOpen(false)}

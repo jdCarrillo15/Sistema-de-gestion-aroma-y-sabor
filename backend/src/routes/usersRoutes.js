@@ -11,6 +11,10 @@ router.put("/updateuser/id", authenticate, authorize("update", "users"), updateU
 router.delete("/harddeleteuser/:id", authenticate, authorize("delete", "users"), hardDeleteUser);
 router.put("/changeState/:id", authenticate, authorize("update", "users"), changeStateUser);
 
+router.post("/createproduct", authenticate, authorize("create_user_and_person", "users"), createUserAndPerson)
+router.get("/getproducts", authenticate, authorize("read", "products"), getUsers);
+
 export default router;
 
 
+    

@@ -156,7 +156,6 @@ const UsuariosPage: React.FC = () => {
     }
   };
 
-
   const openEditModal = (user: User) => {
     setSelectedUser(user);
     setIsEditModalOpen(true);

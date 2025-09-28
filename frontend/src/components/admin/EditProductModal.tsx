@@ -28,7 +28,6 @@ const EditProductModal: React.FC<EditProductModalProps> = ({
 }) => {
   const [name, setName] = useState("");
   const [price, setPrice] = useState("");
-  const [status, setStatus] = useState<"active" | "inactive">("active");
   const [stock, setStock] = useState("");
   const [type, setType] = useState<"prepared" | "nonprepared">("nonprepared");
 
@@ -42,7 +41,6 @@ const EditProductModal: React.FC<EditProductModalProps> = ({
     if (isOpen && product) {
       setName(product.name);
       setPrice(product.price.toString());
-      setStatus(product.status);
       setStock(product.stock.toString());
       setType(product.type);
       setErrors({ name: "", price: "", stock: "" });
@@ -139,7 +137,6 @@ const EditProductModal: React.FC<EditProductModalProps> = ({
       ...product,
       name: name.trim(),
       price: parseFloat(price),
-      status,
       stock: parseInt(stock),
       type,
     };
@@ -245,19 +242,6 @@ const EditProductModal: React.FC<EditProductModalProps> = ({
               >
                 <option value="nonprepared">No preparado</option>
                 <option value="prepared">Preparado</option>
-              </select>
-            </div>
-
-            <div className="form-group">
-              <label htmlFor="status" className="form-label">Estado</label>
-              <select
-                id="status"
-                value={status}
-                onChange={(e) => setStatus(e.target.value as "active" | "inactive")}
-                className="form-input"
-              >
-                <option value="active">Activo</option>
-                <option value="inactive">Inactivo</option>
               </select>
             </div>
 
