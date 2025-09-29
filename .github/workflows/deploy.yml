@@ -19,13 +19,7 @@ jobs:
         with:
           ssh-private-key: ${{ secrets.VPS_SSH_KEY }}
 
-      - name: Detect changes
-        id: changes
-        run: |
-          echo "CHANGED_DIRS=$(git diff --name-only ${{ github.event.before }} ${{ github.sha }} | cut -d/ -f1 | sort -u)" >> $GITHUB_ENV
-
       - name: Deploy backend on VPS
-        if: contains(env.CHANGED_DIRS, 'backend')
         run: |
           ssh -o StrictHostKeyChecking=no ${{ secrets.VPS_USER }}@${{ secrets.VPS_HOST }} "
             cd ${{ secrets.VPS_APP_DIR }}
