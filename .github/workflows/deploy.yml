@@ -27,7 +27,7 @@ jobs:
             git reset --hard origin/deploy
             cd backend
             npm install --omit=dev
-            pm2 startOrReload ecosystem.config.cjs
+            pm2 startOrReload /home/appuser/configs/ecosystem.config.cjs
             pm2 status
           "
 
