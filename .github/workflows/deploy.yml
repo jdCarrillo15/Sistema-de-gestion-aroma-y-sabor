@@ -33,9 +33,11 @@ jobs:
             git reset --hard origin/deploy
 
             cd backend
-            npm ci --omit=dev
+            npm install --omit=dev
 
-            pm2 startOrReload ecosystem.config.cjs
+            pm2 startOrReload aroma-sabor-backend
+            pm2 status
+            pm2 logs aroma-sabor-backend --lines 20
           "
 
       - name: Deploy frontend on VPS
