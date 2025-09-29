@@ -1,22 +1,59 @@
-name: Test Pipeline
+name: Deploy to VPS
 
 on:
   push:
     branches:
-      - deploy   # Se ejecuta cuando hagas push a la rama 'deploy'
+      - deploy
 
 jobs:
-  test-job:
+  deploy:
     runs-on: ubuntu-latest
-
-    container: node:18-alpine   # Imagen ligera
+    environment: vps
 
     steps:
-      - name: Checkout repo
+      - name: Checkout
         uses: actions/checkout@v3
 
-      - name: Show Node version
-        run: node -v
+      - name: Setup SSH
+        uses: webfactory/ssh-agent@v0.9.0
+        with:
+          ssh-private-key: ${{ secrets.VPS_SSH_KEY }}
 
-      - name: Dummy step
-        run: echo "Pipeline ejecutado correctamente en la rama deploy"
+      - name: Detect changes
+        id: changes
+        run: |
+          echo "CHANGED_DIRS=$(git diff-tree --no-commit-id --name-only -r ${{ github.sha }} | cut -d/ -f1 | sort -u)" >> $GITHUB_ENV
+
+      - name: Deploy backend on VPS
+        if: contains(env.CHANGED_DIRS, 'backend')
+        run: |
+          ssh -o StrictHostKeyChecking=no ${{ secrets.VPS_USER }}@${{ secrets.VPS_HOST }} "
+            cd ${{ secrets.VPS_APP_DIR }}
+            git fetch --all
+            git reset --hard origin/deploy
+
+            cd backend
+            npm ci --omit=dev
+
+            pm2 startOrReload ecosystem.config.cjs
+          "
+
+      - name: Deploy frontend on VPS
+        if: contains(env.CHANGED_DIRS, 'frontend')
+        run: |
+          ssh -o StrictHostKeyChecking=no ${{ secrets.VPS_USER }}@${{ secrets.VPS_HOST }} "
+            cd ${{ secrets.VPS_APP_DIR }}
+            git fetch --all
+            git reset --hard origin/deploy
+
+            cd frontend
+            npm ci
+            npm run build
+
+            sudo rm -rf /var/www/aroma-sabor/*
+            sudo cp -r dist/* /var/www/aroma-sabor/
+            sudo chown -R www-data:www-data /var/www/aroma-sabor
+            sudo chmod -R 755 /var/www/aroma-sabor
+
+            sudo systemctl reload nginx
+          "
