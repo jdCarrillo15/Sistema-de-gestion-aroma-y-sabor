@@ -35,12 +35,12 @@ export async function getProducts(req, res) {
 
 //CRUD functions
 export async function createProduct(req, res) {
+  if (!data.name || !data.price) {
+    return res.status(406).json({ error: "Name y price son obligatorios" });
+  }
   try {
     const data = req.body;
 
-    if (!data.name || !data.price) {
-      return res.status(400).json({ error: "Name y price son obligatorios" });
-    }
     if (data.type == "") {
         data.type = "nonprepared";
     }
@@ -74,7 +74,7 @@ export async function getProductById(req, res) {
     const productDoc = await getResourceDoc(id, "products");
 
     if (!productDoc)
-      return res.status(403).json({ error: "Producto no encontrado" });
+      return res.status(404).json({ error: "Producto no encontrado" });
 
     return res.json({
         id: productDoc.id,
@@ -136,7 +136,7 @@ export async function hardDeleteProduct(req, res) {
       message: "Producto y datos relacionados eliminados correctamente",
     });
   } catch (err) {
-    console.error("Error al eliminar producto:", err);
+    // console.error("Error al eliminar producto:", err.message);
     res.status(500).json({
       error: "Error al eliminar producto",
       details: err.message,
