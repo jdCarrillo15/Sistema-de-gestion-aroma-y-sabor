@@ -26,6 +26,7 @@ export async function getUsers(req, res) {
                     user_name: data.user_name,
                     email: data.email,
                     role: data.role,
+                    state: data.state,
                     person,
                     created_at: new Date(data.created_at._seconds * 1000).toISOString(),
                 };
@@ -40,19 +41,20 @@ export async function getUsers(req, res) {
 
 //CRUD functions
 export async function createUserAndPerson(req, res) {
+    const data = req.body;
+    if (!data.email || !data.password) {
+        return res.status(406).json({ error: "Email y password son obligatorios" });
+    }
+    if((await checkEmailUnique(data.email))==false){
+        return res.status(409).json({ error: "El email ya está en uso" });
+    }
+    if(data.password.length < 6){
+        console.log(data.password);
+        return res.status(406).json({ error: "La contraseña debe tener al menos 6 caracteres" });
+    }else if(await checkPasswordStrength(data.password)==false ){
+        return res.status(406).json({ error: "La contraseña debe contener al menos una mayúscula, una minúscula y un número" });
+    }
     try {
-        const data = req.body;
-
-        if (!data.email || !data.password) {
-            return res.status(400).json({ error: "Email y password son obligatorios" });
-        }
-        if(data.email && !(await checkEmailUnique(data.email))){
-            return res.status(400).json({ error: "El email ya está en uso" });
-        }
-        if(data.password && data.password.length < 6){
-            return res.status(400).json({ error: "La contraseña debe tener al menos 6 caracteres" });
-        }
-
         // 1. Crear usuario en Firebase Auth
         const userRecord = await admin.auth().createUser({
             email: data.email, 
@@ -74,7 +76,7 @@ export async function createUserAndPerson(req, res) {
         await db.collection("users").doc(authUid).set({
             person_id: personId,
             user_name: data.user_name || "",
-            role: data.role || "user",
+            role: data.role || "",
             email: data.email,
             state: data.state || "active",
             created_at: admin.firestore.FieldValue.serverTimestamp()
@@ -92,12 +94,24 @@ export async function createUserAndPerson(req, res) {
     }
 }
 
-//Verificar correo unico y robustes de contraseña
+//Verificar correo unico 
 export async function checkEmailUnique(email) {
     const userQuery = await db.collection("users").where("email", "==", email).get();
-    return userQuery.empty; // true si el email es único
+    try {
+        await admin.auth().getUserByEmail(email);
+        return false; // El email ya existe en Auth
+    } catch (error) {
+        if (error.code === 'auth/user-not-found') {
+            return true; // El email es único en Auth
+        }else return userQuery.empty; // true si el email es único
+    }
 }
-
+//Verificar robustes de contraseña
+export function checkPasswordStrength(password) {
+    // Al menos 6 caracteres, una mayúscula, una minúscula y un número
+    const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).{6,}$/;
+    return passwordRegex.test(password);
+}
 export async function getUserById(req, res) {
     try {
         const { id } = req.params
@@ -119,6 +133,7 @@ export async function getUserById(req, res) {
             user_name: userDoc.user_name,
             email: userDoc.email,
             role: userDoc.role,
+            state: userDoc.state,
             person,
             created_at: new Date(userDoc.created_at._seconds * 1000).toISOString()
         });
@@ -173,6 +188,12 @@ export async function hardDeleteUser(req, res) {
             return res.status(400).json({ error: "Se requiere el ID del usuario" });
         }
 
+        if(admin.auth().currentUser && admin.auth().currentUser.uid === id){
+            return res.status(403).json({ error: "No se puede eliminar el usuario autenticado" });
+        }
+        if((await checkUserExists(id))==false){
+            return res.status(404).json({ error: "Usuario no encontrado" });
+        }
         // 1. Eliminar usuario de Firebase Auth
         await admin.auth().deleteUser(id);
 
@@ -191,16 +212,31 @@ export async function hardDeleteUser(req, res) {
 
             // Eliminar el doc de users
             await userRef.delete();
+        }else{
+            return res.status(404).json({ error: "Usuario no encontrado" });
         }
 
         res.json({ message: "Usuario y datos relacionados eliminados correctamente" });
     } catch (err) {
-        console.error("Error al eliminar usuario:", err);
         res.status(500).json({
             error: "Error al eliminar usuario",
             details: err.message
         });
     }
+}
+
+//Verificar si el usuario existe en Auth
+export async function checkUserExists(uid) {
+    try {
+        await admin.auth().getUser(uid);
+        return true; // El usuario existe en Auth
+    } catch (error) {
+        if (error.code === 'auth/user-not-found') {
+            return false; // El usuario no existe en Auth
+        } else {
+            throw error; // Otro error
+        }
+    } 
 }
 
 
