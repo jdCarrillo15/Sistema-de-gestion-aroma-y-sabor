@@ -22,7 +22,7 @@ jobs:
       - name: Detect changes
         id: changes
         run: |
-          echo "CHANGED_DIRS=$(git diff-tree --no-commit-id --name-only -r ${{ github.sha }} | cut -d/ -f1 | sort -u)" >> $GITHUB_ENV
+          echo "CHANGED_DIRS=$(git diff --name-only ${{ github.event.before }} ${{ github.sha }} | cut -d/ -f1 | sort -u)" >> $GITHUB_ENV
 
       - name: Deploy backend on VPS
         if: contains(env.CHANGED_DIRS, 'backend')
@@ -31,13 +31,10 @@ jobs:
             cd ${{ secrets.VPS_APP_DIR }}
             git fetch --all
             git reset --hard origin/deploy
-
             cd backend
             npm install --omit=dev
-
             pm2 startOrReload aroma-sabor-backend
             pm2 status
-            pm2 logs aroma-sabor-backend --lines 20
           "
 
       - name: Deploy frontend on VPS
@@ -47,15 +44,12 @@ jobs:
             cd ${{ secrets.VPS_APP_DIR }}
             git fetch --all
             git reset --hard origin/deploy
-
             cd frontend
             npm ci
             npm run build
-
             sudo rm -rf /var/www/aroma-sabor/*
             sudo cp -r dist/* /var/www/aroma-sabor/
             sudo chown -R www-data:www-data /var/www/aroma-sabor
             sudo chmod -R 755 /var/www/aroma-sabor
-
             sudo systemctl reload nginx
           "
