@@ -18,13 +18,18 @@ export async function loginUser(email: string, password: string) {
 
     const data = await response.json();
 
+    if (data.success) {
+      localStorage.setItem("user", JSON.stringify({
+        uid: data.uid,
+        role: data.role
+      }));
+    }
+
     return data;
   } catch (error) {
     throw error;
   }
 }
-
-
 
 export async function sendRecoveryEmail(email: string) {
   try {
@@ -44,4 +49,22 @@ export async function sendRecoveryEmail(email: string) {
   } catch (error) {
     throw error;
   }
+}
+
+export function getCurrentUser() {
+  const userData = localStorage.getItem("user");
+  return userData ? JSON.parse(userData) : null;
+}
+
+export function isAdmin(): boolean {
+  const user = getCurrentUser();
+  return user?.role === "admin";
+}
+
+export function isAuthenticated(): boolean {
+  return getCurrentUser() !== null;
+}
+
+export function logoutUser() {
+  localStorage.removeItem("user");
 }
