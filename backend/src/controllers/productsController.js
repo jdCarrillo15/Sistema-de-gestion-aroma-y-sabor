@@ -35,11 +35,11 @@ export async function getProducts(req, res) {
 
 //CRUD functions
 export async function createProduct(req, res) {
+  const data = req.body;
   if (!data.name || !data.price) {
     return res.status(406).json({ error: "Name y price son obligatorios" });
   }
   try {
-    const data = req.body;
 
     if (data.type == "") {
         data.type = "nonprepared";
