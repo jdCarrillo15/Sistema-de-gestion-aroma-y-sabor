@@ -1,4 +1,4 @@
-import express from "express";
+import express, { request, response } from "express";
 import { createUserAndPerson, getUserById, getUsers, updateUserById, hardDeleteUser, changeStateUser } from "../controllers/usersController.js";
 import { authenticate, authorize, loadResourceState } from "../middleware/auth.js";
 
