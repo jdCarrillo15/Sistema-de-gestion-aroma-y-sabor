@@ -40,9 +40,6 @@ jobs:
             cd frontend
             npm ci
             npm run build
-            sudo rm -rf /var/www/aroma-sabor/*
-            sudo cp -r dist/* /var/www/aroma-sabor/
-            sudo chown -R www-data:www-data /var/www/aroma-sabor
-            sudo chmod -R 755 /var/www/aroma-sabor
-            sudo systemctl reload nginx
+            rm -rf /var/www/aroma-sabor/*
+            cp -r dist/* /var/www/aroma-sabor/
           "
