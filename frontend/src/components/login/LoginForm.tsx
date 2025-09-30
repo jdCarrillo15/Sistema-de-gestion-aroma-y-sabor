@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import ForgotPasswordModal from "./ForgotPasswordModal.tsx";
 import AlertModal from "../common/AlertModal.tsx";
 import { loginUser } from "../../services/login/authService.ts";
@@ -10,6 +11,7 @@ interface LoginFormProps {
 }
 
 const LoginForm: React.FC<LoginFormProps> = () => {
+  const navigate = useNavigate();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
@@ -44,9 +46,15 @@ const LoginForm: React.FC<LoginFormProps> = () => {
         );
         setShowAlert(true);
 
+        // Redirigir según el rol después de 1.5 segundos
         setTimeout(() => {
-          // console.log("Redirigiendo usuario...");
-        }, 2000);
+          if (data.role === "admin") {
+            navigate("/admin");
+          } else {
+            // Si tienes otras rutas para otros roles, añádelas aquí
+            navigate("/dashboard"); // O la ruta que corresponda
+          }
+        }, 1500);
       }
     } catch (err) {
       setAlertType("error");
@@ -77,9 +85,6 @@ const LoginForm: React.FC<LoginFormProps> = () => {
 
   const handleAlertClose = () => {
     setShowAlert(false);
-
-    if (alertType === "success") {
-    }
   };
 
   const handleRetry = () => {

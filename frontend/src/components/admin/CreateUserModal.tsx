@@ -1,8 +1,6 @@
 import React, { useState, useEffect } from "react";
 import Button from "../common/Button";
 import "../../styles/admin/CreateUserModal.css";
-import { createUser } from "../../services/admin/userService";
-
 
 interface CreateUserModalProps {
   isOpen: boolean;
@@ -37,15 +35,20 @@ const CreateUserModal: React.FC<CreateUserModalProps> = ({
   const [birthdate, setBirthdate] = useState("");
 
   const [errors, setErrors] = useState({
+    userName: "",
     firstName: "",
     lastName: "",
     documentId: "",
     birthdate: "",
     email: "",
+    password: "",
   });
+
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   useEffect(() => {
     if (isOpen) {
+      // Limpiar formulario cuando se abre el modal
       setUserName("");
       setEmail("");
       setPassword("");
@@ -56,12 +59,15 @@ const CreateUserModal: React.FC<CreateUserModalProps> = ({
       setDocumentId("");
       setBirthdate("");
       setErrors({
+        userName: "",
         firstName: "",
         lastName: "",
         documentId: "",
         birthdate: "",
         email: "",
+        password: "",
       });
+      setIsSubmitting(false);
       document.body.style.overflow = "hidden";
     } else {
       document.body.style.overflow = "unset";
@@ -71,7 +77,21 @@ const CreateUserModal: React.FC<CreateUserModalProps> = ({
     };
   }, [isOpen]);
 
-  const validateName = (name: string, field: "firstName" | "lastName") => {
+  // Validaciones
+  const validateUserName = (name: string) => {
+    if (!name.trim()) {
+      return "El nombre de usuario es requerido";
+    }
+    if (name.trim().length < 3) {
+      return "Debe tener al menos 3 caracteres";
+    }
+    if (!/^[a-zA-Z0-9_]+$/.test(name)) {
+      return "Solo letras, números y guiones bajos";
+    }
+    return "";
+  };
+
+  const validateName = (name: string, _field: "firstName" | "lastName") => {
     const nameRegex = /^[a-zA-ZáéíóúüñÁÉÍÓÚÜÑ\s]+$/;
     if (!name.trim()) {
       return "Este campo es requerido";
@@ -87,7 +107,7 @@ const CreateUserModal: React.FC<CreateUserModalProps> = ({
 
   const validateDocument = (doc: string) => {
     if (!doc.trim()) {
-      return ""; 
+      return "";
     }
     const docRegex = /^\d+$/;
     if (!docRegex.test(doc)) {
@@ -107,7 +127,7 @@ const CreateUserModal: React.FC<CreateUserModalProps> = ({
     const birthDate = new Date(date);
     const age = today.getFullYear() - birthDate.getFullYear();
     const monthDiff = today.getMonth() - birthDate.getMonth();
-    
+
     if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birthDate.getDate())) {
       const actualAge = age - 1;
       if (actualAge < 16) {
@@ -130,10 +150,28 @@ const CreateUserModal: React.FC<CreateUserModalProps> = ({
     return "";
   };
 
+  const validatePassword = (password: string) => {
+    if (!password.trim()) {
+      return "La contraseña es requerida";
+    }
+    if (password.length < 6) {
+      return "Debe tener al menos 6 caracteres";
+    }
+    return "";
+  };
+
   const handleKeyDown = (e: React.KeyboardEvent) => {
-    if (e.key === "Escape") {
+    if (e.key === "Escape" && !isSubmitting) {
       onClose();
     }
+  };
+
+  // Event handlers para campos con validación en tiempo real
+  const handleUserNameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value;
+    setUserName(value);
+    const error = validateUserName(value);
+    setErrors(prev => ({ ...prev, userName: error }));
   };
 
   const handleFirstNameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -173,49 +211,69 @@ const CreateUserModal: React.FC<CreateUserModalProps> = ({
     setErrors(prev => ({ ...prev, email: error }));
   };
 
+  const handlePasswordChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value;
+    setPassword(value);
+    const error = validatePassword(value);
+    setErrors(prev => ({ ...prev, password: error }));
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
+
+    if (isSubmitting) return;
+
+    // Validar todos los campos
+    const userNameError = validateUserName(userName);
     const firstNameError = validateName(firstName, "firstName");
     const lastNameError = validateName(lastName, "lastName");
     const documentError = validateDocument(documentId);
     const birthdateError = validateBirthdate(birthdate);
     const emailError = validateEmail(email);
+    const passwordError = validatePassword(password);
 
     setErrors({
+      userName: userNameError,
       firstName: firstNameError,
       lastName: lastNameError,
       documentId: documentError,
       birthdate: birthdateError,
       email: emailError,
+      password: passwordError,
     });
 
-    if (firstNameError || lastNameError || documentError || birthdateError || emailError) {
+    // Si hay errores, no continuar
+    if (userNameError || firstNameError || lastNameError || documentError || birthdateError || emailError || passwordError) {
       return;
     }
 
-    onSubmit({
-      user_name: userName,
-      email,
-      password,
-      role,
-      state,
-      first_name: firstName,
-      last_name: lastName,
-      document_id: documentId,
-      birthdate,
-    });
-    onClose();
-    const user = { userName, email, password, role, state, firstName, lastName, documentId, birthdate };
-    const data = await createUser(user);
-    console.log(data);
-  };
+    setIsSubmitting(true);
 
+    try {
+      // Llamar a onSubmit que manejará la llamada al backend
+      await onSubmit({
+        user_name: userName.trim(),
+        email: email.trim(),
+        password,
+        role,
+        state,
+        first_name: firstName.trim(),
+        last_name: lastName.trim(),
+        document_id: documentId,
+        birthdate,
+      });
+    } catch (error) {
+      console.error("Error en handleSubmit:", error);
+      // El error ya será manejado por el componente padre
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
 
   if (!isOpen) return null;
 
   return (
-    <div 
+    <div
       className="modal-backdrop"
       onKeyDown={handleKeyDown}
       tabIndex={-1}
@@ -227,6 +285,7 @@ const CreateUserModal: React.FC<CreateUserModalProps> = ({
               className="close-button"
               onClick={onClose}
               aria-label="Cerrar"
+              disabled={isSubmitting}
             >
               <svg
                 width="24"
@@ -263,25 +322,30 @@ const CreateUserModal: React.FC<CreateUserModalProps> = ({
 
           <form onSubmit={handleSubmit} className="modal-form">
             <div className="form-group">
-              <label htmlFor="userName" className="form-label">Nombre de usuario</label>
+              <label htmlFor="userName" className="form-label">Nombre de usuario *</label>
               <input
                 type="text"
                 id="userName"
                 value={userName}
-                onChange={(e) => setUserName(e.target.value)}
-                className="form-input"
+                onChange={handleUserNameChange}
+                className={`form-input ${errors.userName ? 'error' : ''}`}
+                disabled={isSubmitting}
                 required
               />
+              {errors.userName && (
+                <span className="error-message">{errors.userName}</span>
+              )}
             </div>
 
             <div className="form-group">
-              <label htmlFor="firstName" className="form-label">Nombre</label>
+              <label htmlFor="firstName" className="form-label">Nombre *</label>
               <input
                 type="text"
                 id="firstName"
                 value={firstName}
                 onChange={handleFirstNameChange}
                 className={`form-input ${errors.firstName ? 'error' : ''}`}
+                disabled={isSubmitting}
                 required
               />
               {errors.firstName && (
@@ -290,13 +354,14 @@ const CreateUserModal: React.FC<CreateUserModalProps> = ({
             </div>
 
             <div className="form-group">
-              <label htmlFor="lastName" className="form-label">Apellido</label>
+              <label htmlFor="lastName" className="form-label">Apellido *</label>
               <input
                 type="text"
                 id="lastName"
                 value={lastName}
                 onChange={handleLastNameChange}
                 className={`form-input ${errors.lastName ? 'error' : ''}`}
+                disabled={isSubmitting}
                 required
               />
               {errors.lastName && (
@@ -314,6 +379,7 @@ const CreateUserModal: React.FC<CreateUserModalProps> = ({
                 className={`form-input ${errors.documentId ? 'error' : ''}`}
                 placeholder="Máximo 10 dígitos"
                 maxLength={10}
+                disabled={isSubmitting}
               />
               {errors.documentId && (
                 <span className="error-message">{errors.documentId}</span>
@@ -328,6 +394,7 @@ const CreateUserModal: React.FC<CreateUserModalProps> = ({
                 value={birthdate}
                 onChange={handleBirthdateChange}
                 className={`form-input ${errors.birthdate ? 'error' : ''}`}
+                disabled={isSubmitting}
               />
               {errors.birthdate && (
                 <span className="error-message">{errors.birthdate}</span>
@@ -335,13 +402,14 @@ const CreateUserModal: React.FC<CreateUserModalProps> = ({
             </div>
 
             <div className="form-group">
-              <label htmlFor="email" className="form-label">Correo Electrónico</label>
+              <label htmlFor="email" className="form-label">Correo Electrónico *</label>
               <input
                 type="email"
                 id="email"
                 value={email}
                 onChange={handleEmailChange}
                 className={`form-input ${errors.email ? 'error' : ''}`}
+                disabled={isSubmitting}
                 required
               />
               {errors.email && (
@@ -350,39 +418,44 @@ const CreateUserModal: React.FC<CreateUserModalProps> = ({
             </div>
 
             <div className="form-group">
-              <label htmlFor="password" className="form-label">Contraseña</label>
+              <label htmlFor="password" className="form-label">Contraseña *</label>
               <input
                 type="password"
                 id="password"
                 value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                className="form-input"
+                onChange={handlePasswordChange}
+                className={`form-input ${errors.password ? 'error' : ''}`}
+                disabled={isSubmitting}
                 required
               />
+              {errors.password && (
+                <span className="error-message">{errors.password}</span>
+              )}
             </div>
 
             <div className="form-group">
-              <label htmlFor="role" className="form-label">Rol</label>
+              <label htmlFor="role" className="form-label">Rol *</label>
               <select
                 id="role"
                 value={role}
                 onChange={(e) => setRole(e.target.value)}
                 className="form-input"
+                disabled={isSubmitting}
               >
-                <option value="admin">Administrador</option>
                 <option value="cocinero">Cocinero</option>
                 <option value="mesero">Mesero</option>
-                <option value="user">Usuario</option>
+                <option value="user">Caja</option>
               </select>
             </div>
 
             <div className="form-group">
-              <label htmlFor="state" className="form-label">Estado</label>
+              <label htmlFor="state" className="form-label">Estado *</label>
               <select
                 id="state"
                 value={state}
                 onChange={(e) => setState(e.target.value)}
                 className="form-input"
+                disabled={isSubmitting}
               >
                 <option value="active">Activo</option>
                 <option value="inactive">Inactivo</option>
@@ -390,11 +463,20 @@ const CreateUserModal: React.FC<CreateUserModalProps> = ({
             </div>
 
             <div className="modal-buttons">
-              <Button type="button" variant="secondary" onClick={onClose}>
+              <Button 
+                type="button" 
+                variant="secondary" 
+                onClick={onClose}
+                disabled={isSubmitting}
+              >
                 Cancelar
               </Button>
-              <Button type="submit" variant="primary">
-                Crear Usuario
+              <Button 
+                type="submit" 
+                variant="primary"
+                disabled={isSubmitting}
+              >
+                {isSubmitting ? "Creando..." : "Crear Usuario"}
               </Button>
             </div>
           </form>

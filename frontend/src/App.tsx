@@ -8,13 +8,21 @@ import UsuariosPage from "./pages/admin/UsuariosPage";
 import InventarioPage from "./pages/admin/InventarioPage";
 import TurnosPage from "./pages/admin/TurnosPage";
 import VentasPage from "./pages/admin/VentasPage";
+import ProtectedRoute from "./components/ProtectedRoute";
 
 function App() {
   return (
     <BrowserRouter>
       <Routes>
         <Route path="/" element={<LoginPage />} />
-        <Route path="/admin" element={<AdminLayout />}>
+        <Route
+          path="/admin"
+          element={
+            <ProtectedRoute>
+              <AdminLayout />
+            </ProtectedRoute>
+          }
+        >
           <Route index element={<AdminDashboard />} />
           <Route path="productos" element={<ProductosPage />} />
           <Route path="usuarios" element={<UsuariosPage />} />

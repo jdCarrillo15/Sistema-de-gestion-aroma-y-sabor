@@ -26,7 +26,6 @@ const CreateProductModal: React.FC<CreateProductModalProps> = ({
 }) => {
   const [name, setName] = useState("");
   const [price, setPrice] = useState("");
-  const [status, setStatus] = useState<"active" | "inactive">("active");
   const [stock, setStock] = useState("");
   const [type, setType] = useState<"prepared" | "nonprepared">("nonprepared");
 
@@ -40,7 +39,6 @@ const CreateProductModal: React.FC<CreateProductModalProps> = ({
     if (isOpen) {
       setName("");
       setPrice("");
-      setStatus("active");
       setStock("0");
       setType("nonprepared");
       setErrors({ name: "", price: "", stock: "" });
@@ -136,7 +134,7 @@ const CreateProductModal: React.FC<CreateProductModalProps> = ({
     onSubmit({
       name: name.trim(),
       price: parseFloat(price),
-      status,
+      status: "active",
       stock: parseInt(stock),
       type,
     });
@@ -238,21 +236,8 @@ const CreateProductModal: React.FC<CreateProductModalProps> = ({
                 onChange={(e) => setType(e.target.value as "prepared" | "nonprepared")}
                 className="form-input"
               >
-                <option value="nonprepared">No preparado</option>
-                <option value="prepared">Preparado</option>
-              </select>
-            </div>
-
-            <div className="form-group">
-              <label htmlFor="status" className="form-label">Estado</label>
-              <select
-                id="status"
-                value={status}
-                onChange={(e) => setStatus(e.target.value as "active" | "inactive")}
-                className="form-input"
-              >
-                <option value="active">Activo</option>
-                <option value="inactive">Inactivo</option>
+                <option value="nonprepared">No preparable</option>
+                <option value="prepared">Preparable</option>
               </select>
             </div>
 

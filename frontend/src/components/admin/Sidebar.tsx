@@ -1,6 +1,7 @@
 import React from "react";
-import { NavLink, Link } from "react-router-dom";
+import { NavLink, useNavigate } from "react-router-dom";
 import Button from "../common/Button.tsx";
+import { logoutUser } from "../../services/login/authService";
 import "../../styles/admin/Sidebar.css";
 import {
   Coffee,
@@ -22,6 +23,13 @@ const menuItems = [
 ];
 
 const Sidebar: React.FC = () => {
+  const navigate = useNavigate();
+
+  const handleLogout = () => {
+    logoutUser();
+    navigate("/");
+  };
+
   return (
     <aside className="sidebar open">
       <div className="sidebar-header">
@@ -55,12 +63,15 @@ const Sidebar: React.FC = () => {
       </nav>
 
       <div className="sidebar-footer">
-        <Link to="/" style={{ textDecoration: "none" }}>
-          <Button type="button" variant="primary" className="logout-btn">
-            <LogOut className="link-icon" />
-            <span>Cerrar Sesión</span>
-          </Button>
-        </Link>
+        <Button 
+          type="button" 
+          variant="primary" 
+          className="logout-btn"
+          onClick={handleLogout}
+        >
+          <LogOut className="link-icon" />
+          <span>Cerrar Sesión</span>
+        </Button>
       </div>
     </aside>
   );
