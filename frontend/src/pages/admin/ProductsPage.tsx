@@ -1,11 +1,11 @@
 import React, { useState, useEffect } from "react";
 import { Plus, Edit3, Trash2, Eye, Package } from "lucide-react";
 import Button from "../../components/common/Button";
-import CreateProductModal from "../../components/admin/CreateProductModal";
-import EditProductModal from "../../components/admin/EditProductModal";
+import CreateProductModal from "../../components/admin/products/CreateProductModal";
+import EditProductModal from "../../components/admin/products/EditProductModal";
 import ConfirmModal from "../../components/admin/ConfirmModal";
 import AlertModal from "../../components/common/AlertModal";
-import ViewProductModal from "../../components/admin/ViewProductModal";
+import ViewProductModal from "../../components/admin/products/ViewProductModal";
 import "../../styles/admin/ProductsPage.css";
 import { getProducts, createProduct, updateProductById, hardDeleteProduct } from "../../services/admin/productService";
 

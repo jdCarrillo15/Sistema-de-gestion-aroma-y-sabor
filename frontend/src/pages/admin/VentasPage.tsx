@@ -2,7 +2,6 @@ import React from "react";
 import { DollarSign } from "lucide-react";
 import "../../styles/admin/RecentProducts.css";
 
-
 type Sale = {
   id: number;
   date: string;

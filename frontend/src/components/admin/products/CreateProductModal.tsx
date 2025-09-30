@@ -1,10 +1,10 @@
 import React, { useState, useEffect } from "react";
-import Button from "../common/Button";
+import Button from "../../common/Button";
 import { Package } from "lucide-react";
 import "../../styles/admin/CreateProductModal.css";
 
 export type Product = {
-  id: string;
+  id?: string;
   name: string;
   price: number;
   status: "active" | "inactive";
@@ -13,17 +13,15 @@ export type Product = {
   created_at?: string;
 };
 
-interface EditProductModalProps {
+interface CreateProductModalProps {
   isOpen: boolean;
   onClose: () => void;
-  product: Product;
   onSubmit: (product: Product) => void;
 }
 
-const EditProductModal: React.FC<EditProductModalProps> = ({
+const CreateProductModal: React.FC<CreateProductModalProps> = ({
   isOpen,
   onClose,
-  product,
   onSubmit,
 }) => {
   const [name, setName] = useState("");
@@ -38,11 +36,11 @@ const EditProductModal: React.FC<EditProductModalProps> = ({
   });
 
   useEffect(() => {
-    if (isOpen && product) {
-      setName(product.name);
-      setPrice(product.price.toString());
-      setStock(product.stock.toString());
-      setType(product.type);
+    if (isOpen) {
+      setName("");
+      setPrice("");
+      setStock("0");
+      setType("nonprepared");
       setErrors({ name: "", price: "", stock: "" });
       document.body.style.overflow = "hidden";
     } else {
@@ -51,7 +49,7 @@ const EditProductModal: React.FC<EditProductModalProps> = ({
     return () => {
       document.body.style.overflow = "unset";
     };
-  }, [isOpen, product]);
+  }, [isOpen]);
 
   const validateName = (name: string) => {
     if (!name.trim()) {
@@ -133,22 +131,20 @@ const EditProductModal: React.FC<EditProductModalProps> = ({
       return;
     }
 
-    const updatedProduct: Product = {
-      ...product,
+    onSubmit({
       name: name.trim(),
       price: parseFloat(price),
+      status: "active",
       stock: parseInt(stock),
       type,
-    };
-
-    onSubmit(updatedProduct);
+    });
     onClose();
   };
 
   if (!isOpen) return null;
 
   return (
-    <div 
+    <div
       className="modal-backdrop"
       onKeyDown={handleKeyDown}
       tabIndex={-1}
@@ -179,9 +175,9 @@ const EditProductModal: React.FC<EditProductModalProps> = ({
             <Package size={64} />
           </div>
 
-          <h2 className="modal-title">Editar Producto</h2>
+          <h2 className="modal-title">Nuevo Producto</h2>
           <p className="modal-description">
-            Modifica la información del producto seleccionado.
+            Completa los siguientes campos para crear un nuevo producto en el catálogo.
           </p>
 
           <form onSubmit={handleSubmit} className="modal-form">
@@ -217,7 +213,7 @@ const EditProductModal: React.FC<EditProductModalProps> = ({
             </div>
 
             <div className="form-group">
-              <label htmlFor="stock" className="form-label">Stock</label>
+              <label htmlFor="stock" className="form-label">Stock inicial</label>
               <input
                 type="text"
                 id="stock"
@@ -240,7 +236,7 @@ const EditProductModal: React.FC<EditProductModalProps> = ({
                 onChange={(e) => setType(e.target.value as "prepared" | "nonprepared")}
                 className="form-input"
               >
-                <option value="nonprepared">No Preparable</option>
+                <option value="nonprepared">No preparable</option>
                 <option value="prepared">Preparable</option>
               </select>
             </div>
@@ -250,7 +246,7 @@ const EditProductModal: React.FC<EditProductModalProps> = ({
                 Cancelar
               </Button>
               <Button type="submit" variant="primary">
-                Actualizar Producto
+                Crear Producto
               </Button>
             </div>
           </form>
@@ -260,4 +256,4 @@ const EditProductModal: React.FC<EditProductModalProps> = ({
   );
 };
 
-export default EditProductModal;
+export default CreateProductModal;

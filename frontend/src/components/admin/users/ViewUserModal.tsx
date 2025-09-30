@@ -1,5 +1,5 @@
 import React, { useEffect } from "react";
-import Button from "../common/Button";
+import Button from "../../common/Button";
 import "../../styles/admin/CreateUserModal.css";
 
 interface ViewUserModalProps {

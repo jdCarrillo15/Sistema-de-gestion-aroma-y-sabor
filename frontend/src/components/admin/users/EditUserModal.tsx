@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
-import Button from "../common/Button";
-import ConfirmModal from "./ConfirmModal";
+import Button from "../../common/Button";
+import ConfirmModal from "./../ConfirmModal";
 import "../../styles/admin/CreateUserModal.css";
 
 interface EditUserModalProps {
@@ -80,7 +80,7 @@ const EditUserModal: React.FC<EditUserModalProps> = ({
     return "";
   };
 
-  const validateName = (name: string, field: "firstName" | "lastName") => {
+  const validateName = (name: string, _field: "firstName" | "lastName") => {
     const nameRegex = /^[a-zA-ZáéíóúüñÁÉÍÓÚÜÑ\s]+$/;
     if (!name.trim()) {
       return "Este campo es requerido";
