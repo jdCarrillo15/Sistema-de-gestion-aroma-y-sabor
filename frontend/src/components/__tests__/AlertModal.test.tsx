@@ -1,5 +1,5 @@
 import { render, screen, fireEvent } from "@testing-library/react";
-import AlertModal from "../AlertModal";
+import AlertModal from "../common/AlertModal";
 
 test("no se renderiza cuando isOpen=false", () => {
   render(

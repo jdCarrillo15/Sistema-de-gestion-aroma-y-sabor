@@ -1,0 +1,89 @@
+.turnos-page {
+  padding: 1.5rem;
+  background: linear-gradient(to bottom right, #f9f9ff, #fff);
+  min-height: 100vh;
+}
+
+/* Título */
+.turnos-page h1 {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #1a1a1a;
+}
+
+/* Botón "Nuevo Turno" */
+.turnos-page button {
+  font-size: 0.9rem;
+  font-weight: 500;
+  transition: all 0.2s ease-in-out;
+  box-shadow: 0 2px 6px rgba(79, 70, 229, 0.25);
+}
+
+.turnos-page button:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 10px rgba(79, 70, 229, 0.35);
+}
+
+/* Caja principal */
+.turnos-page .bg-white {
+  background: #ffffff;
+  border-radius: 12px;
+  padding: 1.5rem;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
+}
+
+/* Lista de turnos */
+.turnos-page ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.turnos-page li {
+  border: 1px solid #f0f0f0;
+  padding: 1rem;
+  border-radius: 10px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  transition: background 0.2s ease, transform 0.2s ease;
+}
+
+.turnos-page li:hover {
+  background: #fafafa;
+  transform: translateX(2px);
+}
+
+/* Texto */
+.turnos-page li p {
+  margin: 0;
+}
+
+.turnos-page li .font-medium {
+  font-size: 1rem;
+  font-weight: 600;
+  color: #333;
+}
+
+.turnos-page li .text-sm {
+  font-size: 0.85rem;
+  color: #555;
+}
+
+/* Acciones */
+.turnos-page li .acciones {
+  font-size: 0.85rem;
+  font-weight: 500;
+  color: #666;
+  display: flex;
+  gap: 0.75rem;
+}
+
+.turnos-page li .acciones span {
+  cursor: pointer;
+  transition: color 0.2s ease;
+}
+
+.turnos-page li .acciones span:hover {
+  color: #4f46e5;
+}

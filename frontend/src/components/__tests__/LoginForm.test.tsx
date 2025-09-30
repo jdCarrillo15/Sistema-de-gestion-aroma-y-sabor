@@ -1,8 +1,8 @@
 import { expect, vi, test, Mock } from "vitest";
 import { render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
-import LoginForm from "../LoginForm";
-import * as authService from "../../services/authService";
+import LoginForm from "../login/LoginForm";
+import * as authService from "../../services/login/authService";
 
 vi.mock("../../services/authService", () => ({
   loginUser: vi.fn(),

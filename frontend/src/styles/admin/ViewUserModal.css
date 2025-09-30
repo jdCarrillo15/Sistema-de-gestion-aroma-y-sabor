@@ -1,0 +1,101 @@
+.viewuser-backdrop {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0,0,0,0.6);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1200;
+}
+
+.viewuser-container {
+  background: #fff;
+  border-radius: 16px;
+  width: 95%;
+  max-width: 420px;
+  padding: 24px;
+  box-shadow: 0 6px 16px rgba(0,0,0,0.2);
+  position: relative;
+  text-align: center;
+  animation: fadeIn 0.3s ease-in-out;
+}
+
+.viewuser-close {
+  position: absolute;
+  top: 12px;
+  right: 16px;
+  background: none;
+  border: none;
+  font-size: 20px;
+  cursor: pointer;
+}
+
+.viewuser-header {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-bottom: 20px;
+  color: black  ;
+}
+
+.viewuser-avatar {
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  background: var(--color-primary, #f97316); 
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  font-size: 32px;
+  font-weight: bold;
+  margin-bottom: 12px;
+}
+
+.viewuser-status {
+  font-size: 14px;
+  margin-top: 6px;
+}
+
+.viewuser-status.activo {
+  color: green;
+  font-weight: 600;
+}
+
+.viewuser-status.inactivo {
+  color: red;
+  font-weight: 600;
+}
+
+.viewuser-section {
+  text-align: left;
+  margin: 15px 0;
+  padding: 12px;
+  background: #f9f9f9;
+  border-radius: 10px;
+  color: black;
+}
+
+.viewuser-section h3 {
+  font-size: 15px;
+  margin-bottom: 8px;
+  color: var(--color-primary, #f97316);
+}
+
+.viewuser-section p {
+  margin: 4px 0;
+  font-size: 14px;
+}
+
+.viewuser-footer {
+  margin-top: 20px;
+  text-align: center;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}

@@ -1,0 +1,167 @@
+
+.sidebar-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 1rem 1.5rem;
+}
+
+.logo-box {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: #f97316;
+  /* naranja */
+  border-radius: 12px;
+  padding: 8px;
+}
+
+.logo-icon {
+  color: #fff;
+  width: 24px;
+  height: 24px;
+}
+
+.brand-title {
+  font-size: 1rem;
+  font-weight: 600;
+  margin: 0;
+}
+
+.brand-sub {
+  font-size: 0.8rem;
+  color: #6b7280;
+}
+
+/* === Navegación === */
+.sidebar-nav {
+  flex-grow: 1;
+  margin-top: 1rem;
+  list-style: none;
+  padding: 0;
+}
+
+.sidebar-nav li {
+  margin: 0.25rem 0;
+}
+
+.sidebar-link {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 0.75rem 1.5rem;
+  text-decoration: none;
+  color: #374151;
+  font-size: 0.95rem;
+  font-weight: 500;
+  border-left: 3px solid transparent;
+  transition: all 0.3s ease;
+}
+
+.sidebar-link:hover {
+  background-color: #f9fafb;
+  color: #f97316;
+}
+
+.sidebar-link.active {
+  background-color: #fff7ed;
+  color: #f97316;
+  border-right: 3px solid #f97316;
+}
+
+.link-icon {
+  width: 20px;
+  height: 20px;
+}
+
+/* === Footer === */
+.sidebar-footer {
+  padding: 1rem 1.5rem;
+}
+
+.logout-btn {
+  width: 100%;
+  background: transparent;
+  border: none;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-size: 0.95rem;
+  color: #374151;
+  cursor: pointer;
+  padding: 0.75rem;
+  border-radius: 8px;
+  transition: all 0.3s ease;
+}
+
+.logout-btn:hover {
+  background-color: #f9fafb;
+  color: #f97316;
+}
+
+.brand-box {
+  display: flex;
+  flex-direction: column;
+}
+
+.brand-title {
+  font-size: 1rem;
+  font-weight: 600;
+  color: #111827;
+  margin: 0;
+  line-height: 1.2;
+}
+
+.brand-sub {
+  font-size: 0.8rem;
+  color: #6b7280;
+  margin: 0;
+  line-height: 1.2;
+}
+
+
+.sidebar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  height: 100vh;
+  width: 250px;
+  background-color: #fff;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  transition: width 0.3s ease;
+  overflow: hidden;
+  z-index: 10;
+  border-right: 1px solid #e5e7eb;
+}
+
+
+@media (max-width: 1024px) {
+  .sidebar {
+    transform: translateX(-100%);
+    width: 240px;
+  }
+
+  .sidebar.open {
+    transform: translateX(0);
+  }
+}
+
+@media (max-width: 640px) {
+  .sidebar {
+    width: 100%;
+  }
+}
+
+
+@media (max-width: 1024px) {
+  .sidebar {
+    transform: translateX(-100%);
+    width: 240px;
+  }
+
+  .sidebar.open {
+    transform: translateX(0);
+  }
+}

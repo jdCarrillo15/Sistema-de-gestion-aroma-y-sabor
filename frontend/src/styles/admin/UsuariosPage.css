@@ -1,0 +1,150 @@
+/* Contenedor principal */
+.usuarios-page {
+  padding: 2rem;
+  background: #fafafa;
+  min-height: 100vh;
+}
+
+/* Header con título + botón */
+.usuarios-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1.5rem;
+}
+
+.usuarios-header h1 {
+  font-size: 1.8rem;
+  font-weight: 700;
+  color: #111827;
+}
+
+/* Tabla */
+.usuarios-tabla-container {
+  background: #fff;
+  border-radius: 12px;
+  padding: 1rem;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+}
+
+.usuarios-tabla {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.95rem;
+}
+
+.usuarios-tabla th,
+.usuarios-tabla td {
+  padding: 0.9rem;
+  text-align: left;
+}
+
+.usuarios-tabla th {
+  font-weight: 600;
+  color: #374151;
+  font-size: 0.9rem;
+  border-bottom: 2px solid #e5e7eb;
+}
+
+.usuarios-tabla tr {
+  transition: background 0.2s ease;
+}
+
+.usuarios-tabla tr:hover {
+  background: #f9fafb;
+}
+
+.nombre {
+  font-weight: 500;
+  color: #111827;
+}
+
+/* Estados */
+.estado {
+  padding: 0.3rem 0.7rem;
+  border-radius: 999px;
+  font-size: 0.75rem;
+  font-weight: 600;
+}
+
+
+.acciones {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.acciones-col {
+  text-align: center;
+}
+
+.usuarios-tabla td,
+.usuarios-tabla th {
+  color: #111827; 
+}
+
+.custom-button {
+  display: inline-flex; 
+  align-items: center;
+  justify-content: center;
+  padding: 0.5rem 1rem; 
+  border-radius: 8px;
+  cursor: pointer;
+  width: auto; 
+  max-width: max-content;
+}
+
+.estado {
+  display: inline-block;
+  padding: 4px 10px;
+  border-radius: 12px;
+  font-weight: bold;
+  font-size: 0.9rem;
+}
+
+.estado.activo {
+  background-color: #d4f8dc;
+  color: #1b7a2f;
+}
+
+.estado.inactivo {
+  background-color: #f6e0e0;
+  color: #a71d2a;
+}
+
+.estado {
+  display: inline-block;
+  padding: 4px 12px;
+  border-radius: 16px;
+  font-weight: bold;
+  font-size: 0.85rem;
+  text-align: center;
+  min-width: 90px;
+}
+
+.product-actions .btn-icon.ver:hover {
+  background: #eff6ff;
+  border-color: #3b82f6;
+  color: #3b82f6;
+}
+
+.product-actions .btn-icon.ver:hover {
+  background: #eff6ff;
+  border-color: #3b82f6;
+  color: #3b82f6;
+}
+
+.product-actions .btn-icon.editar:hover {
+  background: #fef3c7;
+  border-color: #f59e0b;
+  color: #f59e0b;
+}
+
+.product-actions .btn-icon.eliminar:hover {
+  background: #fef2f2;
+  border-color: #ef4444;
+  color: #ef4444;
+}
+
+.product-actions .btn-icon:hover {
+  transform: scale(1.04);
+}

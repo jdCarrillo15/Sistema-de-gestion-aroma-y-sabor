@@ -1,5 +1,5 @@
 import { render, screen, fireEvent } from "@testing-library/react";
-import Button from "../Button";
+import Button from "../common/Button";
 
 test("renderiza el botón con el texto correcto", () => {
   render(<Button>Click aquí</Button>);

@@ -1,0 +1,64 @@
+.inventario-page {
+  padding: 1.5rem;
+  background: linear-gradient(to bottom right, #fffdf9, #fff);
+  min-height: 100vh;
+}
+
+/* Título */
+.inventario-page h1 {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #1a1a1a;
+}
+
+/* Caja principal */
+.inventario-page .bg-white {
+  background: #ffffff;
+  border-radius: 12px;
+  padding: 1.5rem;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
+}
+
+/* Tabla */
+.inventario-page table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.inventario-page th {
+  text-align: left;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: #555;
+  padding-bottom: 0.5rem;
+}
+
+.inventario-page td {
+  padding: 0.75rem 0;
+  font-size: 0.95rem;
+  color: #333;
+}
+
+/* Bordes de filas */
+.inventario-page tbody tr {
+  border-top: 1px solid #f0f0f0;
+}
+
+/* Etiquetas de estado */
+.inventario-page .status {
+  display: inline-block;
+  font-size: 0.75rem;
+  font-weight: 500;
+  padding: 0.25rem 0.75rem;
+  border-radius: 9999px;
+}
+
+.inventario-page .ok {
+  background: #e6f9ec;
+  color: #2e7d32;
+}
+
+.inventario-page .reabastecer {
+  background: #fde7e7;
+  color: #c62828;
+}
