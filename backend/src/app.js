@@ -16,7 +16,7 @@ const app = express();
 app.use(express.json());
 app.use(cookieParser());
 app.use(cors({
-  origin: ["http://localhost:80", "http://185.144.159.8:80"],
+  origin: ["http://localhost:5173", "http://185.144.159.8:80"],
   credentials: true
 }));
 
@@ -31,7 +31,7 @@ app.use(metricsRoutes);
 const PORT = process.env.PORT || 3000;
 
 app.listen(PORT, () => {
-    console.log(`Servidor corriendo en http://localhost:${PORT}`);
+    console.log(`Servidor corriendo en http://185.144.159.8:${PORT}`);
 });
 
 export default app;

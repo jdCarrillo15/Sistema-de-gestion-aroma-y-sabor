@@ -161,15 +161,15 @@ describe("productsController", () => {
     });
 
     describe("createProduct", () => {
-        it("should return 400 if name or price missing", async () => {
+        it("should return 406 if name or price missing", async () => {
             const req = { body: { name: "" } };
             const res = mockRes();
 
             await productsController.createProduct(req, res);
 
-            expect(res.status).toHaveBeenCalledWith(400);
+            expect(res.status).toHaveBeenCalledWith(406);
             expect(res.json).toHaveBeenCalledWith(
-                expect.objectContaining({ error: expect.any(String) })
+                expect.objectContaining({ error: "Name y price son obligatorios" })
             );
         });
 
@@ -195,11 +195,12 @@ describe("productsController", () => {
                     status: "active",
                     stock: 10,
                     type: "nonprepared",
+                    created_at: "timestamp",
                 })
             );
             expect(res.status).toHaveBeenCalledWith(201);
             expect(res.json).toHaveBeenCalledWith(
-                expect.objectContaining({ message: expect.any(String) })
+                expect.objectContaining({ message: "Producto creado correctamente" })
             );
         });
 
@@ -225,6 +226,7 @@ describe("productsController", () => {
                     status: "active",
                     stock: 8,
                     type: "prepared",
+                    created_at: "timestamp",
                 })
             );
         });
@@ -240,7 +242,7 @@ describe("productsController", () => {
 
             expect(res.status).toHaveBeenCalledWith(500);
             expect(res.json).toHaveBeenCalledWith(
-                expect.objectContaining({ error: expect.any(String) })
+                expect.objectContaining({ error: "Error al crear el producto" })
             );
         });
     });
@@ -250,16 +252,16 @@ describe("productsController", () => {
             resourceService.getResourceDoc.mockReset();
         });
 
-        it("should return 403 if product not found", async () => {
+        it("should return 404 if product not found", async () => {
             resourceService.getResourceDoc.mockResolvedValue(null);
             const req = { params: { id: "1" } };
             const res = mockRes();
 
             await productsController.getProductById(req, res);
 
-            expect(res.status).toHaveBeenCalledWith(403);
+            expect(res.status).toHaveBeenCalledWith(404);
             expect(res.json).toHaveBeenCalledWith(
-                expect.objectContaining({ error: expect.any(String) })
+                expect.objectContaining({ error: "Producto no encontrado" })
             );
         });
 
@@ -299,7 +301,7 @@ describe("productsController", () => {
 
             expect(res.status).toHaveBeenCalledWith(500);
             expect(res.json).toHaveBeenCalledWith(
-                expect.objectContaining({ error: expect.any(String) })
+                expect.objectContaining({ error: "Error obteniendo producto" })
             );
         });
 
@@ -396,7 +398,7 @@ describe("productsController", () => {
 
             expect(res.status).toHaveBeenCalledWith(400);
             expect(res.json).toHaveBeenCalledWith(
-                expect.objectContaining({ error: expect.any(String) })
+                expect.objectContaining({ error: "Se requiere el ID del producto" })
             );
         });
 
@@ -409,7 +411,7 @@ describe("productsController", () => {
 
             expect(res.status).toHaveBeenCalledWith(404);
             expect(res.json).toHaveBeenCalledWith(
-                expect.objectContaining({ error: expect.any(String) })
+                expect.objectContaining({ error: "Producto no encontrado" })
             );
         });
 
@@ -427,7 +429,7 @@ describe("productsController", () => {
             expect(mockProductRef.delete).toHaveBeenCalled();
             expect(res.status).toHaveBeenCalledWith(200);
             expect(res.json).toHaveBeenCalledWith(
-                expect.objectContaining({ message: expect.any(String) })
+                expect.objectContaining({ message: "Producto y datos relacionados eliminados correctamente" })
             );
         });
 
@@ -440,7 +442,7 @@ describe("productsController", () => {
 
             expect(res.status).toHaveBeenCalledWith(500);
             expect(res.json).toHaveBeenCalledWith(
-                expect.objectContaining({ error: expect.any(String) })
+                expect.objectContaining({ error: "Error al eliminar producto" })
             );
         });
 
