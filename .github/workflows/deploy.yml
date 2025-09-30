@@ -32,7 +32,6 @@ jobs:
           "
 
       - name: Deploy frontend on VPS
-        if: contains(env.CHANGED_DIRS, 'frontend')
         run: |
           ssh -o StrictHostKeyChecking=no ${{ secrets.VPS_USER }}@${{ secrets.VPS_HOST }} "
             cd ${{ secrets.VPS_APP_DIR }}
