@@ -91,7 +91,7 @@ const CreateUserModal: React.FC<CreateUserModalProps> = ({
     return "";
   };
 
-  const validateName = (name: string, field: "firstName" | "lastName") => {
+  const validateName = (name: string, _field: "firstName" | "lastName") => {
     const nameRegex = /^[a-zA-ZáéíóúüñÁÉÍÓÚÜÑ\s]+$/;
     if (!name.trim()) {
       return "Este campo es requerido";
