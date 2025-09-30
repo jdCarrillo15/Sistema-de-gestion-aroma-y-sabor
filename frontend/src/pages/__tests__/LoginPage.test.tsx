@@ -1,5 +1,6 @@
 import { render, screen } from "@testing-library/react";
-import LoginPage from "../LoginPage.tsx";
+import LoginPage from "../login/LoginPage"
+
 
 test("renderiza el formulario de login dentro de la página", () => {
   render(<LoginPage />);
