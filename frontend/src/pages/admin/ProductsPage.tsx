@@ -6,7 +6,7 @@ import EditProductModal from "../../components/admin/products/EditProductModal";
 import ConfirmModal from "../../components/admin/ConfirmModal";
 import AlertModal from "../../components/common/AlertModal";
 import ViewProductModal from "../../components/admin/products/ViewProductModal";
-import "../../styles/admin/ProductsPage.css";
+import "../../styles/admin/products/ProductsPage.css";
 import { getProducts, createProduct, updateProductById, hardDeleteProduct } from "../../services/admin/productService";
 
 

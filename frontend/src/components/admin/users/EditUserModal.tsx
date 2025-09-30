@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import Button from "../../common/Button";
 import ConfirmModal from "./../ConfirmModal";
-import "../../styles/admin/CreateUserModal.css";
+import "../../../styles/admin/users/CreateUserModal.css";
 
 interface EditUserModalProps {
   isOpen: boolean;

@@ -7,7 +7,7 @@ import ConfirmModal from "../../components/admin/ConfirmModal";
 import AlertModal from "../../components/common/AlertModal";
 import ViewUserModal from "../../components/admin/users/ViewUserModal";
 import { getUsers, createUser, updateUser, hardDeleteUser } from "../../services/admin/userService";
-import "../../styles/admin/UsuariosPage.css";
+import "../../styles/admin/users/UsuariosPage.css";
 
 export type User = {
   id: string;

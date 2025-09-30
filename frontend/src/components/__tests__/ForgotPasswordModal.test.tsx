@@ -4,14 +4,12 @@ import userEvent from "@testing-library/user-event";
 import ForgotPasswordModal from "../login/ForgotPasswordModal";
 import * as authService from "../../services/login/authService";
 
-// Mock del CSS
-vi.mock("../styles/ForgotPasswordModal.css", () => ({}));
+vi.mock("../styles/login/ForgotPasswordModal.css", () => ({}));
 
-vi.mock("../../services/authService", () => ({
+vi.mock("../../services/login/authService", () => ({
   sendRecoveryEmail: vi.fn(),
 }));
 
-// Mock del AlertModal con implementación más simple
 vi.mock("../AlertModal.tsx", () => ({
   default: ({ isOpen, title, message }: any) =>
     isOpen ? (

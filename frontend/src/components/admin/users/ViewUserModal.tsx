@@ -1,6 +1,6 @@
 import React, { useEffect } from "react";
 import Button from "../../common/Button";
-import "../../styles/admin/CreateUserModal.css";
+import "../../../styles/admin/users/CreateUserModal.css";
 
 interface ViewUserModalProps {
   isOpen: boolean;
@@ -31,10 +31,8 @@ const ViewUserModal: React.FC<ViewUserModalProps> = ({
     }
   };
 
-  // Si no está abierto o no hay usuario, no renderizar
   if (!isOpen || !user) return null;
 
-  // Función helper para obtener el estado formateado
   const getFormattedState = (state: string) => {
     if (!state) return "No especificado";
     const lowerState = state.toLowerCase();
@@ -46,7 +44,6 @@ const ViewUserModal: React.FC<ViewUserModalProps> = ({
     return state;
   };
 
-  // Función helper para formatear fecha
   const formatDate = (dateString: string) => {
     if (!dateString) return "No especificado";
     try {
@@ -63,7 +60,6 @@ const ViewUserModal: React.FC<ViewUserModalProps> = ({
     }
   };
 
-  // Función helper para formatear rol
   const getFormattedRole = (role: string) => {
     if (!role) return "No especificado";
     const roleMap: { [key: string]: string } = {
@@ -125,7 +121,6 @@ const ViewUserModal: React.FC<ViewUserModalProps> = ({
           </p>
 
           <div className="user-details">
-            {/* Información de Usuario */}
             <div className="details-section">
               <h3 className="section-title">Datos de Usuario</h3>
               
@@ -161,7 +156,6 @@ const ViewUserModal: React.FC<ViewUserModalProps> = ({
               </div>
             </div>
 
-            {/* Información Personal */}
             {user.person && (
               <div className="details-section">
                 <h3 className="section-title">Información Personal</h3>
@@ -208,7 +202,6 @@ const ViewUserModal: React.FC<ViewUserModalProps> = ({
               </div>
             )}
 
-            {/* Si no hay información personal */}
             {!user.person && (
               <div className="details-section">
                 <h3 className="section-title">Información Personal</h3>

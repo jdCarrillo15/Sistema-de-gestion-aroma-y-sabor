@@ -1,6 +1,6 @@
 import React from "react";
 import { DollarSign } from "lucide-react";
-import "../../styles/admin/RecentProducts.css";
+import "../../styles/admin/products/RecentProducts.css";
 
 type Sale = {
   id: number;
