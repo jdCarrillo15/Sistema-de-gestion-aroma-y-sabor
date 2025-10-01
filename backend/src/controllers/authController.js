@@ -29,8 +29,8 @@ export async function login(req, res) {
         res.cookie("session", sessionCookie, {
             maxAge: expiresIn,
             httpOnly: true,
-            secure: true, // true en producción con HTTPS
-            sameSite: "none"
+            secure: false, // true en producción con HTTPS
+            sameSite: "lax"
         });
 
         const userDoc = await db.collection("users").doc(data.localId).get();
