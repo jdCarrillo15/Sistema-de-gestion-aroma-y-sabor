@@ -1,13 +1,13 @@
 import React, { useEffect, useState } from "react";
 import { Plus, Edit3, Trash2, Eye, Users, UserCheck, UserX, Activity } from "lucide-react";
 import Button from "../../components/common/Button";
-import CreateUserModal from "../../components/admin/CreateUserModal";
-import EditUserModal from "../../components/admin/EditUserModal";
+import CreateUserModal from "../../components/admin/users/CreateUserModal";
+import EditUserModal from "../../components/admin/users/EditUserModal";
 import ConfirmModal from "../../components/admin/ConfirmModal";
 import AlertModal from "../../components/common/AlertModal";
-import ViewUserModal from "../../components/admin/ViewUserModal";
+import ViewUserModal from "../../components/admin/users/ViewUserModal";
 import { getUsers, createUser, updateUser, hardDeleteUser } from "../../services/admin/userService";
-import "../../styles/admin/UsuariosPage.css";
+import "../../styles/admin/users/UsuariosPage.css";
 
 export type User = {
   id: string;
@@ -85,7 +85,6 @@ const UsuariosPage: React.FC = () => {
           : undefined,
       }));
 
-      // Eliminar duplicados por ID
       const uniqueUsers = Array.from(new Map(mappedUsers.map((u) => [u.id, u])).values());
       setUsers(uniqueUsers);
 

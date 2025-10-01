@@ -1,6 +1,6 @@
 import React from "react";
 import { Package } from "lucide-react";
-import "../../styles/admin/ViewProductModal.css";
+import "../../../styles/admin/products/ViewProductModal.css";
 
 export type Product = {
   id: string;

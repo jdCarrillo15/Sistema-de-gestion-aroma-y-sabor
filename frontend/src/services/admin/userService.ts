@@ -1,7 +1,6 @@
 //const API_BASE_URL = "http://localhost:3000";
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
-// Tipos para usuarios
 export interface CreateUserRequest {
   user_name: string;
   email: string;
@@ -20,7 +19,6 @@ export interface UpdateUserRequest {
   role?: string;
   state?: string;
   person_id?: string;
-  // Datos de persona también pueden ser actualizados
   first_name?: string;
   last_name?: string;
   birthdate?: string;
@@ -43,7 +41,6 @@ export interface UserResponse {
   };
 }
 
-// Crear usuario
 export async function createUser(userData: CreateUserRequest): Promise<{ message: string; userId: string }> {
   console.log("Creating user:", userData);
   try {
@@ -68,7 +65,6 @@ export async function createUser(userData: CreateUserRequest): Promise<{ message
   }
 }
 
-// Obtener todos los usuarios
 export async function getUsers(): Promise<{ users: UserResponse[] }> {
   try {
     console.log("🔍 Iniciando getUsers request...");
@@ -81,26 +77,25 @@ export async function getUsers(): Promise<{ users: UserResponse[] }> {
       credentials: "include",
     });
 
-    console.log("📡 Response status:", response.status);
-    console.log("📡 Response ok:", response.ok);
+    console.log("Response status:", response.status);
+    console.log("Response ok:", response.ok);
 
     if (!response.ok) {
       const errorData = await response.json();
-      console.error("❌ Error response:", errorData);
+      console.error("Error response:", errorData);
       throw new Error(errorData.error || "Error obteniendo usuarios");
     }
 
     const data = await response.json();
-    console.log("✅ Users data received:", data);
+    console.log("Users data received:", data);
 
     return data;
   } catch (error) {
-    console.error("💥 Error in getUsers service:", error);
+    console.error("Error in getUsers service:", error);
     throw error;
   }
 }
 
-// Obtener usuario por ID
 export async function getUserById(id: string): Promise<UserResponse> {
   try {
     const response = await fetch(`${API_BASE_URL}/users/getuser/${id}`, {
@@ -123,7 +118,6 @@ export async function getUserById(id: string): Promise<UserResponse> {
   }
 }
 
-// Actualizar usuario
 export async function updateUser(id: string, userData: UpdateUserRequest): Promise<{ message: string }> {
   console.log("Updating user:", id, userData);
   try {
@@ -148,7 +142,6 @@ export async function updateUser(id: string, userData: UpdateUserRequest): Promi
   }
 }
 
-// Cambiar estado del usuario
 export async function changeUserState(id: string, state: string): Promise<{ message: string }> {
   console.log("Changing user state:", id, state);
   try {
@@ -173,7 +166,6 @@ export async function changeUserState(id: string, state: string): Promise<{ mess
   }
 }
 
-// Eliminar usuario (hard delete)
 export async function hardDeleteUser(id: string): Promise<{ message: string }> {
   console.log("Deleting user:", id);
   try {
@@ -197,7 +189,6 @@ export async function hardDeleteUser(id: string): Promise<{ message: string }> {
   }
 }
 
-// Función auxiliar para manejar errores de red
 export function handleApiError(error: any): string {
   if (error instanceof TypeError && error.message.includes('fetch')) {
     return "Error de conexión. Verifica que el servidor esté funcionando.";

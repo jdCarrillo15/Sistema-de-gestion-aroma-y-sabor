@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
-import Button from "../common/Button";
-import "../../styles/admin/CreateUserModal.css";
+import Button from "../../common/Button";
+import "../../../styles/admin/users/CreateUserModal.css";
 
 interface CreateUserModalProps {
   isOpen: boolean;
@@ -48,7 +48,6 @@ const CreateUserModal: React.FC<CreateUserModalProps> = ({
 
   useEffect(() => {
     if (isOpen) {
-      // Limpiar formulario cuando se abre el modal
       setUserName("");
       setEmail("");
       setPassword("");
@@ -77,7 +76,6 @@ const CreateUserModal: React.FC<CreateUserModalProps> = ({
     };
   }, [isOpen]);
 
-  // Validaciones
   const validateUserName = (name: string) => {
     if (!name.trim()) {
       return "El nombre de usuario es requerido";
@@ -166,7 +164,6 @@ const CreateUserModal: React.FC<CreateUserModalProps> = ({
     }
   };
 
-  // Event handlers para campos con validación en tiempo real
   const handleUserNameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value;
     setUserName(value);
@@ -223,7 +220,6 @@ const CreateUserModal: React.FC<CreateUserModalProps> = ({
 
     if (isSubmitting) return;
 
-    // Validar todos los campos
     const userNameError = validateUserName(userName);
     const firstNameError = validateName(firstName, "firstName");
     const lastNameError = validateName(lastName, "lastName");
@@ -242,7 +238,6 @@ const CreateUserModal: React.FC<CreateUserModalProps> = ({
       password: passwordError,
     });
 
-    // Si hay errores, no continuar
     if (userNameError || firstNameError || lastNameError || documentError || birthdateError || emailError || passwordError) {
       return;
     }
@@ -250,7 +245,6 @@ const CreateUserModal: React.FC<CreateUserModalProps> = ({
     setIsSubmitting(true);
 
     try {
-      // Llamar a onSubmit que manejará la llamada al backend
       await onSubmit({
         user_name: userName.trim(),
         email: email.trim(),
@@ -264,7 +258,6 @@ const CreateUserModal: React.FC<CreateUserModalProps> = ({
       });
     } catch (error) {
       console.error("Error en handleSubmit:", error);
-      // El error ya será manejado por el componente padre
     } finally {
       setIsSubmitting(false);
     }
@@ -444,7 +437,8 @@ const CreateUserModal: React.FC<CreateUserModalProps> = ({
               >
                 <option value="cocinero">Cocinero</option>
                 <option value="mesero">Mesero</option>
-                <option value="user">Caja</option>
+                <option value="waiter">Caja</option>
+                <option value="admin">Administrador</option>
               </select>
             </div>
 

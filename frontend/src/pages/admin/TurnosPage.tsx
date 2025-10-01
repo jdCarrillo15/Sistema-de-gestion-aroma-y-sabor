@@ -1,6 +1,5 @@
 import React from "react";
 import { Clock, Plus } from "lucide-react";
-//import "./TurnosPage.css";
 
 type Shift = {
   id: number;
