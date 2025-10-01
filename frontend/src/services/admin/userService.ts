@@ -1,7 +1,6 @@
 //const API_BASE_URL = "http://localhost:3000";
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
-
 export interface CreateUserRequest {
   user_name: string;
   email: string;
@@ -47,8 +46,8 @@ export async function createUser(userData: CreateUserRequest): Promise<{ message
   try {
     const response = await fetch(`${API_BASE_URL}/users/createuser`, {
       method: "POST",
-      headers: { 
-        "Content-Type": "application/json" 
+      headers: {
+        "Content-Type": "application/json"
       },
       body: JSON.stringify(userData),
       credentials: "include",
@@ -69,11 +68,11 @@ export async function createUser(userData: CreateUserRequest): Promise<{ message
 export async function getUsers(): Promise<{ users: UserResponse[] }> {
   try {
     console.log("🔍 Iniciando getUsers request...");
-    
+
     const response = await fetch(`${API_BASE_URL}/users/getusers`, {
       method: "GET",
-      headers: { 
-        "Content-Type": "application/json" 
+      headers: {
+        "Content-Type": "application/json"
       },
       credentials: "include",
     });
@@ -89,7 +88,7 @@ export async function getUsers(): Promise<{ users: UserResponse[] }> {
 
     const data = await response.json();
     console.log("Users data received:", data);
-    
+
     return data;
   } catch (error) {
     console.error("Error in getUsers service:", error);
@@ -101,8 +100,8 @@ export async function getUserById(id: string): Promise<UserResponse> {
   try {
     const response = await fetch(`${API_BASE_URL}/users/getuser/${id}`, {
       method: "GET",
-      headers: { 
-        "Content-Type": "application/json" 
+      headers: {
+        "Content-Type": "application/json"
       },
       credentials: "include",
     });
@@ -124,8 +123,8 @@ export async function updateUser(id: string, userData: UpdateUserRequest): Promi
   try {
     const response = await fetch(`${API_BASE_URL}/users/updateuser/${id}`, {
       method: "PUT",
-      headers: { 
-        "Content-Type": "application/json" 
+      headers: {
+        "Content-Type": "application/json"
       },
       body: JSON.stringify(userData),
       credentials: "include",
@@ -148,8 +147,8 @@ export async function changeUserState(id: string, state: string): Promise<{ mess
   try {
     const response = await fetch(`${API_BASE_URL}/users/changeState/${id}`, {
       method: "PUT",
-      headers: { 
-        "Content-Type": "application/json" 
+      headers: {
+        "Content-Type": "application/json"
       },
       body: JSON.stringify({ state }),
       credentials: "include",
@@ -172,8 +171,8 @@ export async function hardDeleteUser(id: string): Promise<{ message: string }> {
   try {
     const response = await fetch(`${API_BASE_URL}/users/harddeleteuser/${id}`, {
       method: "DELETE",
-      headers: { 
-        "Content-Type": "application/json" 
+      headers: {
+        "Content-Type": "application/json"
       },
       credentials: "include",
     });
@@ -194,10 +193,10 @@ export function handleApiError(error: any): string {
   if (error instanceof TypeError && error.message.includes('fetch')) {
     return "Error de conexión. Verifica que el servidor esté funcionando.";
   }
-  
+
   if (error.message) {
     return error.message;
   }
-  
+
   return "Ha ocurrido un error inesperado";
 }
