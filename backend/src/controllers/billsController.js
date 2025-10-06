@@ -45,7 +45,7 @@ export async function getBills(req, res) {
 //CRUD functions
 export async function createBill(req, res) {
   const data = req.body;
-  if (!data.table || !data.products || data.user_id == null) {
+  if (!data.table || data.products==[] || data.user_id == null) {
     return res.status(406).json({
       error:
         "Debe tener una mesa, un usuario y al menos un producto para crear una cuenta.",
@@ -83,14 +83,14 @@ export async function getBillById(req, res) {
     let user = null;
 
     if (!billDoc)
-      return res.status(404).json({ error: "Producto no encontrado" });
+      return res.status(404).json({ error: "Cuenta no encontrada" });
 
-    const userDoc = await getResourceDoc(data.user_id, "users");
+    const userDoc = await getResourceDoc(billDoc.user_id, "users");
 
     if (userDoc.exists) {
         user = { id: userDoc.id, ...userDoc.data() };
     } else {
-        user = null;
+      return res.status(406).json({ error: "Cuenta sin usuario" });
     }
     return res.json({
       state: billDoc.state,
@@ -104,7 +104,7 @@ export async function getBillById(req, res) {
   } catch (err) {
     res
       .status(500)
-      .json({ error: "Error obteniendo producto", details: err.message });
+      .json({ error: "Error obteniendo cuenta", details: err.message });
   }
 }
 
@@ -155,6 +155,107 @@ export async function hardDeleteBill(req, res) {
     // console.error("Error al eliminar producto:", err.message);
     res.status(500).json({
       error: "Error al eliminar producto",
+      details: err.message,
+    });
+  }
+}
+// agregar un producto a la cuenta
+export async function addProductToBill(req, res) {
+  try {
+    const { id } = req.params;
+    const { product } = req.body;
+
+    if (!product) {
+      return res
+        .status(400)
+        .json({ error: "Se requiere el producto a agregar" });
+    }
+
+    const billRef = db.collection("bills").doc(id);
+    const billSnap = await billRef.get();
+
+    if (!billSnap.exists) {
+      return res.status(404).json({ error: "Cuenta no encontrada" });
+    }
+
+    const billData = billSnap.data();
+    const updatedProducts = [...(billData.products || []), product];
+
+    await billRef.update({ products: updatedProducts });
+
+    res
+      .status(200)
+      .json({ message: "Producto agregado a la cuenta correctamente" });
+  } catch (err) {
+    res.status(500).json({
+      error: "Error al agregar producto a la cuenta",
+      details: err.message,
+    });
+  }
+}
+
+// quitar un producto de la cuenta
+export async function removeProductFromBill(req, res) {
+  try {
+    const { id } = req.params;
+    const { productId } = req.body;
+
+    if (!productId) {
+      return res
+        .status(400)
+        .json({ error: "Se requiere el ID del producto a eliminar" });
+    }
+
+    const billRef = db.collection("bills").doc(id);
+    const billSnap = await billRef.get();
+
+    if (!billSnap.exists) {
+      return res.status(404).json({ error: "Cuenta no encontrada" });
+    }
+
+    const billData = billSnap.data();
+    const updatedProducts = (billData.products || []).filter(
+      (p) => p.id !== productId
+    );
+
+    await billRef.update({ products: updatedProducts });
+
+    res
+      .status(200)
+      .json({ message: "Producto eliminado de la cuenta correctamente" });
+  } catch (err) {
+    res.status(500).json({
+      error: "Error al eliminar producto de la cuenta",
+      details: err.message,
+    });
+  }
+}
+
+//cerrar la cuenta si el unico producto se quito
+export async function closeBillIfEmpty(req, res) {
+  try {
+    const { id } = req.params;
+
+    const billRef = db.collection("bills").doc(id);
+    const billSnap = await billRef.get();
+
+    if (!billSnap.exists) {
+      return res.status(404).json({ error: "Cuenta no encontrada" });
+    }
+
+    const billData = billSnap.data();
+
+    if (!billData.products || billData.products.length === 0) {
+      await billRef.update({ state: "closed" });
+      return res.status(200).json({ message: "Cuenta cerrada correctamente" });
+    } else {
+      return res
+        .status(400)
+        .json({ error: "La cuenta no está vacía, no se puede cerrar" });
+    }
+  } catch (err) {
+    res.status(500).json({
+      error: "Error al cerrar la cuenta",
       details: err.message,
     });
   }
