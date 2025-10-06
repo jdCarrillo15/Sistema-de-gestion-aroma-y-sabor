@@ -145,16 +145,16 @@ export async function hardDeleteBill(req, res) {
       // Eliminar el doc de products
       await billRef.delete();
     } else {
-      return res.status(404).json({ error: "Producto no encontrado" });
+      return res.status(404).json({ error: "Cuenta no encontrado" });
     }
 
     res.status(200).json({
-      message: "Producto y datos relacionados eliminados correctamente",
+      message: "Cuenta y datos relacionados eliminados correctamente",
     });
   } catch (err) {
     // console.error("Error al eliminar producto:", err.message);
     res.status(500).json({
-      error: "Error al eliminar producto",
+      error: "Error al eliminar Cuenta",
       details: err.message,
     });
   }

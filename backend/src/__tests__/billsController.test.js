@@ -319,7 +319,7 @@ describe("billsController", () => {
 
       expect(res.status).toHaveBeenCalledWith(404);
       expect(res.json).toHaveBeenCalledWith(
-        expect.objectContaining({ error: "Producto no encontrado" })
+        expect.objectContaining({ error: "Cuenta no encontrado" })
       );
     });
 
@@ -333,7 +333,7 @@ describe("billsController", () => {
       expect(mockBillRef.delete).toHaveBeenCalled();
       expect(res.status).toHaveBeenCalledWith(200);
       expect(res.json).toHaveBeenCalledWith(
-        expect.objectContaining({ message: "Producto y datos relacionados eliminados correctamente" })
+        expect.objectContaining({ message: "Cuenta y datos relacionados eliminados correctamente" })
       );
     });
 
