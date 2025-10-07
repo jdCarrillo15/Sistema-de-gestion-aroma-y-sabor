@@ -28,7 +28,7 @@ export async function getUsers(req, res) {
                     role: data.role,
                     state: data.state,
                     person,
-                    created_at: new Date(data.created_at._seconds * 1000).toISOString(),
+                    created_at: admin.firestore.FieldValue.serverTimestamp(),
                 };
             })
         );
