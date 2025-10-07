@@ -23,7 +23,6 @@ keys/
 # (tests)
 coverage/
 __mocks__
-__tests__
 # Build outputs
 dist/
 build/
