@@ -71,7 +71,12 @@ describe("billsController", () => {
           },
         ],
       });
-      resourceService.getResourceDoc.mockResolvedValueOnce({ exists: true, id: "u1", data: () => ({ nombre: "Juan" }) });
+      // Primer llamado: usuario
+      resourceService.getResourceDoc.mockResolvedValue({
+        exists: true,
+        id: "u1",
+        data: () => ({ nombre: "Juan" }),
+      });
 
       const req = {};
       const res = mockRes();
@@ -185,6 +190,7 @@ describe("billsController", () => {
     });
 
     it("debe retornar la cuenta si existe", async () => {
+      // Primer llamado: bill, Segundo llamado: usuario
       resourceService.getResourceDoc
         .mockResolvedValueOnce({
           id: "1",
@@ -214,7 +220,7 @@ describe("billsController", () => {
           user: { id: "u1", nombre: "Juan" },
           products: [],
           id: "1",
-          created_at: "timestamp",
+          created_at: "timestamp", // Si tu controller retorna un timestamp fijo
         })
       );
     });

@@ -45,13 +45,12 @@ export async function getBills(req, res) {
 //CRUD functions
 export async function createBill(req, res) {
   const data = req.body;
-  if (!data.table || data.products==[] || data.user_id == null) {
+  if (!data.table || data.products == [] || data.user_id == null) {
     return res.status(406).json({
       error:
         "Debe tener una mesa, un usuario y al menos un producto para crear una cuenta.",
     });
   }
-  
 
   try {
     // 1. Crear documento en "products"
@@ -88,7 +87,7 @@ export async function getBillById(req, res) {
     const userDoc = await getResourceDoc(billDoc.user_id, "users");
 
     if (userDoc.exists) {
-        user = { id: userDoc.id, ...userDoc.data() };
+      user = { id: userDoc.id, ...userDoc.data() };
     } else {
       return res.status(406).json({ error: "Cuenta sin usuario" });
     }
@@ -159,17 +158,35 @@ export async function hardDeleteBill(req, res) {
     });
   }
 }
+
+//documentacion en comentarios con estructura de peticion esperada
+/**
+ * @route POST /bills/addProductToBill/:id
+ * @desc Agrega un producto a una cuenta existente
+ * @param {string} id - ID de la cuenta a la que se agregará el producto
+ * @body {object} product - Objeto del producto a agregar (debe contener al menos un campo 'id')
+ * @returns {object} Mensaje de éxito o error
+ * @example
+ * // Petición
+ * POST /bills/addProductToBill/abc123
+ * {
+ *   "product": {
+ *     "name": "Producto Ejemplo",
+ *     "units": 1
+ *   }
+ * }
+ */
 // agregar un producto a la cuenta
 export async function addProductToBill(req, res) {
+  const { id } = req.params;
+  const { product } = req.body;
+  
+  if (!product) {
+    return res
+      .status(400)
+      .json({ error: "Se requiere el producto a agregar" });
+  }
   try {
-    const { id } = req.params;
-    const { product } = req.body;
-
-    if (!product) {
-      return res
-        .status(400)
-        .json({ error: "Se requiere el producto a agregar" });
-    }
 
     const billRef = db.collection("bills").doc(id);
     const billSnap = await billRef.get();
@@ -179,7 +196,7 @@ export async function addProductToBill(req, res) {
     }
 
     const billData = billSnap.data();
-    const updatedProducts = [...(billData.products || []), product];
+    const updatedProducts = [...(billData.products) || [], product];
 
     await billRef.update({ products: updatedProducts });
 
@@ -232,17 +249,26 @@ export async function removeProductFromBill(req, res) {
 }
 
 //cerrar la cuenta si el unico producto se quito
+//documentacion de la funcion closebillifempty en comentarios con estructura de peticion
+/**
+ * @route PUT /bills/closeBillIfEmpty/:id
+ * @desc Cierra una cuenta si no tiene productos asociados
+ * @param {string} id - ID de la cuenta a cerrar
+ * @returns {object} Mensaje de éxito o error
+ * @example
+ * // Petición
+ * PUT /bills/closeBillIfEmpty/abc123
+ */ 
 export async function closeBillIfEmpty(req, res) {
   try {
     const { id } = req.params;
-
+  
     const billRef = db.collection("bills").doc(id);
     const billSnap = await billRef.get();
-
+  
     if (!billSnap.exists) {
       return res.status(404).json({ error: "Cuenta no encontrada" });
     }
-
     const billData = billSnap.data();
 
     if (!billData.products || billData.products.length === 0) {
@@ -256,6 +282,85 @@ export async function closeBillIfEmpty(req, res) {
   } catch (err) {
     res.status(500).json({
       error: "Error al cerrar la cuenta",
+      details: err.message,
+    });
+  }
+}
+
+//modificacion de productos de una cuenta
+export async function updateProductsInBill(req, res) {
+  try {
+    const { id } = req.params;
+    const { products } = req.body;
+
+    if (!products || !Array.isArray(products)) {
+      return res
+        .status(400)
+        .json({ error: "Se requiere un array de productos para actualizar" });
+    }
+
+    const billRef = db.collection("bills").doc(id);
+    const billSnap = await billRef.get();
+
+    if (!billSnap.exists) {
+      return res.status(404).json({ error: "Cuenta no encontrada" });
+    }
+    await billRef.update({ products });
+
+    res
+      .status(200)
+      .json({ message: "Productos de la cuenta actualizados correctamente" });
+  } catch (err) {
+    res.status(500).json({
+      error: "Error al actualizar productos de la cuenta",
+      details: err.message,
+    });
+  }
+}
+
+//documentacion de la funcion calculatebilltotal en comentarios con estructura de peticion
+/**
+ * @route POST /bills/calculateBillTotal/:id
+ * @desc Calcula el total de una cuenta sumando los precios de los productos asociados
+ * @param {string} id - ID de la cuenta a calcular el total
+ * @returns {object} Total calculado o mensaje de error
+ * @example
+ * // Petición
+ * POST /bills/calculateBillTotal/abc123
+ */
+export async function calculateBillTotal(req, res) {
+  try {
+    const { id } = req.params;
+
+    const billRef = db.collection("bills").doc(id);
+    const billSnap = await billRef.get();
+
+    if (!billSnap.exists) {
+      return res.status(404).json({ error: "Cuenta no encontrada" });
+    }
+
+    const billData = billSnap.data();
+    let total = 0;
+
+    for (const item of billData.products) {
+      const productDoc = await db
+        .collection("products")
+        .where("name", "==", item.name)
+        .limit(1)
+        .get();
+
+      if (!productDoc.empty) {
+        const productData = productDoc.docs[0].data();
+        total += productData.price * item.units;
+      }
+    }
+
+    await billRef.update({ total });
+
+    res.status(200).json({ total });
+  } catch (err) {
+    res.status(500).json({
+      error: "Error al calcular el total de la cuenta",
       details: err.message,
     });
   }
