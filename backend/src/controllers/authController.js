@@ -21,7 +21,7 @@ export async function login(req, res) {
         const data = await response.json();
 
         if (data.error) {
-            return res.send({ success: false, error: data.error.message });
+            return res.status(500).send({ success: false, error: data.error.message });
         }
 
         const sessionCookie = await admin.auth().createSessionCookie(data.idToken, { expiresIn });
