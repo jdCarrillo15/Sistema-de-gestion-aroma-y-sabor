@@ -19,21 +19,8 @@ jobs:
         with:
           ssh-private-key: ${{ secrets.VPS_SSH_KEY }}
 
-      - name: Detect changes since last deploy
-        id: changes
-        run: |
-          git fetch origin deploy
-          LAST_DEPLOY=$(git rev-parse origin/deploy)
-          echo "Comparando cambios desde el último deploy ($LAST_DEPLOY)..."
-          CHANGED_DIRS=$(git diff --name-only $LAST_DEPLOY...HEAD | cut -d/ -f1 | sort -u)
-          echo "CHANGED_DIRS=$CHANGED_DIRS" >> $GITHUB_ENV
-          echo "Cambios detectados en:"
-          echo "$CHANGED_DIRS"
-
       - name: Deploy backend on VPS
-        if: contains(env.CHANGED_DIRS, 'backend')
         run: |
-          echo "Desplegando backend..."
           ssh -o StrictHostKeyChecking=no ${{ secrets.VPS_USER }}@${{ secrets.VPS_HOST }} "
             cd ${{ secrets.VPS_APP_DIR }}
             git fetch --all
@@ -45,9 +32,7 @@ jobs:
           "
 
       - name: Deploy frontend on VPS
-        if: contains(env.CHANGED_DIRS, 'frontend')
         run: |
-          echo "Desplegando frontend..."
           ssh -o StrictHostKeyChecking=no ${{ secrets.VPS_USER }}@${{ secrets.VPS_HOST }} "
             cd ${{ secrets.VPS_APP_DIR }}
             git fetch --all
