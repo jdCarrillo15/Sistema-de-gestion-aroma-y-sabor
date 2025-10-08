@@ -1,0 +1,285 @@
+.cocina-caja-page {
+  padding: 1rem;
+  padding-bottom: 5rem;
+  max-width: 100%;
+}
+
+.cocina-caja-page {
+  padding: 1rem;
+  padding-bottom: 5rem;
+  min-width: 100%; /* que ocupe todo el ancho */
+  height: 100%; 
+  box-sizing: border-box;
+  background-color: #f9fafb;
+}
+
+.page-header {
+  margin-bottom: 1rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 1rem;
+}
+
+.page-title {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: #111827;
+  margin: 0 0 0.25rem 0;
+}
+
+.page-subtitle {
+  font-size: 0.875rem;
+  color: #6b7280;
+  margin: 0;
+}
+
+.report-toggle-btn {
+  font-size: 0.75rem;
+  padding: 0.5rem 0.75rem;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+/* Estadísticas */
+.stats-grid-cocina,
+.stats-grid-caja {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 0.75rem;
+  margin-bottom: 1rem;
+}
+
+.stat-card {
+  background: white;
+  padding: 0.75rem;
+  border-radius: 8px;
+  border: 1px solid #e5e7eb;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.stat-icon {
+  width: 40px;
+  height: 40px;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.stat-icon.orange {
+  background: #fff7ed;
+  color: #f97316;
+}
+
+.stat-icon.green {
+  background: #f0fdf4;
+  color: #22c55e;
+}
+
+.stat-content {
+  flex: 1;
+}
+
+.stat-value {
+  font-size: 1.5rem;
+  font-weight: 700;
+  line-height: 1;
+  margin: 0 0 0.25rem 0;
+  color: #111827;
+}
+
+.stat-label {
+  font-size: 0.75rem;
+  color: #6b7280;
+  margin: 0;
+}
+
+/* Secciones */
+.orders-section,
+.ready-section,
+.bills-section,
+.report-section {
+  margin-bottom: 1rem;
+}
+
+.section-title {
+  font-size: 1rem;
+  font-weight: 700;
+  margin: 0 0 0.5rem 0;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  color: #f97316;
+}
+
+.section-title.ready {
+  color: #22c55e;
+}
+
+.orders-list,
+.bills-section {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.ready-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.empty-state {
+  background: #f9fafb;
+  border: 2px dashed #d1d5db;
+  border-radius: 8px;
+  padding: 1.5rem;
+  text-align: center;
+}
+
+.empty-state p {
+  color: #6b7280;
+  font-size: 0.875rem;
+  margin: 0;
+}
+
+/* Reporte */
+.report-summary {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 0.75rem;
+  padding: 1rem;
+  background: linear-gradient(135deg, #22c55e 0%, #16a34a 100%);
+  border-radius: 8px;
+  margin-bottom: 1rem;
+}
+
+.summary-card {
+  text-align: center;
+}
+
+.summary-label {
+  font-size: 0.75rem;
+  color: #dcfce7;
+  margin: 0 0 0.5rem 0;
+}
+
+.summary-value {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: white;
+  margin: 0;
+}
+
+.report-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  margin-bottom: 0.75rem;
+}
+
+.report-item {
+  background: white;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  padding: 0.75rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 1rem;
+}
+
+.report-item-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.report-item-table {
+  font-size: 0.875rem;
+  font-weight: 700;
+  margin: 0 0 0.25rem 0;
+  color: #111827;
+}
+
+.report-item-time {
+  font-size: 0.75rem;
+  color: #6b7280;
+  margin: 0 0 0.5rem 0;
+}
+
+.payment-badge {
+  display: inline-block;
+  padding: 0.125rem 0.5rem;
+  border-radius: 9999px;
+  font-size: 0.75rem;
+  font-weight: 500;
+}
+
+.payment-badge.efectivo {
+  background: #f0fdf4;
+  color: #16a34a;
+}
+
+.payment-badge.tarjeta {
+  background: #eff6ff;
+  color: #2563eb;
+}
+
+.payment-badge.transferencia {
+  background: #faf5ff;
+  color: #9333ea;
+}
+
+.report-item-total {
+  font-size: 1rem;
+  font-weight: 700;
+  color: #22c55e;
+  white-space: nowrap;
+  margin: 0;
+}
+
+.report-total {
+  background: #f3f4f6;
+  border: 2px solid #d1d5db;
+  border-radius: 8px;
+  padding: 1rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-weight: 700;
+}
+
+.report-total-amount {
+  font-size: 1.25rem;
+  color: #22c55e;
+}
+
+/* Desktop */
+@media (width: 768px) {
+  .cocina-caja-page {
+    padding: 1.5rem;
+  }
+
+  .page-title {
+    font-size: 1.5rem;
+  }
+
+  .stats-grid-cocina,
+  .stats-grid-caja {
+    grid-template-columns: repeat(4, 1fr);
+    gap: 1rem;
+  }
+
+  .report-summary {
+    padding: 1.5rem;
+  }
+
+  .summary-value {
+    font-size: 1.5rem;
+  }
+}
+  

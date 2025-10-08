@@ -7,8 +7,8 @@ import UsuariosPage from "./pages/admin/UsuariosPage";
 import InventarioPage from "./pages/admin/InventarioPage";
 import TurnosPage from "./pages/admin/TurnosPage";
 import VentasPage from "./pages/admin/VentasPage";
-import MeseroLayout from "./components/mesero/MeseroLayout";
-import MesasPage from "./pages/mesero/MesasPage";
+import CocinaCajaLayout from "./components/cocina/CocinaCajaLayout"; 
+import CocinaCajaPage from "./pages/cocina-caja/CocinaCajaPage";        
 import ProtectedRoute from "./components/ProtectedRoute";
 
 function App() {
@@ -16,7 +16,8 @@ function App() {
     <BrowserRouter>
       <Routes>
         <Route path="/" element={<LoginPage />} />
-        
+
+        {/* Panel Admin */}
         <Route
           path="/admin"
           element={
@@ -33,15 +34,30 @@ function App() {
           <Route path="ventas" element={<VentasPage />} />
         </Route>
 
+        {/* Panel Mesero */}
+      
+
         <Route
-          path="/mesero"
+          path="/cocina"
           element={
-            <ProtectedRoute allowedRoles={['waiter']}>
-              <MeseroLayout />
+            <ProtectedRoute allowedRoles={['kitchen', 'caja']}>
+              <CocinaCajaLayout />
             </ProtectedRoute>
           }
         >
-          <Route index element={<MesasPage />} />
+          <Route index element={<CocinaCajaPage />} />
+        </Route>
+
+        
+        <Route
+          path="/caja"
+          element={
+            <ProtectedRoute allowedRoles={['kitchen', 'caja']}>
+              <CocinaCajaLayout />
+            </ProtectedRoute>
+          }
+        >
+          <Route index element={<CocinaCajaPage />} />
         </Route>
       </Routes>
     </BrowserRouter>

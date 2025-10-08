@@ -1,11 +1,23 @@
-.mesero-sidebar {
-  display: flex;
-  flex-direction: column;
-  background: white;
-  height: 100vh;
+.cocina-caja-sidebar {
+  display: none; /* Oculto en mobile */
 }
 
-.sidebar-header {
+/* Desktop */ 
+@media (min-width: 768px) {
+  .cocina-caja-sidebar {
+    display: flex;
+    flex-direction: column;
+    position: fixed;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    width: 260px;
+    background: white;
+    border-right: 1px solid #e5e7eb;
+    z-index: 40;
+  }
+
+  .sidebar-header {
   display: flex;
   align-items: center;
   gap: 12px;
@@ -68,7 +80,7 @@
   color: #374151;
   font-size: 0.95rem;
   font-weight: 500;
-  border-left: 3px solid transparent;
+  border-right: 3px solid transparent;
   transition: all 0.2s ease;
 }
 
@@ -80,7 +92,7 @@
 .sidebar-link.active {
   background-color: #fff7ed;
   color: #f97316;
-  border-left-color: #f97316;
+  border-right-color: #f97316;
 }
 
 .link-icon {
@@ -113,4 +125,5 @@
 .logout-btn:hover {
   background-color: #f9fafb !important;
   color: #f97316 !important;
+}
 }

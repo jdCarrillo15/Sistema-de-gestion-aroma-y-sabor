@@ -1,0 +1,40 @@
+.cocina-caja-layout {
+  display: flex;
+  min-height: 100vh;
+  width: 100%;  
+  background-color: #f9fafb;
+}
+
+/*.cocina-caja-main {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+}*/
+
+.cocina-caja-main {
+  flex: 1; /* ocupa todo el espacio restante */
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  background-color: #f9fafb; /* asegúrate de que no se vea negro */
+}
+
+/*.cocina-caja-content {
+  flex: 1;
+  overflow-y: auto;
+} */
+.cocina-caja-content {
+  flex: 1;
+  overflow-y: auto;
+  width: 100%; /* forzamos ocupar ancho */
+  background-color: #f9fafb; /* mismo color de fondo */
+}
+
+
+/* Desktop */
+@media (min-width: 768px) {
+  .cocina-caja-main {
+    margin-left: 260px;
+  }
+}

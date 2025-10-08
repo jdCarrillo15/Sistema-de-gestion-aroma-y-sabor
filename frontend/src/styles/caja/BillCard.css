@@ -1,0 +1,119 @@
+.bill-card {
+  background: white;
+  border: 2px solid #e5e7eb;
+  border-radius: 8px;
+  padding: 1rem;
+}
+
+.bill-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 1rem;
+  margin-bottom: 0.75rem;
+}
+
+.bill-table {
+  font-size: 1.125rem;
+  font-weight: 700;
+  margin: 0 0 0.25rem 0;
+  color: #111827;
+}
+
+.bill-time {
+  font-size: 0.75rem;
+  color: #6b7280;
+  margin: 0;
+}
+
+.bill-total-box {
+  text-align: right;
+  flex-shrink: 0;
+}
+
+.bill-total-label {
+  font-size: 0.625rem;
+  color: #6b7280;
+  margin: 0 0 0.25rem 0;
+}
+
+.bill-total {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: #f97316;
+  margin: 0;
+}
+
+.bill-details {
+  background: #f9fafb;
+  padding: 0.75rem;
+  border-radius: 8px;
+  margin-bottom: 0.75rem;
+}
+
+.bill-details-header {
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: #6b7280;
+  margin: 0 0 0.5rem 0;
+}
+
+.bill-items {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  margin-bottom: 0.5rem;
+}
+
+.bill-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 0.875rem;
+  gap: 1rem;
+}
+
+.bill-item-name {
+  font-weight: 500;
+  color: #111827;
+  flex: 1;
+}
+
+.bill-item-price {
+  color: #6b7280;
+  font-weight: 400;
+  white-space: nowrap;
+}
+
+.bill-total-row {
+  border-top: 1px solid #d1d5db;
+  padding-top: 0.5rem;
+  display: flex;
+  justify-content: space-between;
+  font-weight: 700;
+  font-size: 0.875rem;
+}
+
+.bill-total-amount {
+  color: #f97316;
+}
+
+.pay-btn {
+  width: 100%;
+  font-size: 1rem;
+  font-weight: 700;
+  background: #22c55e !important;
+}
+
+.pay-btn:hover {
+  background: #16a34a !important;
+}
+
+/* Desktop */
+@media (min-width: 768px) {
+  .bills-section {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1rem;
+  }
+}
