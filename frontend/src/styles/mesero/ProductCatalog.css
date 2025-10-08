@@ -34,7 +34,6 @@
   flex-direction: column;
 }
 
-/* Header */
 .catalog-header {
   display: flex;
   justify-content: space-between;
@@ -102,7 +101,6 @@
   box-shadow: 0 0 0 3px rgba(249, 115, 22, 0.1);
 }
 
-/* Categories */
 .catalog-categories {
   display: flex;
   gap: 0.5rem;
@@ -120,9 +118,6 @@
   background: #d1d5db;
   border-radius: 4px;
 }
-
-/* Continuación de frontend/src/styles/mesero/ProductCatalog.css */
-
 .category-btn {
   display: flex;
   align-items: center;
@@ -157,7 +152,6 @@
   font-size: 0.9rem;
 }
 
-/* Products Grid */
 .catalog-products {
   flex: 1;
   padding: 1.5rem;
@@ -239,7 +233,6 @@
   margin-top: 0.25rem;
 }
 
-/* Footer */
 .catalog-footer {
   border-top: 2px solid #e5e7eb;
   padding: 1.5rem;
@@ -316,7 +309,6 @@
   gap: 0.75rem;
 }
 
-/* Responsive */
 @media (max-width: 768px) {
   .catalog-container {
     max-width: 100%;
@@ -407,8 +399,6 @@
   opacity: 0.5;
   cursor: not-allowed;
 }
-/* frontend/src/styles/mesero/ProductCatalog.css */
-
 .product-card.out-of-stock {
   opacity: 0.6;
   cursor: not-allowed;
@@ -466,4 +456,64 @@
   border-color: #f97316;
   color: white;
 }
+}
+
+.product-card {
+  position: relative;
+  background: #fff;
+  border-radius: 12px;
+  padding: 12px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  cursor: pointer;
+  transition: all 0.2s ease-in-out;
+}
+
+.product-card:hover {
+  transform: translateY(-2px);
+}
+
+.product-card.selected {
+  border: 2px solid #ff7b00;
+  background: #fff7ee;
+}
+
+.product-card.out-of-stock {
+  opacity: 0.5;
+  cursor: not-allowed;
+  pointer-events: none;
+  filter: grayscale(0.8);
+  background: #f8f8f8;
+}
+
+.product-badge {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  padding: 4px 8px;
+  border-radius: 8px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+}
+
+.product-badge.out-of-stock {
+  background-color: #fde2e2;
+  color: #d93025;
+}
+
+.product-badge:not(.out-of-stock) {
+  background-color: #e4f9ed;
+  color: #12a15b;
+}
+
+@media (max-width: 768px) {
+  .product-card {
+    padding: 10px;
+    border-radius: 10px;
+  }
+
+  .product-badge {
+    font-size: 0.7rem;
+    padding: 3px 6px;
+  }
 }

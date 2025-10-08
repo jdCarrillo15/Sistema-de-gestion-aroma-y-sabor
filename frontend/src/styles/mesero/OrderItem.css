@@ -1,0 +1,150 @@
+.order-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1rem;
+  background: white;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  transition: all 0.2s ease;
+}
+
+.order-item:hover {
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  border-color: #d1d5db;
+}
+
+.order-item.deleting {
+  opacity: 0.5;
+  pointer-events: none;
+}
+
+.order-info {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.order-header {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+}
+
+.order-name {
+  margin: 0;
+  font-size: 1rem;
+  font-weight: 600;
+  color: #111827;
+}
+
+.order-status {
+  padding: 0.25rem 0.75rem;
+  border-radius: 6px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.order-status.pending {
+  background: #fef3c7;
+  color: #92400e;
+}
+
+.order-status.preparing {
+  background: #dbeafe;
+  color: #1e40af;
+}
+
+.order-status.ready {
+  background: #d1fae5;
+  color: #065f46;
+}
+
+.order-status.finished {
+  background: #e5e7eb;
+  color: #374151;
+}
+
+.order-details {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  color: #6b7280;
+  font-size: 0.875rem;
+}
+
+.order-quantity {
+  font-weight: 500;
+}
+
+.order-price {
+  color: #111827;
+  font-weight: 600;
+}
+
+.remove-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  border: none;
+  border-radius: 8px;
+  background: #fef2f2;
+  color: #dc2626;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  flex-shrink: 0;
+}
+
+.remove-btn:hover:not(:disabled) {
+  background: #fee2e2;
+  transform: scale(1.05);
+}
+
+.remove-btn:active:not(:disabled) {
+  transform: scale(0.95);
+}
+
+.remove-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.spin {
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* Responsive */
+@media (max-width: 640px) {
+  .order-item {
+    padding: 0.875rem;
+  }
+
+  .order-name {
+    font-size: 0.9rem;
+  }
+
+  .order-status {
+    font-size: 0.7rem;
+    padding: 0.2rem 0.6rem;
+  }
+
+  .remove-btn {
+    width: 32px;
+    height: 32px;
+  }
+}

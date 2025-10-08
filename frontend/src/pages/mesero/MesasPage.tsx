@@ -1,34 +1,14 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
+import { mockTables } from '../../services/mesero/mockData';
+import { Table } from '../../types/mesero';
 import TableCard from '../../components/mesero/TableCard';
 import TableModal from '../../components/mesero/TableModal';
-import { Table, Bill } from '../../types/mesero';
-import { mockTables, mockBills } from '../../services/mesero/mockData';
 import '../../styles/mesero/MesasPage.css';
 
 const MesasPage: React.FC = () => {
-  const [tables, setTables] = useState<Table[]>([]);
-  const [bills, setBills] = useState<Bill[]>([]);
+  const [tables, setTables] = useState<Table[]>(mockTables);
   const [selectedTable, setSelectedTable] = useState<Table | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [isLoading, setIsLoading] = useState(false);
-
-  useEffect(() => {
-    loadData();
-  }, []);
-
-  const loadData = async () => {
-    setIsLoading(true);
-    try {
-     
-      await new Promise(resolve => setTimeout(resolve, 500));
-      setTables(mockTables);
-      setBills(mockBills);
-    } catch (error) {
-      console.error('Error cargando datos:', error);
-    } finally {
-      setIsLoading(false);
-    }
-  };
 
   const handleTableClick = (table: Table) => {
     setSelectedTable(table);
@@ -40,103 +20,80 @@ const MesasPage: React.FC = () => {
     setSelectedTable(null);
   };
 
-  const handleUpdateTable = () => {
-    loadData();
-  };
+  const handleUpdateTable = (tableId: string, updates: Partial<Table>) => {
+    setTables(prev => 
+      prev.map(table => 
+        table.id === tableId 
+          ? { ...table, ...updates }
+          : table
+      )
+    );
 
-  
-  const totalTables = tables.length;
-  const occupiedTables = tables.filter(t => t.status === 'occupied').length;
-  const freeTables = tables.filter(t => t.status === 'free').length;
-  const totalSales = bills.reduce((sum, bill) => sum + bill.total, 0);
+    
+    if (selectedTable && selectedTable.id === tableId) {
+      setSelectedTable({ ...selectedTable, ...updates });
+    }
+  };
 
   return (
     <div className="mesas-page">
-      
       <div className="mesas-header">
-        <div>
-          <h1 className="mesas-title">Gestión de Mesas</h1>
-          <p className="mesas-subtitle">Administra las mesas del restaurante</p>
-        </div>
+        <h1 className="mesas-title">Gestión de Mesas</h1>
+        <p className="mesas-subtitle">Administra las mesas del restaurante</p>
       </div>
 
-      
+      {/* Tarjetas de estadísticas */}
       <div className="stats-grid">
-        <div className="stat-card">
+        {/* Mesas Totales */}
+        <div className="stat-card stat-total">
           <div className="stat-left">
-            <div className="stat-icon total">
-            </div>
             <div>
-              <div className="stat-value">{totalTables}</div>
-              <div className="stat-label">Mesas Totales</div>
+              <p className="stat-value">{tables.length}</p>
+              <p className="stat-label">Mesas Totales</p>
             </div>
           </div>
         </div>
 
-        <div className="stat-card">
+        {/* Mesas Ocupadas */}
+        <div className="stat-card stat-occupied">
           <div className="stat-left">
-            <div className="stat-icon occupied">
-            </div>
             <div>
-              <div className="stat-value">{occupiedTables}</div>
-              <div className="stat-label">Mesas Ocupadas</div>
+              <p className="stat-value">{tables.filter(t => t.status === 'occupied').length}</p>
+              <p className="stat-label">Mesas Ocupadas</p>
             </div>
           </div>
         </div>
 
-        <div className="stat-card">
+        {/* Mesas Libres */}
+        <div className="stat-card stat-free">
           <div className="stat-left">
-            <div className="stat-icon free">
-            </div>
             <div>
-              <div className="stat-value">{freeTables}</div>
-              <div className="stat-label">Mesas Libres</div>
-            </div>
-          </div>
-        </div>
-
-        <div className="stat-card">
-          <div className="stat-left">
-            <div className="stat-icon sales">
-            </div>
-            <div>
-              <div className="stat-value">${totalSales.toLocaleString()}</div>
-              <div className="stat-label">Total veentas Activas</div>
+              <p className="stat-value">{tables.filter(t => t.status === 'free').length}</p>
+              <p className="stat-label">Mesas Libres</p>
             </div>
           </div>
         </div>
       </div>
 
-      {/* Grid de Mesas */}
       <div className="mesas-section">
         <h2 className="section-title">Mesas del Restaurante</h2>
-        
-        {isLoading ? (
-          <div className="loading-state">
-            <div className="spinner"></div>
-            <p>Cargando mesas...</p>
-          </div>
-        ) : (
-          <div className="mesas-grid">
-            {tables.map(table => (
-              <TableCard
-                key={table.id}
-                table={table}
-                bill={bills.find(b => b.id === table.current_bill_id)}
-                onClick={() => handleTableClick(table)}
-              />
-            ))}
-          </div>
-        )}
+        <div className="mesas-grid">
+          {tables.map(table => (
+            <TableCard
+              key={table.id}
+              table={table}
+              onClick={() => handleTableClick(table)}
+            />
+          ))}
+        </div>
       </div>
 
-      {/* Modal de Mesa */}
       {selectedTable && (
         <TableModal
           isOpen={isModalOpen}
           onClose={handleCloseModal}
           table={selectedTable}
-          onUpdate={handleUpdateTable}
+          onUpdateTable={handleUpdateTable}
         />
       )}
     </div>

@@ -1,69 +1,41 @@
 import React from 'react';
-import { Order } from '../../types/mesero';
-import { Edit3, Trash2 } from 'lucide-react';
+import { Trash2 } from 'lucide-react';
+import { BillProduct } from '../../services/mesero/billService';
+import '../../styles/mesero/OrderItem.css';
 
 interface OrderItemProps {
-  order: Order;
-  onEdit: () => void;
+  order: BillProduct;
   onRemove: () => void;
-  getStatusColor: (status: Order['status']) => string;
-  getStatusText: (status: Order['status']) => string;
 }
 
-const OrderItem: React.FC<OrderItemProps> = ({ 
-  order, 
-  onEdit, 
-  onRemove, 
-  getStatusColor, 
-  getStatusText 
-}) => {
+const OrderItem: React.FC<OrderItemProps> = ({ order, onRemove }) => {
+  const getStatusBadge = (status: string) => {
+    const statusConfig = {
+      pending: { label: 'Pendiente', className: 'pending' },
+      preparing: { label: 'Preparando', className: 'preparing' },
+      ready: { label: 'Listo', className: 'ready' },
+      finished: { label: 'Entregado', className: 'finished' }
+    };
+
+    const config = statusConfig[status as keyof typeof statusConfig] || statusConfig.pending;
+
+    return <span className={`order-status ${config.className}`}>{config.label}</span>;
+  };
+
   return (
     <div className="order-item">
-      <div className="order-main">
-        <div className="order-info">
-          <h4 className="order-name">{order.product_name}</h4>
-          <div className="order-details">
-            <span className="order-quantity">x{order.quantity}</span>
-            <span className="order-separator">•</span>
-            <span className="order-price">${order.product_price.toLocaleString()}</span>
-          </div>
+      <div className="order-info">
+        <div className="order-header">
+          <h4 className="order-name">{order.name}</h4>
+          {getStatusBadge(order.process)}
         </div>
-
-        <div className="order-status-container">
-          <span 
-            className="order-status"
-            style={{ 
-              backgroundColor: `${getStatusColor(order.status)}20`,
-              color: getStatusColor(order.status),
-              border: `1px solid ${getStatusColor(order.status)}40`
-            }}
-          >
-            {getStatusText(order.status)}
-          </span>
+        <div className="order-details">
+          <span className="order-quantity">{order.units}x unidades</span>
         </div>
       </div>
-
-      <div className="order-footer">
-        <div className="order-actions">
-          <button 
-            className="action-btn edit-btn" 
-            onClick={onEdit}
-            title="Editar"
-          >
-            <Edit3 size={16} />
-          </button>
-          <button 
-            className="action-btn delete-btn" 
-            onClick={onRemove}
-            title="Eliminar"
-          >
-            <Trash2 size={16} />
-          </button>
-        </div>
-        <div className="order-subtotal">
-          ${order.subtotal.toLocaleString()}
-        </div>
-      </div>
+      <button className="remove-btn" onClick={onRemove} title="Eliminar">
+        <Trash2 size={18} />
+      </button>
     </div>
   );
 };

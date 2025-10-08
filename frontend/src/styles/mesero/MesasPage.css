@@ -130,6 +130,45 @@
   margin-bottom: 1rem;
 }
 
+.stat-card {
+  border-radius: 12px;
+  padding: 16px;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.08);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+}
+
+/* Colores personalizados */
+.stat-total {
+  background-color: #dbeafe; /* azul claro */
+  border: 1px solid #60a5fa;
+  color: #1e3a8a;
+}
+
+.stat-occupied {
+  background-color: #ffedd5; /* naranja claro */
+  border: 1px solid #fdba74;
+  color: #9a3412;
+}
+
+.stat-free {
+  background-color: #dcfce7; /* verde claro */
+  border: 1px solid #86efac;
+  color: #166534;
+}
+
+.stat-value {
+  font-size: 1.8rem;
+  font-weight: 700;
+}
+
+.stat-label {
+  font-size: 0.9rem;
+  opacity: 0.9;
+}
+
 @keyframes spin {
   to { transform: rotate(360deg); }
 }

@@ -1,59 +1,61 @@
-// frontend/src/components/mesero/TableCard.tsx
-
 import React from 'react';
-import { Table, Bill } from '../../types/mesero';
-import { getOrdersByBillId } from '../../services/mesero/mockData';
+import { Table } from '../../types/mesero';
+import { Users, Clock } from 'lucide-react';
 import '../../styles/mesero/TableCard.css';
 
 interface TableCardProps {
   table: Table;
-  bill?: Bill;
   onClick: () => void;
 }
 
-const TableCard: React.FC<TableCardProps> = ({ table, bill, onClick }) => {
-  const isFree = table.status === 'free';
-  const orders = bill ? getOrdersByBillId(bill.id) : [];
-  const productCount = orders.length;
-
-  const formatTime = (dateString: string | Date) => {
-    const date = new Date(dateString);
-    return date.toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' });
+const TableCard: React.FC<TableCardProps> = ({ table, onClick }) => {
+  const getStatusInfo = () => {
+    if (table.status === 'free') {
+      return {
+        label: 'Libre',
+        className: 'free'
+      };
+    }
+    return {
+      label: 'Ocupada',
+      className: 'occupied'
+    };
   };
 
+  const statusInfo = getStatusInfo();
+
   return (
-    <div
-      className={`table-card ${table.status}`}
+    <div 
+      className={`table-card ${statusInfo.className}`}
       onClick={onClick}
     >
       <div className="table-header">
-        <h3 className="table-number">Mesa {table.number}</h3>
-        <span className={`table-badge ${table.status}`}>
-          {isFree ? 'Libre' : 'Ocupada'}
-        </span>
+        <div className="table-number">
+          <span className="table-label">Mesa </span>
+          <span className="table-digit">{table.number}</span>
+        </div>
+        <div className={`status-badge ${statusInfo.className}`}>
+          <span className="status-label">{statusInfo.label}</span>
+        </div>
       </div>
 
-      <div className="table-body">
-        {isFree ? (
-          <div className="table-empty">
-            <p className="empty-text">Mesa disponible</p>
-            <p className="table-hint">Haz clic para asignar</p>
+      <div className="table-info">
+        <div className="info-item">
+          <Users size={16} className="info-icon" />
+          <span>{table.capacity} personas</span>
+        </div>
+        
+        {table.status === 'occupied' && table.current_bill_id && (
+          <div className="info-item active">
+            <Clock size={16} className="info-icon" />
+            <span>Cuenta abierta</span>
           </div>
-        ) : bill ? (
-          <div className="table-occupied">
-            <div className="occupied-info">
-              <div className="info-row">
-                <span className="info-text">Desde: {formatTime(bill.created_at)}</span>
-              </div>
-              <div className="info-row">
-                <span className="info-text">{productCount} producto{productCount !== 1 ? 's' : ''}</span>
-              </div>
-              <div className="info-row total">
-                <span className="info-text total-amount">${bill.total.toLocaleString()}</span>
-              </div>
-            </div>
-          </div>
-        ) : null}
+        )}
+      </div>
+      <div className="table-footer">
+        <button className="table-action-btn">
+          {table.status === 'free' ? 'Asignar' : 'Ver Cuenta'}
+        </button>
       </div>
     </div>
   );

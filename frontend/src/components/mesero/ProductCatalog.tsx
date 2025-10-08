@@ -1,5 +1,3 @@
-// frontend/src/components/mesero/ProductCatalog.tsx
-
 import React, { useState, useEffect } from 'react';
 import { Product } from '../../types/mesero';
 import { getProducts } from '../../services/mesero/productService';
@@ -19,7 +17,7 @@ const ProductCatalog: React.FC<ProductCatalogProps> = ({ isOpen, onClose, onSele
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
   const [quantity, setQuantity] = useState(1);
   const [isLoading, setIsLoading] = useState(false);
-
+  const [isAdding, setIsAdding] = useState(false);
   useEffect(() => {
     if (isOpen) {
       loadProducts();
@@ -51,11 +49,19 @@ const ProductCatalog: React.FC<ProductCatalogProps> = ({ isOpen, onClose, onSele
     setQuantity(1);
   };
 
-  const handleAddToOrder = () => {
+  const handleAddToOrder = async () => {
     if (selectedProduct) {
-      onSelectProduct(selectedProduct, quantity);
-      setSelectedProduct(null);
-      setQuantity(1);
+      setIsAdding(true); 
+      try {
+        await onSelectProduct(selectedProduct, quantity);
+      } catch (error) {
+        console.error('Error agregando producto:', error);
+      } finally {
+        setIsAdding(false); 
+        setSelectedProduct(null);
+        setQuantity(1);
+        onClose(); 
+      }
     }
   };
 
@@ -164,9 +170,11 @@ const ProductCatalog: React.FC<ProductCatalogProps> = ({ isOpen, onClose, onSele
               <Button 
                 variant="primary" 
                 onClick={handleAddToOrder}
-                disabled={selectedProduct.stock <= 0}
+                disabled={selectedProduct.stock <= 0 || isAdding}
               >
-                Agregar (${(selectedProduct.price * quantity).toLocaleString()})
+                {isAdding
+                  ? 'Agregando...'
+                  : `Agregar ($${(selectedProduct.price * quantity).toLocaleString()})`}
               </Button>
             </div>
           </div>

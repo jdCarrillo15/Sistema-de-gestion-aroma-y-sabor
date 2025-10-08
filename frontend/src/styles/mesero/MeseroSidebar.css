@@ -114,3 +114,47 @@
   background-color: #f9fafb !important;
   color: #f97316 !important;
 }
+
+.toggle-sidebar-btn {
+  position: fixed;
+  top: 1rem;
+  left: 1rem;
+  background: #f97316;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  padding: 0.5rem;
+  z-index: 1001;
+  cursor: pointer;
+  display: none;
+}
+
+
+@media (max-width: 768px) {
+  .toggle-sidebar-btn {
+    display: block;
+  }
+
+  .mesero-sidebar {
+    position: fixed;
+    top: 0;
+    left: -270px; 
+    width: 250px;
+    height: 100vh;
+    background: white;
+    box-shadow: 2px 0 10px rgba(0, 0, 0, 0.1);
+    transition: left 0.3s ease;
+    z-index: 1000;
+  }
+
+  .mesero-sidebar.open {
+    left: 0; 
+  }
+
+ 
+  .sidebar-footer {
+    padding: 1rem 1.5rem;
+    border-top: 1px solid #e5e7eb;
+    margin-bottom: 2rem;
+  }
+}
