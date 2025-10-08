@@ -1,20 +1,13 @@
 .cocina-caja-page {
-  padding: 1rem;
+  padding: 1.5rem 1.5rem;
   padding-bottom: 5rem;
   max-width: 100%;
-}
-
-.cocina-caja-page {
-  padding: 1rem;
-  padding-bottom: 5rem;
-  min-width: 100%; /* que ocupe todo el ancho */
-  height: 100%; 
-  box-sizing: border-box;
-  background-color: #f9fafb;
+  min-height: calc(100vh - 60px);
+  background: #f9fafb;
 }
 
 .page-header {
-  margin-bottom: 1rem;
+  margin-bottom: 1.5rem;
   display: flex;
   justify-content: space-between;
   align-items: flex-start;
@@ -23,7 +16,7 @@
 
 .page-title {
   font-size: 1.25rem;
-  font-weight: 700;
+  font-weight: 600;
   color: #111827;
   margin: 0 0 0.25rem 0;
 }
@@ -35,8 +28,8 @@
 }
 
 .report-toggle-btn {
-  font-size: 0.75rem;
-  padding: 0.5rem 0.75rem;
+  font-size: 0.875rem;
+  padding: 0.625rem 1rem;
   white-space: nowrap;
   flex-shrink: 0;
 }
@@ -46,24 +39,29 @@
 .stats-grid-caja {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
-  gap: 0.75rem;
-  margin-bottom: 1rem;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
 }
 
 .stat-card {
   background: white;
-  padding: 0.75rem;
-  border-radius: 8px;
+  padding: 1rem;
+  border-radius: 12px;
   border: 1px solid #e5e7eb;
   display: flex;
   align-items: center;
-  gap: 0.5rem;
+  gap: 0.75rem;
+  transition: all 0.2s ease;
+}
+
+.stat-card:hover {
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
 }
 
 .stat-icon {
-  width: 40px;
-  height: 40px;
-  border-radius: 8px;
+  width: 48px;
+  height: 48px;
+  border-radius: 10px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -85,7 +83,7 @@
 }
 
 .stat-value {
-  font-size: 1.5rem;
+  font-size: 1.75rem;
   font-weight: 700;
   line-height: 1;
   margin: 0 0 0.25rem 0;
@@ -93,9 +91,10 @@
 }
 
 .stat-label {
-  font-size: 0.75rem;
+  font-size: 0.875rem;
   color: #6b7280;
   margin: 0;
+  font-weight: 500;
 }
 
 /* Secciones */
@@ -103,13 +102,13 @@
 .ready-section,
 .bills-section,
 .report-section {
-  margin-bottom: 1rem;
+  margin-bottom: 1.5rem;
 }
 
 .section-title {
-  font-size: 1rem;
+  font-size: 1.125rem;
   font-weight: 700;
-  margin: 0 0 0.5rem 0;
+  margin: 0 0 1rem 0;
   display: flex;
   align-items: center;
   gap: 0.5rem;
@@ -124,20 +123,20 @@
 .bills-section {
   display: flex;
   flex-direction: column;
-  gap: 0.75rem;
+  gap: 1rem;
 }
 
 .ready-list {
   display: flex;
   flex-direction: column;
-  gap: 0.5rem;
+  gap: 0.75rem;
 }
 
 .empty-state {
   background: #f9fafb;
   border: 2px dashed #d1d5db;
-  border-radius: 8px;
-  padding: 1.5rem;
+  border-radius: 12px;
+  padding: 2rem;
   text-align: center;
 }
 
@@ -151,11 +150,12 @@
 .report-summary {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
-  gap: 0.75rem;
-  padding: 1rem;
+  gap: 1rem;
+  padding: 1.5rem;
   background: linear-gradient(135deg, #22c55e 0%, #16a34a 100%);
-  border-radius: 8px;
-  margin-bottom: 1rem;
+  border-radius: 12px;
+  margin-bottom: 1.5rem;
+  box-shadow: 0 4px 6px -1px rgba(34, 197, 94, 0.2);
 }
 
 .summary-card {
@@ -163,13 +163,14 @@
 }
 
 .summary-label {
-  font-size: 0.75rem;
+  font-size: 0.875rem;
   color: #dcfce7;
   margin: 0 0 0.5rem 0;
+  font-weight: 500;
 }
 
 .summary-value {
-  font-size: 1.25rem;
+  font-size: 1.5rem;
   font-weight: 700;
   color: white;
   margin: 0;
@@ -178,19 +179,24 @@
 .report-list {
   display: flex;
   flex-direction: column;
-  gap: 0.5rem;
-  margin-bottom: 0.75rem;
+  gap: 0.75rem;
+  margin-bottom: 1rem;
 }
 
 .report-item {
   background: white;
   border: 1px solid #e5e7eb;
-  border-radius: 8px;
-  padding: 0.75rem;
+  border-radius: 10px;
+  padding: 1rem;
   display: flex;
   justify-content: space-between;
   align-items: center;
   gap: 1rem;
+  transition: all 0.2s ease;
+}
+
+.report-item:hover {
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
 }
 
 .report-item-info {
@@ -199,24 +205,24 @@
 }
 
 .report-item-table {
-  font-size: 0.875rem;
+  font-size: 0.9375rem;
   font-weight: 700;
   margin: 0 0 0.25rem 0;
   color: #111827;
 }
 
 .report-item-time {
-  font-size: 0.75rem;
+  font-size: 0.8125rem;
   color: #6b7280;
   margin: 0 0 0.5rem 0;
 }
 
 .payment-badge {
   display: inline-block;
-  padding: 0.125rem 0.5rem;
+  padding: 0.25rem 0.625rem;
   border-radius: 9999px;
   font-size: 0.75rem;
-  font-weight: 500;
+  font-weight: 600;
 }
 
 .payment-badge.efectivo {
@@ -235,7 +241,7 @@
 }
 
 .report-item-total {
-  font-size: 1rem;
+  font-size: 1.125rem;
   font-weight: 700;
   color: #22c55e;
   white-space: nowrap;
@@ -245,41 +251,75 @@
 .report-total {
   background: #f3f4f6;
   border: 2px solid #d1d5db;
-  border-radius: 8px;
-  padding: 1rem;
+  border-radius: 10px;
+  padding: 1.25rem;
   display: flex;
   justify-content: space-between;
   align-items: center;
   font-weight: 700;
+  margin-top: 0.5rem;
 }
 
 .report-total-amount {
-  font-size: 1.25rem;
+  font-size: 1.5rem;
   color: #22c55e;
 }
 
 /* Desktop */
-@media (width: 768px) {
+@media (min-width: 768px) {
   .cocina-caja-page {
-    padding: 1.5rem;
+    padding: 2rem 1.5rem;
+  }
+
+  .page-header {
+    margin-bottom: 2rem;
   }
 
   .page-title {
     font-size: 1.5rem;
+    font-weight: 700;
+    color: #1a1a1a;
   }
 
   .stats-grid-cocina,
   .stats-grid-caja {
     grid-template-columns: repeat(4, 1fr);
-    gap: 1rem;
+    gap: 1.25rem;
+    margin-bottom: 2rem;
+  }
+
+  .stat-card {
+    padding: 1.25rem;
+  }
+
+  .section-title {
+    font-size: 1.25rem;
+    margin-bottom: 1.25rem;
+  }
+
+  .orders-list,
+  .bills-section {
+    gap: 1.25rem;
   }
 
   .report-summary {
-    padding: 1.5rem;
+    padding: 2rem;
+    margin-bottom: 2rem;
   }
 
   .summary-value {
-    font-size: 1.5rem;
+    font-size: 2rem;
+  }
+
+  .report-item {
+    padding: 1.25rem;
   }
 }
-  
+
+/* Tablets */
+@media (min-width: 1024px) {
+  .cocina-caja-page {
+    max-width: 1400px;
+    margin: 0 auto;
+  }
+}

@@ -1,30 +1,32 @@
 import React from 'react';
-import { Clock, User } from 'lucide-react';
+import { Calendar, User } from 'lucide-react';
 import { getCurrentUser } from '../../services/login/authService';
 import '../../styles/cocina/CocinaCajaTopbar.css';
 
 const CocinaCajaTopbar: React.FC = () => {
   const user = getCurrentUser();
+  const userName = user?.email?.split('@')[0] || 'Usuario';
+  const userInitial = userName.charAt(0).toUpperCase();
 
   return (
     <header className="cocina-caja-topbar">
       <div className="topbar-container">
         <div className="topbar-left">
-          <h2 className="topbar-title">Sistema de Pedidos</h2>
+          <h3 className="topbar-title">Sistema de Pedidos</h3>
         </div>
 
         <div className="topbar-right">
-          <Clock className="clock-icon" size={20} />
+          <button className="topbar-calendar-button" aria-label="Calendario">
+            <Calendar className="topbar-icon" />
+          </button>
+          
           <div className="topbar-user">
-            <div className="user-avatar">
-              <User size={20} />
+            <div className="topbar-avatar">
+              {userInitial}
             </div>
-            <div className="user-info">
-              <span className="user-name">
-                {user?.email?.split('@')[0] || 'Usuario'}
-              </span>
-              <span className="user-role"></span>
-            </div>
+            <span className="topbar-username">
+              {userName}
+            </span>
           </div>
         </div>
       </div>

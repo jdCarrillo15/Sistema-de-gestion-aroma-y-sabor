@@ -26,7 +26,7 @@ const CocinaCajaSidebar: React.FC = () => {
         </div>
         <div className="brand-box">
           <h3 className="brand-title">Aroma y Sabor</h3>
-          <p className="brand-sub"></p>
+          <p className="brand-sub">Panel de cocina</p>
         </div>
       </div>
 
