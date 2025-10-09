@@ -12,7 +12,9 @@ router.delete("/harddeleteBill/:id", authenticate, authorize("delete", "bills"),
 router.post("/addProductToBill/:id", authenticate, authorize("update", "bills"), addProductToBill);
 router.post("/removeProductFromBill/:id", authenticate, authorize("update", "bills"), removeProductFromBill);
 router.put("/updateProductsInBill/:id", authenticate, authorize("update", "bills"), updateProductsInBill);
-// router.put("/closeBillIfEmpty/:id", authenticate, authorize("update", "bills"), closeBillIfEmpty);
+router.put("/closeBillIfEmpty/:id", authenticate, authorize("update", "bills"), closeBillIfEmpty);
+router.post("/calculateBillTotal/:id", authenticate, authorize("read", "bills"), calculateBillTotal);
+router.put("/changeProductStateInBill/:id", authenticate, authorize("update", "bills"), changeProductStateInBill);
 
 
 export default router;

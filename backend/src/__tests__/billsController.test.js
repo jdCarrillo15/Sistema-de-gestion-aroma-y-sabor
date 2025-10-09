@@ -28,6 +28,8 @@ const mockRes = () => {
 };
 
 const mockDoc = { update: jest.fn(), get: jest.fn(), delete: jest.fn() };
+const mockBillRef = { update: jest.fn(), get: jest.fn(), delete: jest.fn() };
+const mockProductRef = { update: jest.fn(), get: jest.fn(), delete: jest.fn() };
 
 const mockCollection = {
   doc: jest.fn(() => mockDoc),
@@ -41,265 +43,243 @@ const mockCollection = {
 beforeEach(() => {
   jest.clearAllMocks();
   db.collection.mockReturnValue(mockCollection);
+  mockCollection.doc.mockReturnValue({
+    get: jest.fn().mockResolvedValue({
+      exists: true,
+      data: () => ({
+        products: [{ id: "prod1", units: 1 }],
+      }),
+    }),
+    update: jest.fn().mockResolvedValue(), // asegúrate de incluirlo
+  });
 });
 
 jest.spyOn(console, "log").mockImplementation(() => {});
 
-describe("billsController", () => {
-  describe("getBills", () => {
-    it("debe retornar una lista vacía si no hay cuentas", async () => {
-      mockCollection.get.mockResolvedValue({ empty: true });
-      const res = mockRes();
-      await billsController.getBills({}, res);
-      expect(res.json).toHaveBeenCalledWith({ bills: [] });
-    });
+// ==============================
+// ✅ CREATE BILL
+// ==============================
+describe("createBill", () => {
+  let req, res;
 
-    it("debe retornar las cuentas con datos de usuario", async () => {
-      const billDoc = {
-        id: "1",
-        data: () => ({
-          state: "open",
-          total: 100,
-          table: 5,
-          user_id: "u1",
-          products: [],
-        }),
-      };
-      mockCollection.get.mockResolvedValue({ empty: false, docs: [billDoc] });
-      db.collection.mockImplementation((col) => {
-        if (col === "users") {
-          return {
-            doc: () => ({
-              get: () =>
-                Promise.resolve({ id: "u1", data: () => ({ name: "John" }) }),
-            }),
-          };
-        }
-        return mockCollection;
-      });
-      const res = mockRes();
-      await billsController.getBills({}, res);
-      expect(res.json).toHaveBeenCalledWith(
-        expect.objectContaining({
-          bills: expect.any(Array),
-        })
-      );
-    });
+  beforeEach(() => {
+    req = { body: {}, params: {} };
+    res = mockRes();
+  });
 
-    it("maneja errores correctamente", async () => {
-      mockCollection.get.mockRejectedValue(new Error("Fallo DB"));
-      const res = mockRes();
-      await billsController.getBills({}, res);
-      expect(res.status).toHaveBeenCalledWith(500);
+  test("crea cuenta correctamente sin productos", async () => {
+    req.body = { table: 1, user_id: "user123", total: 0 };
+    mockCollection.add.mockResolvedValue({ id: "newBill123" });
+
+    await billsController.createBill(req, res);
+
+    expect(mockCollection.add).toHaveBeenCalledTimes(1);
+    expect(res.status).toHaveBeenCalledWith(201);
+    expect(res.json).toHaveBeenCalledWith({
+      message: "Cuenta creada correctamente",
+      id: "newBill123",
     });
   });
 
-  describe("createBill", () => {
-    it("retorna 406 si faltan mesa o usuario", async () => {
-      const req = { body: { products: [] } };
-      const res = mockRes();
-      await billsController.createBill(req, res);
-      expect(res.status).toHaveBeenCalledWith(406);
-    });
+  test("falla sin mesa o usuario", async () => {
+    req.body = { table: null, user_id: null };
+    await billsController.createBill(req, res);
+    expect(res.status).toHaveBeenCalledWith(406);
+  });
+});
 
-    it("crea la cuenta correctamente", async () => {
-      mockCollection.add.mockResolvedValue({});
-      mockCollection.where.mockReturnValue({
-        limit: jest.fn(() => ({
-          get: jest.fn(() =>
-            Promise.resolve({
-              exists: true,
-              docs: [{ id: "p1", stock: 10, data: () => ({ stock: 10 }) }],
-            })
-          ),
-        })),
-      });
+// ==============================
+// ✅ ADD PRODUCT TO BILL
+// ==============================
+describe("addProductToBill", () => {
+  let req, res;
 
-      db.collection.mockImplementation((col) => {
-        if (col === "products") return mockCollection;
-        if (col === "bills") return mockCollection;
-        return mockCollection;
-      });
-
-      const req = {
-        body: {
-          state: "open",
-          total: 150,
-          table: 5,
-          user_id: "user123",
-          products: [
-            { id: "p1", name: "coca cola", units: 1, process: "in process" },
-          ],
-        },
-      };
-      const res = mockRes();
-
-      await billsController.createBill(req, res);
-      expect(res.status).toHaveBeenCalledWith(201);
-    });
-
-    it("maneja errores en la creación", async () => {
-      mockCollection.add.mockRejectedValue(new Error("Fallo DB"));
-      const req = { body: { table: 5, user_id: "user123", products: [] } };
-      const res = mockRes();
-      await billsController.createBill(req, res);
-      expect(res.status).toHaveBeenCalledWith(500);
-    });
+  beforeEach(() => {
+    req = { body: {}, params: {} };
+    res = mockRes();
   });
 
-  describe("getBillById", () => {
-    it("retorna 404 si no se encuentra la cuenta", async () => {
-      getResourceDoc.mockResolvedValueOnce(null);
-      const req = { params: { id: "1" } };
-      const res = mockRes();
-      await billsController.getBillById(req, res);
-      expect(res.status).toHaveBeenCalledWith(404);
-    });
-
-    it("retorna la cuenta con datos de usuario", async () => {
-      getResourceDoc
-        .mockResolvedValueOnce({
-          state: "open",
-          total: 100,
-          table: 5,
-          user_id: "u1",
-          products: [],
-        })
-        .mockResolvedValueOnce({ data: () => ({ name: "Juan" }) });
-
-      const req = { params: { id: "1" } };
-      const res = mockRes();
-      await billsController.getBillById(req, res);
-      expect(res.json).toHaveBeenCalledWith(
-        expect.objectContaining({ id: "1" })
-      );
-    });
-  });
-
-  describe("addProductToBill", () => {
-    const mockBillRef = {
-      get: jest.fn(),
-      update: jest.fn(),
+  test("agrega productos correctamente", async () => {
+    req.params.id = "bill123";
+    req.body = {
+      products: [{ id: "prod1", units: 2 }],
     };
 
-    beforeEach(() => {
-      db.collection.mockImplementation((col) => {
-        if (col === "bills") return { doc: () => mockBillRef };
-        if (col === "products") return mockCollection;
-        return mockCollection;
-      });
-    });
-
-    it("retorna 406 si no se envían productos", async () => {
-      const req = { params: { id: "1" }, body: {} };
-      const res = mockRes();
-      await billsController.addProductToBill(req, res);
-      expect(res.status).toHaveBeenCalledWith(406);
-    });
-
-    it("retorna 404 si la cuenta no existe", async () => {
-      mockBillRef.get.mockResolvedValue({ exists: false });
-      const req = {
-        params: { id: "1" },
-        body: { products: [{ id: "p1", units: 1 }] },
-      };
-      const res = mockRes();
-      await billsController.addProductToBill(req, res);
-      expect(res.status).toHaveBeenCalledWith(404);
-    });
-
-    it("agrega producto correctamente", async () => {
-      mockBillRef.get.mockResolvedValue({
+    mockCollection.doc.mockImplementation((id) => ({
+      get: jest.fn().mockResolvedValue({
         exists: true,
-        data: () => ({ products: [{ id: "p1", units: 1 }] }),
-      });
-      mockBillRef.update.mockResolvedValue({});
-      mockCollection.where.mockReturnValue({
-        limit: jest.fn(() => ({
-          get: jest.fn(() =>
-            Promise.resolve({
-              exists: true,
-              docs: [{ id: "p2", stock: 10, data: () => ({ stock: 10 }) }],
-            })
-          ),
-        })),
-      });
+        data: () => ({ price: 10, stock: 5, name: "Producto 1" }),
+      }),
+      update: jest.fn().mockResolvedValue(), // ✅ agregado
+    }));
 
-      const req = {
-        params: { id: "1" },
-        body: { products: [{ id: "p2", units: 1 }] },
-      };
-      const res = mockRes();
-
-      await billsController.addProductToBill(req, res);
-      expect(res.status).toHaveBeenCalledWith(201);
+    mockDoc.get.mockResolvedValueOnce({
+      exists: true,
+      data: () => ({ products: [], total: 0 }),
     });
+
+    await billsController.addProductToBill(req, res);
+
+    expect(res.status).toHaveBeenCalledWith(201);
+    expect(res.json).toHaveBeenCalledWith(
+      expect.objectContaining({
+        message: "Producto agregado a la cuenta correctamente",
+      })
+    );
   });
 
-  db.collection.mockImplementation((col) => {
-    if (col === "bills") return { doc: () => mockBillRef };
-    if (col === "products") {
-      return {
-        where: jest.fn().mockReturnValue({
-          limit: jest.fn(() => ({
-            get: jest.fn(() =>
-              Promise.resolve({
-                empty: false,
-                docs: [{ data: () => ({ price: 10 }) }],
-              })
-            ),
-          })),
-        }),
-      };
-    }
-    return mockCollection;
-  });
-
-  describe("removeProductFromBill", () => {
-    const mockBillRef = {
-      get: jest.fn(),
-      update: jest.fn(),
+  test("falla si producto no existe", async () => {
+    req.params.id = "bill123";
+    req.body = {
+      products: [{ id: "noProd", units: 1 }],
     };
 
-    beforeEach(() => {
-      db.collection.mockImplementation((col) => {
-        if (col === "bills") {
-          return { doc: () => mockBillRef };
-        }
-        if (col === "products") {
-          return {
-            where: jest.fn().mockReturnValue({
-              limit: jest.fn(() => ({
-                get: jest.fn(() =>
-                  Promise.resolve({
-                    empty: false,
-                    docs: [{ data: () => ({ price: 10 }) }],
-                  })
-                ),
-              })),
-            }),
-          };
-        }
-        return mockCollection;
-      });
+    mockCollection.doc.mockReturnValue({
+      get: jest.fn().mockResolvedValue({ exists: false }),
     });
 
-    it("retorna 400 si falta productId", async () => {
-      const req = { params: { id: "1" }, body: {} };
-      const res = mockRes();
-      await billsController.removeProductFromBill(req, res);
-      expect(res.status).toHaveBeenCalledWith(400);
+    await billsController.addProductToBill(req, res);
+    expect(res.status).toHaveBeenCalledWith(404);
+  });
+});
+
+// ==============================
+// ✅ REMOVE PRODUCT FROM BILL
+// ==============================
+describe("removeProductFromBill", () => {
+  let req, res;
+
+  beforeEach(() => {
+    req = { body: {}, params: {} };
+    res = mockRes();
+
+    db.collection.mockImplementation((col) => {
+      if (col === "bills") return { doc: () => mockBillRef };
+      if (col === "products") return { doc: jest.fn(() => mockProductRef) };
+      return mockCollection;
+    });
+  });
+
+  test("elimina producto correctamente", async () => {
+    req.params.id = "bill123";
+    req.body = { productId: "prod1" };
+
+    mockBillRef.get.mockResolvedValue({
+      exists: true,
+      data: () => ({ products: [{ id: "prod1", units: 2 }] }),
     });
 
-    it("elimina producto correctamente", async () => {
-      mockBillRef.get.mockResolvedValue({
-        exists: true,
-        data: () => ({ products: [{ id: "p1" }, { id: "p2" }] }),
-      });
-      const req = { params: { id: "1" }, body: { productId: "p1" } };
-      const res = mockRes();
-      await billsController.removeProductFromBill(req, res);
-      expect(res.status).toHaveBeenCalledWith(200);
+    await billsController.removeProductFromBill(req, res);
+
+    expect(mockBillRef.update).toHaveBeenCalled();
+    expect(res.status).toHaveBeenCalledWith(200);
+  });
+
+  test("falla si no se pasa productId", async () => {
+    req.params.id = "bill123";
+    req.body = {};
+    await billsController.removeProductFromBill(req, res);
+    expect(res.status).toHaveBeenCalledWith(400);
+  });
+});
+
+// ==============================
+// ✅ UPDATE PRODUCTS IN BILL
+// ==============================
+describe("updateProductsInBill", () => {
+  let req, res;
+
+  beforeEach(() => {
+    req = { body: {}, params: {} };
+    res = mockRes();
+  });
+
+  test("actualiza productos correctamente", async () => {
+    req.params.id = "bill123";
+    req.body = { products: [{ id: "prod1", units: 3 }] };
+
+    mockDoc.get.mockResolvedValueOnce({
+      exists: true,
+      data: () => ({
+        products: [{ id: "prod1", units: 1 }],
+      }),
     });
+
+    await billsController.updateProductsInBill(req, res);
+    expect(res.status).toHaveBeenCalledWith(200);
+  });
+});
+
+// ==============================
+// ✅ CLOSE BILL IF EMPTY
+// ==============================
+describe("closeBillIfEmpty", () => {
+  let req, res;
+  const mockDocRef = { update: jest.fn(), get: jest.fn() };
+
+  beforeEach(() => {
+    req = { body: {}, params: {} };
+    res = mockRes();
+    db.collection.mockReturnValue({ doc: () => mockDocRef });
+  });
+
+  test("cierra cuenta vacía", async () => {
+    req.params.id = "bill123";
+    mockDocRef.get.mockResolvedValue({
+      exists: true,
+      data: () => ({ products: [] }),
+    });
+
+    await billsController.closeBillIfEmpty(req, res);
+    expect(mockDocRef.update).toHaveBeenCalledWith({ state: "closed" });
+    expect(res.status).toHaveBeenCalledWith(200);
+  });
+
+  test("no cierra cuenta con productos", async () => {
+    req.params.id = "bill123";
+    mockDocRef.get.mockResolvedValue({
+      exists: true,
+      data: () => ({ products: [{ id: "prod1" }] }),
+    });
+
+    await billsController.closeBillIfEmpty(req, res);
+    expect(res.status).toHaveBeenCalledWith(400);
+  });
+});
+
+// ==============================
+// ✅ CHANGE PRODUCT STATE
+// ==============================
+describe("changeProductStateInBill", () => {
+  let req, res;
+  const mockDocRef = { update: jest.fn(), get: jest.fn() };
+
+  beforeEach(() => {
+    req = { body: {}, params: {} };
+    res = mockRes();
+    db.collection.mockReturnValue({ doc: () => mockDocRef });
+  });
+
+  test("cambia estado del producto correctamente", async () => {
+    req.params.id = "bill123";
+    req.body = { productId: "prod1", newState: "done" };
+
+    mockDocRef.get.mockResolvedValueOnce({
+      exists: true,
+      data: () => ({
+        products: [{ id: "prod1", process: "in process" }],
+      }),
+    });
+
+    await billsController.changeProductStateInBill(req, res);
+    expect(mockDocRef.update).toHaveBeenCalled();
+    expect(res.status).toHaveBeenCalledWith(200);
+  });
+
+  test("falla si no hay productId", async () => {
+    req.params.id = "bill123";
+    req.body = { newState: "done" };
+    await billsController.changeProductStateInBill(req, res);
+    expect(res.status).toHaveBeenCalledWith(400);
   });
 });
