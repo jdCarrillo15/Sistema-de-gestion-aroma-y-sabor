@@ -14,12 +14,10 @@ export async function getBills(req, res) {
         const data = doc.data();
         let user = null;
 
-        const userDoc = await getResourceDoc(data.user_id, "users");
+        const userDoc = await db.collection("users").doc(data.user_id).get();
 
         if (userDoc.exists) {
           user = { id: userDoc.id, ...userDoc.data() };
-        } else {
-          user = null;
         }
 
         return {
@@ -27,8 +25,8 @@ export async function getBills(req, res) {
           total: data.total,
           table: data.table,
           created_at: data.created_at,
-          user,
-          products: data.products,
+          user: user,
+          products: data.products || [],
           id: doc.id,
         };
       })
@@ -38,38 +36,62 @@ export async function getBills(req, res) {
   } catch (err) {
     res
       .status(500)
-      .json({ error: "Error obteniendo productos", details: err.message });
+      .json({ error: "Error al solicitar la cuenta", details: err.message });
   }
 }
 
-//CRUD functions
 export async function createBill(req, res) {
   const data = req.body;
-  if (!data.table || data.products == [] || data.user_id == null) {
+  if (!data.table || !data.user_id) {
     return res.status(406).json({
-      error:
-        "Debe tener una mesa, un usuario y al menos un producto para crear una cuenta.",
+      error: "Debe tener una mesa y un usuario para crear una cuenta.",
     });
   }
 
   try {
-    // 1. Crear documento en "products"
-    await db.collection("bills").add({
-      state: data.state,
-      total: data.total,
+    if (data.products && data.products.length > 0) {
+      for (const item of data.products) {
+        const productDoc = await db.collection("products").doc(item.id).get();
+
+        if (!productDoc.exists) {
+          return res.status(404).json({
+            error: `El producto ${item.id} no existe.`,
+          });
+        }
+
+        const productData = productDoc.data();
+        if (productData.stock < item.units) {
+          return res.status(400).json({
+            error: `No hay suficiente stock para ${productData.name}. Stock disponible: ${productData.stock}`,
+          });
+        }
+
+        await db
+          .collection("products")
+          .doc(item.id)
+          .update({
+            stock: admin.firestore.FieldValue.increment(-item.units),
+          });
+      }
+    }
+
+    const billRef = await db.collection("bills").add({
+      state: data.state || "open",
+      total: data.total || 0,
       table: data.table,
       user_id: data.user_id,
-      products: data.products,
-      id: data.id,
+      products: data.products || [],
       created_at: admin.firestore.FieldValue.serverTimestamp(),
     });
 
     res.status(201).json({
-      message: "Producto creado correctamente",
+      message: "Cuenta creada correctamente",
+      id: billRef.id,
     });
   } catch (error) {
+    console.error("Error al crear cuenta:", error);
     res.status(500).json({
-      error: "Error al crear el producto",
+      error: "Error al crear la cuenta",
       details: error.message,
     });
   }
@@ -78,32 +100,36 @@ export async function createBill(req, res) {
 export async function getBillById(req, res) {
   try {
     const { id } = req.params;
-    const billDoc = await getResourceDoc(id, "bills");
+    const billDoc = await db.collection("bills").doc(id).get();
+
+    if (!billDoc.exists) {
+      return res.status(404).json({ error: "Cuenta no encontrada" });
+    }
+
+    const billData = billDoc.data();
     let user = null;
 
-    if (!billDoc)
-      return res.status(404).json({ error: "Cuenta no encontrada" });
-
-    const userDoc = await getResourceDoc(billDoc.user_id, "users");
-
-    if (userDoc.exists) {
-      user = { id: userDoc.id, ...userDoc.data() };
-    } else {
-      return res.status(406).json({ error: "Cuenta sin usuario" });
+    if (billData.user_id) {
+      const userData = await db.collection("users").doc(billData.user_id).get();
+      if (userData.exists) {
+        user = { id: billData.user_id, ...userData.data() };
+      }
     }
+
     return res.json({
-      state: billDoc.state,
-      total: billDoc.total,
-      table: billDoc.table,
+      id: id,
+      state: billData.state,
+      total: billData.total,
+      table: billData.table,
       user,
-      products: billDoc.products,
-      id: billDoc.id,
-      created_at: admin.firestore.FieldValue.serverTimestamp(),
+      products: billData.products || [],
+      created_at: billData.created_at,
     });
   } catch (err) {
-    res
-      .status(500)
-      .json({ error: "Error obteniendo cuenta", details: err.message });
+    res.status(500).json({
+      error: "Error obteniendo cuenta",
+      details: err.message,
+    });
   }
 }
 
@@ -117,7 +143,7 @@ export async function updateBillById(req, res) {
 
     const data = req.body;
 
-    await db.collection("products").doc(req.params.id).update(data);
+    await db.collection("bills").doc(req.params.id).update(data);
     res.status(200).json({ message: "Cuenta actualizada correctamente" });
   } catch (err) {
     res
@@ -134,24 +160,19 @@ export async function hardDeleteBill(req, res) {
       return res.status(400).json({ error: "Se requiere el ID de la cuenta" });
     }
 
-    // 1. Eliminar documento en "products"
     const billRef = db.collection("bills").doc(id);
     const billSnap = await billRef.get();
 
-    if (billSnap.exists) {
-      const billData = billSnap.data();
-
-      // Eliminar el doc de products
-      await billRef.delete();
-    } else {
-      return res.status(404).json({ error: "Cuenta no encontrado" });
+    if (!billSnap.exists) {
+      return res.status(404).json({ error: "Cuenta no encontrada" });
     }
 
+    await billRef.delete();
+
     res.status(200).json({
-      message: "Cuenta y datos relacionados eliminados correctamente",
+      message: "Cuenta eliminada correctamente",
     });
   } catch (err) {
-    // console.error("Error al eliminar producto:", err.message);
     res.status(500).json({
       error: "Error al eliminar Cuenta",
       details: err.message,
@@ -159,34 +180,41 @@ export async function hardDeleteBill(req, res) {
   }
 }
 
-//documentacion en comentarios con estructura de peticion esperada
-/**
- * @route POST /bills/addProductToBill/:id
- * @desc Agrega un producto a una cuenta existente
- * @param {string} id - ID de la cuenta a la que se agregará el producto
- * @body {object} product - Objeto del producto a agregar (debe contener al menos un campo 'id')
- * @returns {object} Mensaje de éxito o error
- * @example
- * // Petición
- * POST /bills/addProductToBill/abc123
- * {
- *   "product": {
- *     "name": "Producto Ejemplo",
- *     "units": 1
- *   }
- * }
- */
-// agregar un producto a la cuenta
 export async function addProductToBill(req, res) {
   const { id } = req.params;
-  const { product } = req.body;
-  
-  if (!product) {
+  const { products } = req.body;
+
+  if (!products || !Array.isArray(products) || products.length === 0) {
     return res
-      .status(400)
-      .json({ error: "Se requiere el producto a agregar" });
+      .status(406)
+      .json({ error: "Se requiere al menos un producto a agregar" });
   }
+
   try {
+    for (const item of products) {
+      const productDoc = await db.collection("products").doc(item.id).get();
+
+      if (!productDoc.exists) {
+        return res.status(404).json({
+          error: `El producto ${item.id} no existe.`,
+        });
+      }
+
+      const productData = productDoc.data();
+
+      if (productData.stock < item.units) {
+        return res.status(400).json({
+          error: `No hay suficiente stock para ${productData.name}. Stock disponible: ${productData.stock}`,
+        });
+      }
+
+      await db
+        .collection("products")
+        .doc(item.id)
+        .update({
+          stock: admin.firestore.FieldValue.increment(-item.units),
+        });
+    }
 
     const billRef = db.collection("bills").doc(id);
     const billSnap = await billRef.get();
@@ -196,22 +224,28 @@ export async function addProductToBill(req, res) {
     }
 
     const billData = billSnap.data();
-    const updatedProducts = [...(billData.products) || [], product];
+    const updatedProducts = [...(billData.products || []), ...products];
 
-    await billRef.update({ products: updatedProducts });
+    const total = await calculateTotal(updatedProducts);
 
-    res
-      .status(200)
-      .json({ message: "Producto agregado a la cuenta correctamente" });
+    await billRef.update({
+      products: updatedProducts,
+      total: total,
+    });
+
+    res.status(201).json({
+      message: "Producto agregado a la cuenta correctamente",
+      total: total,
+    });
   } catch (err) {
+    console.error("Error al agregar producto:", err);
     res.status(500).json({
-      error: "Error al agregar producto a la cuenta",
+      error: "Error al agregar producto",
       details: err.message,
     });
   }
 }
 
-// quitar un producto de la cuenta
 export async function removeProductFromBill(req, res) {
   try {
     const { id } = req.params;
@@ -231,15 +265,26 @@ export async function removeProductFromBill(req, res) {
     }
 
     const billData = billSnap.data();
+
+    
+    const productToRemove = (billData.products || []).find(p => p.id === productId);
+    if (productToRemove) {
+      await db.collection("products").doc(productToRemove.id).update({
+        stock: admin.firestore.FieldValue.increment(productToRemove.units),
+      });
+    }
+
     const updatedProducts = (billData.products || []).filter(
       (p) => p.id !== productId
     );
 
-    await billRef.update({ products: updatedProducts });
+    const total = await calculateTotal(updatedProducts);
+    await billRef.update({ products: updatedProducts, total });
 
-    res
-      .status(200)
-      .json({ message: "Producto eliminado de la cuenta correctamente" });
+    res.status(200).json({
+      message: "Producto eliminado de la cuenta correctamente",
+      total,
+    });
   } catch (err) {
     res.status(500).json({
       error: "Error al eliminar producto de la cuenta",
@@ -248,27 +293,84 @@ export async function removeProductFromBill(req, res) {
   }
 }
 
-//cerrar la cuenta si el unico producto se quito
-//documentacion de la funcion closebillifempty en comentarios con estructura de peticion
-/**
- * @route PUT /bills/closeBillIfEmpty/:id
- * @desc Cierra una cuenta si no tiene productos asociados
- * @param {string} id - ID de la cuenta a cerrar
- * @returns {object} Mensaje de éxito o error
- * @example
- * // Petición
- * PUT /bills/closeBillIfEmpty/abc123
- */ 
-export async function closeBillIfEmpty(req, res) {
+export async function updateProductsInBill(req, res) {
   try {
     const { id } = req.params;
-  
+    const { products } = req.body;
+
+    if (!products || !Array.isArray(products)) {
+      return res
+        .status(400)
+        .json({ error: "Se requiere un array de productos para actualizar" });
+    }
+
     const billRef = db.collection("bills").doc(id);
     const billSnap = await billRef.get();
-  
+
     if (!billSnap.exists) {
       return res.status(404).json({ error: "Cuenta no encontrada" });
     }
+
+    const billData = billSnap.data();
+    const currentProducts = billData.products || [];
+
+    
+    for (const updatedProduct of products) {
+      const existing = currentProducts.find(p => p.id === updatedProduct.id);
+      if (existing) {
+        const diff = updatedProduct.units - existing.units;
+        if (diff !== 0) {
+          await db.collection("products").doc(updatedProduct.id).update({
+            stock: admin.firestore.FieldValue.increment(-diff),
+          });
+        }
+      } else {
+        
+        await db.collection("products").doc(updatedProduct.id).update({
+          stock: admin.firestore.FieldValue.increment(-updatedProduct.units),
+        });
+      }
+    }
+
+    
+    products.forEach((updatedProduct) => {
+      const index = currentProducts.findIndex(
+        (p) => p.id === updatedProduct.id
+      );
+      if (index !== -1) {
+        currentProducts[index] = { ...currentProducts[index], ...updatedProduct };
+      } else {
+        currentProducts.push(updatedProduct);
+      }
+    });
+
+    const total = await calculateTotal(currentProducts);
+
+    await billRef.update({ products: currentProducts, total });
+
+    res.status(200).json({
+      message: "Productos de la cuenta actualizados correctamente",
+      total,
+    });
+  } catch (err) {
+    res.status(500).json({
+      error: "Error al actualizar productos de la cuenta",
+      details: err.message,
+    });
+  }
+}
+
+export async function closeBillIfEmpty(req, res) {
+  try {
+    const { id } = req.params;
+
+    const billRef = db.collection("bills").doc(id);
+    const billSnap = await billRef.get();
+
+    if (!billSnap.exists) {
+      return res.status(404).json({ error: "Cuenta no encontrada" });
+    }
+
     const billData = billSnap.data();
 
     if (!billData.products || billData.products.length === 0) {
@@ -287,47 +389,6 @@ export async function closeBillIfEmpty(req, res) {
   }
 }
 
-//modificacion de productos de una cuenta
-export async function updateProductsInBill(req, res) {
-  try {
-    const { id } = req.params;
-    const { products } = req.body;
-
-    if (!products || !Array.isArray(products)) {
-      return res
-        .status(400)
-        .json({ error: "Se requiere un array de productos para actualizar" });
-    }
-
-    const billRef = db.collection("bills").doc(id);
-    const billSnap = await billRef.get();
-
-    if (!billSnap.exists) {
-      return res.status(404).json({ error: "Cuenta no encontrada" });
-    }
-    await billRef.update({ products });
-
-    res
-      .status(200)
-      .json({ message: "Productos de la cuenta actualizados correctamente" });
-  } catch (err) {
-    res.status(500).json({
-      error: "Error al actualizar productos de la cuenta",
-      details: err.message,
-    });
-  }
-}
-
-//documentacion de la funcion calculatebilltotal en comentarios con estructura de peticion
-/**
- * @route POST /bills/calculateBillTotal/:id
- * @desc Calcula el total de una cuenta sumando los precios de los productos asociados
- * @param {string} id - ID de la cuenta a calcular el total
- * @returns {object} Total calculado o mensaje de error
- * @example
- * // Petición
- * POST /bills/calculateBillTotal/abc123
- */
 export async function calculateBillTotal(req, res) {
   try {
     const { id } = req.params;
@@ -340,20 +401,7 @@ export async function calculateBillTotal(req, res) {
     }
 
     const billData = billSnap.data();
-    let total = 0;
-
-    for (const item of billData.products) {
-      const productDoc = await db
-        .collection("products")
-        .where("name", "==", item.name)
-        .limit(1)
-        .get();
-
-      if (!productDoc.empty) {
-        const productData = productDoc.docs[0].data();
-        total += productData.price * item.units;
-      }
-    }
+    const total = await calculateTotal(billData.products || []);
 
     await billRef.update({ total });
 
@@ -361,6 +409,64 @@ export async function calculateBillTotal(req, res) {
   } catch (err) {
     res.status(500).json({
       error: "Error al calcular el total de la cuenta",
+      details: err.message,
+    });
+  }
+}
+
+async function calculateTotal(products) {
+  let total = 0;
+
+  for (const item of products) {
+    const productDoc = await db.collection("products").doc(item.id).get();
+
+    if (productDoc.exists) {
+      const productData = productDoc.data();
+      total += productData.price * item.units;
+    }
+  }
+
+  return total;
+}
+
+export async function changeProductStateInBill(req, res) {
+  try {
+    const { id } = req.params;
+    const { productId, newState } = req.body;
+
+    if (!productId || !newState) {
+      return res
+        .status(400)
+        .json({ error: "Se requieren productId y newState" });
+    }
+
+    const billRef = db.collection("bills").doc(id);
+    const billSnap = await billRef.get();
+
+    if (!billSnap.exists) {
+      return res.status(404).json({ error: "Cuenta no encontrada" });
+    }
+
+    const billData = billSnap.data();
+    const products = billData.products || [];
+
+    const productIndex = products.findIndex((p) => p.id === productId);
+    if (productIndex === -1) {
+      return res
+        .status(404)
+        .json({ error: "Producto no encontrado en la cuenta" });
+    }
+
+    products[productIndex].process = newState;
+
+    await billRef.update({ products });
+
+    res.status(200).json({
+      message: "Estado del producto actualizado correctamente",
+    });
+  } catch (err) {
+    res.status(500).json({
+      error: "Error al actualizar el estado del producto en la cuenta",
       details: err.message,
     });
   }

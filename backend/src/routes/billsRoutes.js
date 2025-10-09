@@ -1,5 +1,5 @@
 import express from "express";
-import { createBill, getBillById, getBills, updateBillById, hardDeleteBill, addProductToBill, removeProductFromBill, updateProductsInBill } from "../controllers/billsController.js";
+import { createBill, getBillById, getBills, updateBillById, hardDeleteBill, addProductToBill, removeProductFromBill, updateProductsInBill, closeBillIfEmpty, calculateBillTotal, changeProductStateInBill } from "../controllers/billsController.js";
 import { authenticate, authorize, loadResourceState } from "../middleware/auth.js";
 
 const router = express.Router();
@@ -12,7 +12,9 @@ router.delete("/harddeleteBill/:id", authenticate, authorize("delete", "bills"),
 router.post("/addProductToBill/:id", authenticate, authorize("update", "bills"), addProductToBill);
 router.post("/removeProductFromBill/:id", authenticate, authorize("update", "bills"), removeProductFromBill);
 router.put("/updateProductsInBill/:id", authenticate, authorize("update", "bills"), updateProductsInBill);
-// router.put("/closeBillIfEmpty/:id", authenticate, authorize("update", "bills"), closeBillIfEmpty);
+router.put("/closeBillIfEmpty/:id", authenticate, authorize("update", "bills"), closeBillIfEmpty);
+router.post("/calculateBillTotal/:id", authenticate, authorize("read", "bills"), calculateBillTotal);
+router.put("/changeProductStateInBill/:id", authenticate, authorize("update", "bills"), changeProductStateInBill);
 
 
 export default router;
