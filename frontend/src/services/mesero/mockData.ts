@@ -1,48 +1,41 @@
-import { Table} from '../../types/mesero';
+import { Table } from '../../types/mesero';
 
-//mesas ficticias
+// Mesas ficticias
 export const mockTables: Table[] = [
   {
     id: '1',
     number: 1,
-    status: 'free',
     capacity: 4,
     current_bill_id: null
   },
   {
     id: '2',
     number: 2,
-    status: 'occupied',
     capacity: 2,
-    current_bill_id: '051CanEqk2VVo6jBOrFW' 
+    current_bill_id: '051CanEqk2VVo6jBOrFW',
   },
   {
     id: '3',
     number: 3,
-    status: 'free',
     capacity: 6,
-    current_bill_id: null
+    current_bill_id: null,
   },
   {
     id: '4',
     number: 4,
-    status: 'free',
     capacity: 4,
-    current_bill_id: null
+    current_bill_id: null,
   },
   {
     id: '5',
     number: 5,
-    status: 'free',
     capacity: 8,
-    current_bill_id: null
+    current_bill_id: '2h5L8OVJPUVs4xfwaQOe',
   },
   {
     id: '6',
     number: 6,
-    status: 'free',
     capacity: 4,
-    current_bill_id: null
+    current_bill_id: null,
   }
 ];
-

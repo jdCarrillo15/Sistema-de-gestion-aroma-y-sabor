@@ -1,14 +1,49 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { mockTables } from '../../services/mesero/mockData';
 import { Table } from '../../types/mesero';
 import TableCard from '../../components/mesero/TableCard';
 import TableModal from '../../components/mesero/TableModal';
+import { getBillById } from '../../services/mesero/billService';
 import '../../styles/mesero/MesasPage.css';
 
 const MesasPage: React.FC = () => {
   const [tables, setTables] = useState<Table[]>(mockTables);
   const [selectedTable, setSelectedTable] = useState<Table | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [loading, setLoading] = useState(true);
+  
+  useEffect(() => {
+    const updateTablesState = async () => {
+      const updatedTables = await Promise.all(
+        tables.map(async (table) => {
+          if (table.current_bill_id) {
+            try {
+              const bill = await getBillById(table.current_bill_id);
+              if (bill && bill.state === 'open') {
+                return { ...table, status: 'occupied' };
+              } else {
+                return { ...table, status: 'free', current_bill_id: null };
+              }
+            } catch (err) {
+              console.error(`Error al obtener cuenta de mesa ${table.number}:`, err);
+              return table;
+            }
+          } else {
+            return { ...table, status: 'free' };
+          }
+        })
+      );
+
+      setTables(updatedTables as Table[]);
+      setLoading(false);
+    };
+
+    updateTablesState();
+  }, []);
+
+  if(loading){
+    return <div>Cargando mesa...</div>;
+  }
 
   const handleTableClick = (table: Table) => {
     setSelectedTable(table);
@@ -21,15 +56,14 @@ const MesasPage: React.FC = () => {
   };
 
   const handleUpdateTable = (tableId: string, updates: Partial<Table>) => {
-    setTables(prev => 
-      prev.map(table => 
-        table.id === tableId 
+    setTables(prev =>
+      prev.map(table =>
+        table.id === tableId
           ? { ...table, ...updates }
           : table
       )
     );
 
-    
     if (selectedTable && selectedTable.id === tableId) {
       setSelectedTable({ ...selectedTable, ...updates });
     }
@@ -44,7 +78,6 @@ const MesasPage: React.FC = () => {
 
       {/* Tarjetas de estadísticas */}
       <div className="stats-grid">
-        {/* Mesas Totales */}
         <div className="stat-card stat-total">
           <div className="stat-left">
             <div>
@@ -54,7 +87,6 @@ const MesasPage: React.FC = () => {
           </div>
         </div>
 
-        {/* Mesas Ocupadas */}
         <div className="stat-card stat-occupied">
           <div className="stat-left">
             <div>
@@ -64,7 +96,6 @@ const MesasPage: React.FC = () => {
           </div>
         </div>
 
-        {/* Mesas Libres */}
         <div className="stat-card stat-free">
           <div className="stat-left">
             <div>

@@ -1,7 +1,7 @@
 export interface Table {
   id: string;
   number: number;
-  status: 'free' | 'occupied';
+  status?: 'free' | 'occupied';
   capacity: number;
   current_bill_id: string | null;
 }
