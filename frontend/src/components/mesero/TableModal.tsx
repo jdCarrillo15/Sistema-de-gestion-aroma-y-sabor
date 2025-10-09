@@ -16,6 +16,7 @@ import { getCurrentUser } from '../../services/login/authService';
 import ProductCatalog from './ProductCatalog';
 import OrderItem from './OrderItem';
 import Button from '../common/Button';
+import AlertModal from '../common/AlertModal';
 import { X, Plus } from 'lucide-react';
 import '../../styles/mesero/TableModal.css';
 
@@ -34,7 +35,23 @@ const TableModal: React.FC<TableModalProps> = ({ isOpen, onClose, table, onUpdat
   const [isCreatingBill, setIsCreatingBill] = useState(false);
   const [isAddingProduct, setIsAddingProduct] = useState(false);
 
-  
+  // Estados para modales de alerta
+  const [showAlert, setShowAlert] = useState(false);
+  const [alertConfig, setAlertConfig] = useState({
+    title: '',
+    message: '',
+    type: 'info' as 'success' | 'error' | 'info' | 'warning',
+    onConfirm: () => {}
+  });
+
+  // Estado para confirmaciones
+  const [showConfirm, setShowConfirm] = useState(false);
+  const [confirmConfig, setConfirmConfig] = useState({
+    title: '',
+    message: '',
+    onConfirm: () => {}
+  });
+
   useEffect(() => {
     if (isOpen) {
       loadBill();
@@ -56,10 +73,25 @@ const TableModal: React.FC<TableModalProps> = ({ isOpen, onClose, table, onUpdat
       }
     } catch (error) {
       console.error('Error cargando cuenta:', error);
-      alert('Error al cargar la cuenta. Por favor intenta de nuevo.');
+      showAlertModal('Error', 'Error al cargar la cuenta. Por favor intenta de nuevo.', 'error');
     } finally {
       setIsLoading(false);
     }
+  };
+
+  const showAlertModal = (title: string, message: string, type: 'success' | 'error' | 'info' | 'warning', onConfirm?: () => void) => {
+    setAlertConfig({
+      title,
+      message,
+      type,
+      onConfirm: onConfirm || (() => setShowAlert(false))
+    });
+    setShowAlert(true);
+  };
+
+  const showConfirmModal = (title: string, message: string, onConfirm: () => void) => {
+    setConfirmConfig({ title, message, onConfirm });
+    setShowConfirm(true);
   };
 
   const handleCreateBill = async () => {
@@ -67,7 +99,7 @@ const TableModal: React.FC<TableModalProps> = ({ isOpen, onClose, table, onUpdat
     try {
       const user = getCurrentUser();
       if (!user) {
-        alert('No se pudo identificar el usuario');
+        showAlertModal('Error', 'No se pudo identificar el usuario', 'error');
         return;
       }
 
@@ -79,12 +111,13 @@ const TableModal: React.FC<TableModalProps> = ({ isOpen, onClose, table, onUpdat
           status: 'occupied',
           current_bill_id: newBill.id
         });
+        showAlertModal('Éxito', 'Cuenta creada correctamente', 'success');
       } else {
-        alert('Error al crear la cuenta');
+        showAlertModal('Error', 'Error al crear la cuenta', 'error');
       }
     } catch (error) {
       console.error('Error creando cuenta:', error);
-      alert('Error al crear la cuenta: ' + (error as Error).message);
+      showAlertModal('Error', 'Error al crear la cuenta: ' + (error as Error).message, 'error');
     } finally {
       setIsCreatingBill(false);
     }
@@ -92,7 +125,7 @@ const TableModal: React.FC<TableModalProps> = ({ isOpen, onClose, table, onUpdat
 
   const handleAddProduct = async (product: Product, quantity: number) => {
     if (!currentBill) {
-      alert('Primero debe crear una cuenta para esta mesa');
+      showAlertModal('Error', 'Primero debe crear una cuenta para esta mesa', 'error');
       return;
     }
 
@@ -110,67 +143,65 @@ const TableModal: React.FC<TableModalProps> = ({ isOpen, onClose, table, onUpdat
         setTimeout(() => {
           setIsCatalogOpen(false);
         }, 600);
+        showAlertModal('Éxito', 'Producto agregado correctamente', 'success');
       } else {
-        alert('Error al agregar el producto');
+        showAlertModal('Error', 'Error al agregar el producto', 'error');
       }
     } catch (error) {
       console.error('Error agregando producto:', error);
-      alert('Error al agregar el producto: ' + (error as Error).message);
+      showAlertModal('Error', 'Error al agregar el producto: ' + (error as Error).message, 'error');
     } finally {
       setIsAddingProduct(false);
     }
   };
 
-  
   const handleRemoveOrder = async (productId: string) => {
     if (!currentBill) return;
 
-    if (!window.confirm('¿Estás seguro de eliminar este producto de la cuenta?')) {
-      return;
-    }
-
-    setIsLoading(true);
-    try {
-      const result = await removeProductFromBill(currentBill.id, productId);
-      
-      if (result.success) {
-        await loadBill();
-        
-        
-        const updatedBill = await getBillById(currentBill.id);
-        if (updatedBill && (!updatedBill.products || updatedBill.products.length === 0)) {
-          const shouldClose = window.confirm('La cuenta quedó vacía. ¿Deseas cerrarla?');
-          if (shouldClose) {
-            await handleCloseBill();
+    showConfirmModal(
+      '¿Eliminar producto?',
+      '¿Estás seguro de que deseas eliminar este producto de la cuenta?',
+      async () => {
+        setIsLoading(true);
+        try {
+          const result = await removeProductFromBill(currentBill.id, productId);
+          
+          if (result.success) {
+            await loadBill();
+            
+            const updatedBill = await getBillById(currentBill.id);
+            if (updatedBill && (!updatedBill.products || updatedBill.products.length === 0)) {
+              showConfirmModal(
+                'Cuenta vacía',
+                'La cuenta quedó vacía. ¿Deseas cerrarla?',
+                () => handleCloseBill()
+              );
+            }
           }
+        } catch (error) {
+          console.error('Error eliminando producto:', error);
+          showAlertModal('Error', 'Error al eliminar el producto: ' + (error as Error).message, 'error');
+        } finally {
+          setIsLoading(false);
         }
       }
-    } catch (error) {
-      console.error('Error eliminando producto:', error);
-      alert('Error al eliminar el producto: ' + (error as Error).message);
-    } finally {
-      setIsLoading(false);
-    }
+    );
   };
+
   const handleUpdateQuantity = async (productId: string, newQuantity: number) => {
     if (!currentBill) return;
 
     try {
-      
       const updatedProducts = orders.map((p) =>
         p.id === productId ? { ...p, units: newQuantity } : p
       );
 
-      
       const result = await updateProductsInBill(currentBill.id, updatedProducts);
-
-      
       setOrders(updatedProducts);
       setCurrentBill({ ...currentBill, products: updatedProducts, total: result.total });
-
     } catch (error) {
       console.error('Error al actualizar cantidad:', error);
-      alert('No se pudo actualizar la cantidad del producto.');
+      showAlertModal('Error', 'No se pudo actualizar la cantidad del producto.', 'error');
     }
   };
 
@@ -186,37 +217,39 @@ const TableModal: React.FC<TableModalProps> = ({ isOpen, onClose, table, onUpdat
       });
       
       onClose();
-      alert('Cuenta cerrada exitosamente');
+      showAlertModal('Éxito', 'Cuenta cerrada exitosamente', 'success');
     } catch (error) {
       console.error('Error cerrando cuenta:', error);
-      alert('Error al cerrar la cuenta: ' + (error as Error).message);
+      showAlertModal('Error', 'Error al cerrar la cuenta: ' + (error as Error).message, 'error');
     }
   };
 
   const handleDeleteBill = async () => {
     if (!currentBill) return;
 
-    if (!window.confirm('¿Estás seguro de eliminar esta cuenta? Esta acción no se puede deshacer.')) {
-      return;
-    }
-
-    setIsLoading(true);
-    try {
-      await deleteBill(currentBill.id);
-      
-      onUpdateTable(table.id, {
-        status: 'free',
-        current_bill_id: null
-      });
-      
-      onClose();
-      alert('Cuenta eliminada exitosamente');
-    } catch (error) {
-      console.error('Error eliminando cuenta:', error);
-      alert('Error al eliminar la cuenta: ' + (error as Error).message);
-    } finally {
-      setIsLoading(false);
-    }
+    showConfirmModal(
+      '¿Eliminar cuenta?',
+      '¿Estás seguro de eliminar esta cuenta? Esta acción no se puede deshacer.',
+      async () => {
+        setIsLoading(true);
+        try {
+          await deleteBill(currentBill.id);
+          
+          onUpdateTable(table.id, {
+            status: 'free',
+            current_bill_id: null
+          });
+          
+          onClose();
+          showAlertModal('Éxito', 'Cuenta eliminada exitosamente', 'success');
+        } catch (error) {
+          console.error('Error eliminando cuenta:', error);
+          showAlertModal('Error', 'Error al eliminar la cuenta: ' + (error as Error).message, 'error');
+        } finally {
+          setIsLoading(false);
+        }
+      }
+    );
   };
 
   const calculateTotal = (): number => {
@@ -366,6 +399,36 @@ const TableModal: React.FC<TableModalProps> = ({ isOpen, onClose, table, onUpdat
         onClose={() => setIsCatalogOpen(false)}
         onSelectProduct={handleAddProduct}
       />
+
+      {/* Modal de Alerta */}
+      {showAlert && (
+        <AlertModal
+          isOpen={showAlert}
+          onClose={alertConfig.onConfirm}
+          title={alertConfig.title}
+          message={alertConfig.message}
+          type={alertConfig.type}
+          buttonText="Aceptar"
+        />
+      )}
+
+      {/* Modal de Confirmación */}
+      {showConfirm && (
+        <AlertModal
+          isOpen={showConfirm}
+          onClose={() => {
+            confirmConfig.onConfirm();
+            setShowConfirm(false);
+          }}
+          title={confirmConfig.title}
+          message={confirmConfig.message}
+          type="warning"
+          buttonText="Sí, continuar"
+          showSecondaryButton={true}
+          secondaryButtonText="Cancelar"
+          onSecondaryAction={() => setShowConfirm(false)}
+        />
+      )}
     </>
   );
 };
