@@ -1,4 +1,3 @@
-//const API_BASE_URL = "http://localhost:3000";
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
 export interface Bill {
@@ -13,6 +12,7 @@ export interface Bill {
 }
 
 export interface BillProduct {
+  id: string;  // ID del producto en Firestore
   name: string;
   units: number;
   process: 'pending' | 'preparing' | 'ready' | 'finished';
@@ -75,33 +75,30 @@ export async function createBill(tableNumber: string, userId: string): Promise<B
     });
 
     if (!response.ok) {
-      throw new Error("Error al crear cuenta");
+      const errorData = await response.json();
+      throw new Error(errorData.error || "Error al crear cuenta");
     }
 
     const data = await response.json();
-
-  
-    if (data.id) {
-     
-      await new Promise(resolve => setTimeout(resolve, 500));
-      const newBill = await getBillById(data.id);
-      return newBill;
-    }
-
-    // Fallback: buscar por tabla
-    await new Promise(resolve => setTimeout(resolve, 500));
+    
+    // Esperar un poco para que Firebase termine de guardar
+    await new Promise(resolve => setTimeout(resolve, 1000));
+    
+    // Buscar la cuenta recién creada
     const bills = await getBills();
     const newBill = bills.find(b => b.table === tableNumber && b.state === 'open');
     
     return newBill || null;
   } catch (error) {
     console.error("Error en createBill:", error);
-    return null;
+    throw error;
   }
 }
 
+// CORRECCIÓN CRÍTICA: Enviar array de productos
 export async function addProductToBill(
   billId: string, 
+  productId: string,
   productName: string, 
   units: number
 ): Promise<boolean> {
@@ -111,28 +108,31 @@ export async function addProductToBill(
       headers: { "Content-Type": "application/json" },
       credentials: "include",
       body: JSON.stringify({
-        product: {
+        products: [{  //  ARRAY
+          id: productId,  //ID del producto
           name: productName,
           units: units,
           process: 'pending'
-        }
+        }]
       })
     });
 
     if (!response.ok) {
-      throw new Error("Error al agregar producto");
+      const errorData = await response.json();
+      console.error("Error del servidor:", errorData);
+      throw new Error(errorData.error || "Error al agregar producto");
     }
 
     return true;
   } catch (error) {
     console.error("Error en addProductToBill:", error);
-    return false;
+    throw error;
   }
 }
 
 export async function removeProductFromBill(
   billId: string, 
-  productIndex: number
+  productId: string
 ): Promise<boolean> {
   try {
     const response = await fetch(`${API_BASE_URL}/bills/removeProductFromBill/${billId}`, {
@@ -140,17 +140,18 @@ export async function removeProductFromBill(
       headers: { "Content-Type": "application/json" },
       credentials: "include",
       body: JSON.stringify({
-        productIndex: productIndex
+        productId: productId  // Enviar el ID del producto a eliminar
       })
     });
 
     if (!response.ok) {
-      throw new Error("Error al eliminar producto");
+      const errorData = await response.json();
+      throw new Error(errorData.error || "Error al eliminar producto");
     }
 
     return true;
   } catch (error) {
     console.error("Error en removeProductFromBill:", error);
-    return false;
+    throw error;
   }
 }

@@ -12,7 +12,7 @@ import { getCurrentUser } from '../../services/login/authService';
 import ProductCatalog from './ProductCatalog';
 import OrderItem from './OrderItem';
 import Button from '../common/Button';
-import { X, Plus} from 'lucide-react';
+import { X, Plus } from 'lucide-react';
 import '../../styles/mesero/TableModal.css';
 
 interface TableModalProps {
@@ -52,6 +52,7 @@ const TableModal: React.FC<TableModalProps> = ({ isOpen, onClose, table, onUpdat
       }
     } catch (error) {
       console.error('Error cargando cuenta:', error);
+      alert('Error al cargar la cuenta. Por favor intenta de nuevo.');
     } finally {
       setIsLoading(false);
     }
@@ -79,12 +80,13 @@ const TableModal: React.FC<TableModalProps> = ({ isOpen, onClose, table, onUpdat
       }
     } catch (error) {
       console.error('Error creando cuenta:', error);
-      alert('Error al crear la cuenta');
+      alert('Error al crear la cuenta: ' + (error as Error).message);
     } finally {
       setIsCreatingBill(false);
     }
   };
 
+  // CORRECCIÓN CRÍTICA: Pasar el ID del producto
   const handleAddProduct = async (product: Product, quantity: number) => {
     if (!currentBill) {
       alert('Primero debe crear una cuenta para esta mesa');
@@ -93,12 +95,18 @@ const TableModal: React.FC<TableModalProps> = ({ isOpen, onClose, table, onUpdat
 
     setIsAddingProduct(true);
     try {
-      const success = await addProductToBill(currentBill.id, product.name, quantity);
+      // Pasar el ID del producto
+      const success = await addProductToBill(
+        currentBill.id, 
+        product.id,      //ID del producto
+        product.name, 
+        quantity
+      );
 
       if (success) {
         
         await loadBill();
-
+        
         
         setTimeout(() => {
           setIsCatalogOpen(false);
@@ -108,7 +116,7 @@ const TableModal: React.FC<TableModalProps> = ({ isOpen, onClose, table, onUpdat
       }
     } catch (error) {
       console.error('Error agregando producto:', error);
-      alert('Error al agregar el producto');
+      alert('Error al agregar el producto: ' + (error as Error).message);
     } finally {
       setIsAddingProduct(false);
     }
@@ -183,6 +191,7 @@ const TableModal: React.FC<TableModalProps> = ({ isOpen, onClose, table, onUpdat
                       variant="primary" 
                       className="add-product-btn"
                       onClick={() => setIsCatalogOpen(true)}
+                      disabled={isAddingProduct}
                     >
                       <Plus size={18} />
                       Agregar Producto
@@ -229,6 +238,7 @@ const TableModal: React.FC<TableModalProps> = ({ isOpen, onClose, table, onUpdat
               </Button>
             </div>
           )}
+
           {isAddingProduct && (
             <div className="loading-overlay">
               <div className="spinner"></div>
