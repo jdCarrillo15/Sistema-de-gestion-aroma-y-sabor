@@ -4,7 +4,7 @@
   min-height: 100vh;
 }
 
-/* Header */
+
 .mesas-header {
   margin-bottom: 2rem;
 }
@@ -22,7 +22,7 @@
   margin: 0;
 }
 
-/* Stats Grid */
+
 .stats-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
@@ -88,7 +88,7 @@
   margin: 0;
 }
 
-/* Mesas Section */
+
 .mesas-section {
   background: white;
   border-radius: 16px;
@@ -103,14 +103,14 @@
   margin: 0 0 1.5rem 0;
 }
 
-/* Grid de Mesas */
+
 .mesas-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
   gap: 1.5rem;
 }
 
-/* Loading State */
+
 .loading-state {
   display: flex;
   flex-direction: column;
@@ -140,21 +140,21 @@
   text-align: center;
 }
 
-/* Colores personalizados */
+
 .stat-total {
-  background-color: #dbeafe; /* azul claro */
+  background-color: #dbeafe; 
   border: 1px solid #60a5fa;
   color: #1e3a8a;
 }
 
 .stat-occupied {
-  background-color: #ffedd5; /* naranja claro */
+  background-color: #ffedd5; 
   border: 1px solid #fdba74;
   color: #9a3412;
 }
 
 .stat-free {
-  background-color: #dcfce7; /* verde claro */
+  background-color: #dcfce7; 
   border: 1px solid #86efac;
   color: #166534;
 }

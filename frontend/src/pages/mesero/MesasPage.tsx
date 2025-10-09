@@ -42,7 +42,14 @@ const MesasPage: React.FC = () => {
   }, []);
 
   if(loading){
-    return <div>Cargando mesa...</div>;
+    return (
+      <div className="mesas-page">
+        <div className="loading-state">
+          <div className="spinner"></div>
+          <p>Cargando mesas...</p>
+        </div>
+      </div>
+    );
   }
 
   const handleTableClick = (table: Table) => {
