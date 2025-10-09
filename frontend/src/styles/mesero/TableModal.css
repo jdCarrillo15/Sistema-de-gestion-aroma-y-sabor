@@ -694,3 +694,103 @@
     font-size: 1.5rem;
   }
 }
+.table-modal-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 1rem;
+  padding: 1.5rem;
+  border-top: 2px solid #e5e7eb;
+  background: #fafafa;
+}
+
+.footer-left {
+  display: flex;
+  gap: 0.75rem;
+}
+
+.footer-right {
+  display: flex;
+  gap: 0.75rem;
+}
+
+/* Botón de eliminar cuenta - estilo de advertencia */
+.footer-left button {
+  background: #fee2e2;
+  color: #dc2626;
+  border: 1px solid #fecaca;
+}
+
+.footer-left button:hover:not(:disabled) {
+  background: #fecaca;
+  border-color: #dc2626;
+}
+
+/* Responsive para footer */
+@media (max-width: 640px) {
+  .table-modal-footer {
+    flex-direction: column;
+    gap: 0.75rem;
+  }
+
+  .footer-left,
+  .footer-right {
+    width: 100%;
+    flex-direction: column;
+  }
+
+  .footer-left button,
+  .footer-right button {
+    width: 100%;
+  }
+}/* Footer con botones a los lados */
+.table-modal-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 1rem;
+  padding: 1.5rem;
+  border-top: 2px solid #e5e7eb;
+  background: #fafafa;
+}
+
+.footer-left {
+  display: flex;
+  gap: 0.75rem;
+}
+
+.footer-right {
+  display: flex;
+  gap: 0.75rem;
+}
+
+/* Botón de eliminar cuenta - rojo */
+.footer-left button {
+  background: #fee2e2;
+  color: #dc2626;
+  border: 1px solid #fecaca;
+}
+
+.footer-left button:hover:not(:disabled) {
+  background: #fecaca;
+  border-color: #dc2626;
+}
+
+/* Responsive */
+@media (max-width: 640px) {
+  .table-modal-footer {
+    flex-direction: column;
+    gap: 0.75rem;
+  }
+
+  .footer-left,
+  .footer-right {
+    width: 100%;
+    flex-direction: column;
+  }
+
+  .footer-left button,
+  .footer-right button {
+    width: 100%;
+  }
+}

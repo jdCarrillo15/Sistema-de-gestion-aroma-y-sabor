@@ -14,7 +14,7 @@ export const mockTables: Table[] = [
     number: 2,
     status: 'occupied',
     capacity: 2,
-    current_bill_id: 'AzRHcliz8W452H8vyOSe' 
+    current_bill_id: '051CanEqk2VVo6jBOrFW' 
   },
   {
     id: '3',
