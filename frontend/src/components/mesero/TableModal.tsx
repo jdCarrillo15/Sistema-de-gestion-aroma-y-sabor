@@ -8,6 +8,7 @@ import {
   removeProductFromBill,
   closeBillIfEmpty,
   deleteBill,
+  updateProductsInBill,
   Bill,
   BillProduct 
 } from '../../services/mesero/billService';
@@ -33,7 +34,7 @@ const TableModal: React.FC<TableModalProps> = ({ isOpen, onClose, table, onUpdat
   const [isCreatingBill, setIsCreatingBill] = useState(false);
   const [isAddingProduct, setIsAddingProduct] = useState(false);
 
-  // Cargar cuenta cuando se abre el modal
+  
   useEffect(() => {
     if (isOpen) {
       loadBill();
@@ -149,6 +150,27 @@ const TableModal: React.FC<TableModalProps> = ({ isOpen, onClose, table, onUpdat
       alert('Error al eliminar el producto: ' + (error as Error).message);
     } finally {
       setIsLoading(false);
+    }
+  };
+  const handleUpdateQuantity = async (productId: string, newQuantity: number) => {
+    if (!currentBill) return;
+
+    try {
+      
+      const updatedProducts = orders.map((p) =>
+        p.id === productId ? { ...p, units: newQuantity } : p
+      );
+
+      
+      const result = await updateProductsInBill(currentBill.id, updatedProducts);
+
+      
+      setOrders(updatedProducts);
+      setCurrentBill({ ...currentBill, products: updatedProducts, total: result.total });
+
+    } catch (error) {
+      console.error('Error al actualizar cantidad:', error);
+      alert('No se pudo actualizar la cantidad del producto.');
     }
   };
 
@@ -281,6 +303,7 @@ const TableModal: React.FC<TableModalProps> = ({ isOpen, onClose, table, onUpdat
                           key={`${order.id}-${index}`}
                           order={order}
                           onRemove={() => handleRemoveOrder(order.id)}
+                          onUpdateQuantity={(newQty) => handleUpdateQuantity(order.id, newQty)}
                         />
                       ))}
                     </div>
