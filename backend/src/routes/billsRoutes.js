@@ -1,5 +1,5 @@
 import express from "express";
-import { createBill, getBillById, getBills, updateBillById, hardDeleteBill, addProductToBill, removeProductFromBill, updateProductsInBill } from "../controllers/billsController.js";
+import { createBill, getBillById, getBills, updateBillById, hardDeleteBill, addProductToBill, removeProductFromBill, updateProductsInBill, closeBillIfEmpty, calculateBillTotal, changeProductStateInBill } from "../controllers/billsController.js";
 import { authenticate, authorize, loadResourceState } from "../middleware/auth.js";
 
 const router = express.Router();
