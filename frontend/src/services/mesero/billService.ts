@@ -79,14 +79,9 @@ export async function createBill(tableNumber: string, userId: string): Promise<B
       throw new Error(errorData.error || "Error al crear cuenta");
     }
 
-   // const data = await response.json();
-    
-    // Esperar un poco para que Firebase termine de guardar
-    await new Promise(resolve => setTimeout(resolve, 1000));
-    
-    // Buscar la cuenta recién creada
-    const bills = await getBills();
-    const newBill = bills.find(b => b.table === tableNumber && b.state === 'open');
+    const data = await response.json();
+    const newBillId = data.id;
+    const newBill = await getBillById(newBillId);
     
     return newBill || null;
   } catch (error) {
@@ -157,7 +152,7 @@ export async function removeProductFromBill(
   }
 }
 
-
+/*
 export async function updateProductStatus(
   billId: string,
   productId: string,
@@ -185,7 +180,7 @@ export async function updateProductStatus(
     throw error;
   }
 }
-
+*/
 
 export async function updateProductsInBill(
   billId: string,
