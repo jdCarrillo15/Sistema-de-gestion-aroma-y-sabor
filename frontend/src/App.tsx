@@ -8,8 +8,9 @@ import InventarioPage from "./pages/admin/InventarioPage";
 import TurnosPage from "./pages/admin/TurnosPage";
 import VentasPage from "./pages/admin/VentasPage";
 import CocinaCajaLayout from "./components/cocina/CocinaCajaLayout"; 
-import CocinaCajaPage from "./pages/cocina-caja/CocinaCajaPage";        
+import CocinaPage from "./pages/cocina/CocinaPage"; 
 import ProtectedRoute from "./components/ProtectedRoute";
+import CajaPage from "./pages/caja/CajaPage";
 
 function App() {
   return (
@@ -33,10 +34,7 @@ function App() {
           <Route path="turnos" element={<TurnosPage />} />
           <Route path="ventas" element={<VentasPage />} />
         </Route>
-
-        {/* Panel Mesero */}
-      
-
+        
         <Route
           path="/cocina"
           element={
@@ -45,7 +43,7 @@ function App() {
             </ProtectedRoute>
           }
         >
-          <Route index element={<CocinaCajaPage />} />
+          <Route index element={<CocinaPage />} />
         </Route>
 
         
@@ -57,7 +55,7 @@ function App() {
             </ProtectedRoute>
           }
         >
-          <Route index element={<CocinaCajaPage />} />
+          <Route index element={<CajaPage />} />
         </Route>
       </Routes>
     </BrowserRouter>

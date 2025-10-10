@@ -2,9 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { Clock, CheckCircle, Users, DollarSign } from 'lucide-react';
 import OrderCard from '../../components/cocina/OrderCard';
 import ReadyOrderCard from '../../components/cocina/ReadyOrderCard';
-import BillCard from '../../components/caja/BillCard';
 import Button from '../../components/common/Button';
-import '../../styles/cocina/CocinaCajaPage.css';
+import '../../styles/cocina/CocinaPage.css';
 
 type ViewType = 'cocina' | 'caja';
 
@@ -83,8 +82,8 @@ const CocinaCajaPage: React.FC = () => {
              showReport ? 'Reporte de Ventas' : 'Panel de Caja'}
           </h1>
           <p className="page-subtitle">
-            {activeView === 'cocina' ? 'Gestiona los pedidos' : 
-             showReport ? 'Ventas del día' : 'Gestiona los pagos'}
+            {activeView === 'cocina' ? '' : 
+             showReport ? 'Ventas del día' : ''}
           </p>
         </div>
         
@@ -182,16 +181,6 @@ const CocinaCajaPage: React.FC = () => {
                 <p className="stat-label">Total</p>
               </div>
             </div>
-          </div>
-
-          <div className="bills-section">
-            {bills.map(bill => (
-              <BillCard
-                key={bill.id}
-                bill={bill}
-                onPay={handlePayBill}
-              />
-            ))}
           </div>
         </>
       )}
