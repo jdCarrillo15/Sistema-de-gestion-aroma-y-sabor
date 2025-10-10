@@ -54,16 +54,26 @@
   gap: 1rem;
 }
 
-.topbar-user {
+/* User Dropdown Container */
+.topbar-user-dropdown {
+  position: relative;
+}
+
+.topbar-user-button {
   display: flex;
   align-items: center;
   gap: 0.75rem;
   padding: 0.5rem;
+  border: none;
+  background: transparent;
+  cursor: pointer;
   border-radius: 8px;
   transition: background 0.2s ease;
+  position: relative;
+  z-index: 1001;
 }
 
-.topbar-user:hover {
+.topbar-user-button:hover {
   background: #f9fafb;
 }
 
@@ -76,11 +86,14 @@
   align-items: center;
   justify-content: center;
   color: white;
+  flex-shrink: 0;
 }
 
 .user-info {
   display: flex;
   flex-direction: column;
+  align-items: flex-start;
+  text-align: left;
 }
 
 .user-name {
@@ -96,12 +109,229 @@
   line-height: 1.2;
 }
 
+.dropdown-icon {
+  color: #6b7280;
+  transition: transform 0.2s ease;
+  flex-shrink: 0;
+}
+
+.dropdown-icon.open {
+  transform: rotate(180deg);
+}
+
+/* Dropdown Backdrop (solo móvil) */
+.dropdown-backdrop {
+  display: none;
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.3);
+  z-index: 999;
+}
+
+/* Dropdown Menu */
+.dropdown-menu {
+  position: absolute;
+  top: calc(100% + 0.5rem);
+  right: 0;
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+  min-width: 280px;
+  z-index: 1000;
+  animation: slideDown 0.2s ease-out;
+  border: 1px solid #e5e7eb;
+}
+
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.dropdown-header {
+  padding: 1rem;
+}
+
+.dropdown-user-info {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.dropdown-avatar {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #f97316 0%, #ea580c 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  flex-shrink: 0;
+}
+
+.dropdown-name {
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: #111827;
+  margin: 0 0 0.25rem 0;
+}
+
+.dropdown-email {
+  font-size: 0.85rem;
+  color: #6b7280;
+  margin: 0;
+  word-break: break-all;
+}
+
+.dropdown-divider {
+  height: 1px;
+  background: #e5e7eb;
+  margin: 0.5rem 0;
+}
+
+.dropdown-item {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.75rem 1rem;
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  font-size: 0.9rem;
+  color: #374151;
+  transition: background 0.2s ease;
+  text-align: left;
+}
+
+.dropdown-item:hover {
+  background: #f9fafb;
+}
+
+.dropdown-item:first-of-type {
+  border-radius: 0;
+}
+
+.dropdown-item:last-of-type {
+  border-radius: 0 0 12px 12px;
+}
+
+.logout-item {
+  color: #dc2626;
+  font-weight: 500;
+}
+
+.logout-item:hover {
+  background: #fef2f2;
+}
+
+/* Responsive */
 @media (max-width: 768px) {
+  .mesero-topbar {
+    padding: 0 1rem;
+  }
+
   .topbar-search {
     max-width: 200px;
   }
 
   .user-info {
     display: none;
+  }
+
+  .dropdown-icon {
+    display: none;
+  }
+
+  .topbar-user-button {
+    padding: 0.5rem;
+  }
+
+  /* Mostrar backdrop en móvil */
+  .dropdown-backdrop {
+    display: block;
+  }
+
+  .dropdown-menu {
+    position: fixed;
+    top: 64px;
+    right: 0.5rem;
+    left: auto;
+    min-width: 260px;
+    max-width: calc(100vw - 1rem);
+    z-index: 1000;
+  }
+
+  .user-avatar {
+    width: 36px;
+    height: 36px;
+  }
+
+  .user-avatar svg {
+    width: 18px;
+    height: 18px;
+  }
+}
+
+@media (max-width: 480px) {
+  .mesero-topbar {
+    padding: 0 0.75rem;
+  }
+
+  .topbar-search {
+    display: none;
+  }
+
+  .topbar-container {
+    justify-content: flex-end;
+  }
+
+  .topbar-user-button {
+    padding: 0.5rem;
+  }
+
+  .dropdown-menu {
+    position: fixed;
+    top: 56px;
+    right: 0.5rem;
+    left: auto;
+    min-width: 260px;
+    max-width: calc(100vw - 1rem);
+    z-index: 1000;
+  }
+
+  .dropdown-header {
+    padding: 0.875rem;
+  }
+
+  .dropdown-avatar {
+    width: 44px;
+    height: 44px;
+  }
+
+  .dropdown-avatar svg {
+    width: 22px;
+    height: 22px;
+  }
+
+  .dropdown-name {
+    font-size: 0.9rem;
+  }
+
+  .dropdown-email {
+    font-size: 0.8rem;
+  }
+
+  .dropdown-item {
+    padding: 0.875rem;
   }
 }

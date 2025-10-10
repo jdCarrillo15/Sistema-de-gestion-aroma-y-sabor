@@ -3,6 +3,12 @@
   flex-direction: column;
   background: white;
   height: 100vh;
+  width: 250px;
+  position: fixed;
+  top: 0;
+  left: 0;
+  border-right: 1px solid #e5e7eb;
+  z-index: 900;
 }
 
 .sidebar-header {
@@ -20,6 +26,7 @@
   background: linear-gradient(135deg, #f97316 0%, #ea580c 100%);
   border-radius: 12px;
   padding: 8px;
+  flex-shrink: 0;
 }
 
 .logo-icon {
@@ -88,73 +95,16 @@
   height: 20px;
 }
 
-.sidebar-footer {
-  padding: 1rem 1.5rem;
-  border-top: 1px solid #e5e7eb;
-}
-
-.logout-btn {
-  width: 100%;
-  background: transparent !important;
-  border: none !important;
-  display: flex;
-  align-items: center;
-  justify-content: flex-start;
-  gap: 12px;
-  font-size: 0.95rem;
-  color: #374151;
-  cursor: pointer;
-  padding: 0.75rem;
-  border-radius: 8px;
-  transition: all 0.3s ease;
-  box-shadow: none !important;
-}
-
-.logout-btn:hover {
-  background-color: #f9fafb !important;
-  color: #f97316 !important;
-}
-
-.toggle-sidebar-btn {
-  position: fixed;
-  top: 1rem;
-  left: 1rem;
-  background: #f97316;
-  color: white;
-  border: none;
-  border-radius: 8px;
-  padding: 0.5rem;
-  z-index: 1001;
-  cursor: pointer;
-  display: none;
-}
-
-
-@media (max-width: 768px) {
-  .toggle-sidebar-btn {
-    display: block;
-  }
-
+/* Responsive - En móvil el sidebar desaparece */
+@media (max-width: 1024px) {
   .mesero-sidebar {
-    position: fixed;
-    top: 0;
-    left: -270px; 
-    width: 250px;
-    height: 100vh;
-    background: white;
-    box-shadow: 2px 0 10px rgba(0, 0, 0, 0.1);
-    transition: left 0.3s ease;
-    z-index: 1000;
+    display: none;
   }
+}
 
-  .mesero-sidebar.open {
-    left: 0; 
-  }
-
- 
-  .sidebar-footer {
-    padding: 1rem 1.5rem;
-    border-top: 1px solid #e5e7eb;
-    margin-bottom: 2rem;
+/* En móvil, todo el espacio es para el contenido */
+@media (max-width: 1024px) {
+  .mesero-main {
+    margin-left: 0 !important;
   }
 }
