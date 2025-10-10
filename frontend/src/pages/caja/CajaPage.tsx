@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { DollarSign, Users, FileText, ArrowLeft } from 'lucide-react';
 import Button from '../../components/common/Button';
+import CocinaCajaMobileNav from '../../components/cocina/CocinaCajaMobileNav';
 import '../../styles/caja/CajaPage.css';
 
 type OrderItem = {
@@ -18,6 +19,7 @@ type ActiveTable = {
 
 const CajaPage: React.FC = () => {
   const [showReport, setShowReport] = useState(false);
+
 
   const [activeTables, setActiveTables] = useState<ActiveTable[]>([
     {
@@ -235,6 +237,8 @@ const CajaPage: React.FC = () => {
           </div>
         </div>
       )}
+      <CocinaCajaMobileNav
+      />
     </div>
   );
 };

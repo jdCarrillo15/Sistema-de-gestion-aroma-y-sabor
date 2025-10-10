@@ -1,32 +1,31 @@
 import React from 'react';
+import { NavLink } from 'react-router-dom';
 import { ChefHat, DollarSign } from 'lucide-react';
 import '../../styles/cocina/CocinaCajaMobileNav.css';
 
-interface CocinaCajaMobileNavProps {
-  activeView: 'cocina' | 'caja';
-  setActiveView: (view: 'cocina' | 'caja') => void;
-}
-
-const CocinaCajaMobileNav: React.FC<CocinaCajaMobileNavProps> = ({ 
-  activeView, 
-  setActiveView 
-}) => {
+const CocinaCajaMobileNav: React.FC = () => {
   return (
     <nav className="mobile-nav">
-      <button
-        onClick={() => setActiveView('cocina')}
-        className={`mobile-nav-btn ${activeView === 'cocina' ? 'active' : ''}`}
+      <NavLink
+        to="/cocina"
+        end
+        className={({ isActive }) =>
+          `mobile-nav-btn ${isActive ? 'active' : ''}`
+        }
       >
         <ChefHat size={16} />
         Cocina
-      </button>
-      <button
-        onClick={() => setActiveView('caja')}
-        className={`mobile-nav-btn ${activeView === 'caja' ? 'active' : ''}`}
+      </NavLink>
+      
+      <NavLink
+        to="/caja"
+        className={({ isActive }) =>
+          `mobile-nav-btn ${isActive ? 'active' : ''}`
+        }
       >
         <DollarSign size={16} />
         Caja
-      </button>
+      </NavLink>
     </nav>
   );
 };
