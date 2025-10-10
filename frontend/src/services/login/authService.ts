@@ -9,12 +9,11 @@ export async function loginUser(email: string, password: string) {
       credentials: "include",
     });
 
-    if (!response.ok) {
-      throw new Error("Error en las credenciales");
-    }
-
     const data = await response.json();
 
+    if (!data.success) {
+      return false; // Retorna false para credenciales incorrectas
+    }
     if (data.success) {
       localStorage.setItem("user", JSON.stringify({
         uid: data.uid,
@@ -25,7 +24,8 @@ export async function loginUser(email: string, password: string) {
 
     return data;
   } catch (error) {
-    throw error;
+    console.error("Error de conexión:", error);
+    throw new Error("No se pudo conectar con el servidor");
   }
 }
 

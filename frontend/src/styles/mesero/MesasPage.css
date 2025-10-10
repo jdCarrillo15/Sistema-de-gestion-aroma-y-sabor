@@ -121,13 +121,14 @@
 }
 
 .spinner {
-  width: 48px;
-  height: 48px;
-  border: 4px solid #e5e7eb;
-  border-top-color: #f97316;
+  width: 60px;
+  height: 60px;
+  border: 5px solid #fcd9b6;   
+  border-top-color: #f97316;    
   border-radius: 50%;
-  animation: spin 1s linear infinite;
+  animation: spin 0.9s linear infinite;
   margin-bottom: 1rem;
+  box-shadow: 0 0 8px rgba(249, 115, 22, 0.4);
 }
 
 .stat-card {
