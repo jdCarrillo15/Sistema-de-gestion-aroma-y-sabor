@@ -1,0 +1,161 @@
+.table-card {
+  background: white;
+  border-radius: 12px;
+  padding: 1.25rem;
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  border: 2px solid transparent;
+  min-height: 180px;
+  display: flex;
+  flex-direction: column;
+}
+
+.table-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 12px 24px rgba(0, 0, 0, 0.15);
+}
+
+/* Mesa Libre */
+.table-card.free {
+  background: linear-gradient(135deg, #f9fafb 0%, #ffffff 100%);
+  border-color: #849ef7;
+}
+
+.table-card.free:hover {
+  border-color: #10b981;
+  box-shadow: 0 12px 24px rgba(16, 185, 129, 0.2);
+}
+
+/* Mesa Ocupada */
+.table-card.occupied {
+  background: linear-gradient(135deg, #FFF8E1 0%, #FFE0B2 100%);
+  border-color: #f97316;
+}
+
+.table-card.occupied:hover {
+  border-color: #ea580c;
+  box-shadow: 0 12px 24px rgba(249, 115, 22, 0.25);
+}
+
+/* Header */
+.table-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1rem;
+}
+
+.table-number {
+  margin: 0;
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: #111827;
+}
+
+.table-badge {
+  padding: 4px 12px;
+  border-radius: 16px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.table-badge.free {
+  background: #d1fae5;
+  color: #065f46;
+}
+
+.table-badge.occupied {
+  background: #fed7aa;
+  color: #9a3412;
+}
+
+/* Body */
+.table-body {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Estado Libre */
+.table-empty {
+  text-align: center;
+  padding: 1rem;
+}
+
+.empty-icon {
+  font-size: 2.5rem;
+  margin-bottom: 0.5rem;
+  opacity: 0.6;
+}
+
+.empty-text {
+  font-size: 0.95rem;
+  color: #6b7280;
+  font-weight: 500;
+  margin: 0.5rem 0;
+}
+
+.table-hint {
+  font-size: 0.8rem;
+  color: #9ca3af;
+  margin: 0;
+}
+
+/* Estado Ocupado */
+.table-occupied {
+  width: 100%;
+  
+}
+
+.occupied-info {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.info-row {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.9rem;
+  color: #374151;
+}
+
+.info-icon {
+  font-size: 1rem;
+  
+}
+
+.info-text {
+  font-weight: 500;
+}
+
+.info-row.total {
+  margin-top: 0.5rem;
+  padding-top: 0.75rem;
+  border-top: 1px solid rgba(0, 0, 0, 0.1);
+}
+
+.total-amount {
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: #f97316;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .table-card {
+    min-height: 160px;
+  }
+
+  .table-number {
+    font-size: 1.1rem;
+  }
+
+  .info-row {
+    font-size: 0.85rem;
+  }
+}

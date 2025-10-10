@@ -176,19 +176,21 @@
 /**/
 .login-button {
   width: 100%;
+  height: 48px; /* Altura fija para evitar que crezca */
   background: linear-gradient(135deg, #8B4513 0%, #D2691E 100%);
   color: white;
   border: none;
-  padding: 14px 24px;
   border-radius: 8px;
   font-size: 16px;
   font-weight: 600;
   cursor: pointer;
   transition: all 0.2s ease;
   box-shadow: 0 4px 12px rgba(139, 69, 19, 0.3);
-
   position: relative;
   overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .login-button:hover {
@@ -199,6 +201,11 @@
 .login-button:active {
   transform: translateY(0);
   box-shadow: 0 2px 8px rgba(139, 69, 19, 0.3);
+}
+
+.login-button:disabled {
+  cursor: not-allowed;
+  opacity: 0.8;
 }
 
 .login-button::before {
@@ -226,17 +233,49 @@
   animation: shine-out 0.8s forwards;
 }
 
+
+.loading-container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  height: 100%;
+  width: 100%;
+}
+
+.loading-container span {
+  white-space: nowrap;
+  font-size: 15px;
+}
+
+
+.spinner {
+  width: 10px; 
+  height: 10px;
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  border-top: 2px solid white;
+  border-radius: 50%;
+  animation: spin 0.7s linear infinite;
+  display: inline-block;
+  box-sizing: border-box;
+  flex-shrink: 0; 
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
 @keyframes shine-in {
   from { left: -75%; }
-  to   { left: 125%; }
+  to { left: 125%; }
 }
 
 @keyframes shine-out {
   from { left: 125%; }
-  to   { left: -75%; }
+  to { left: -75%; }
 }
-/**/
-
 @media (max-width: 480px) {
   .login-form-card {
     padding: 24px;

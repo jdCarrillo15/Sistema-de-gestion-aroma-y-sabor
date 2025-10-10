@@ -46,14 +46,16 @@ const LoginForm: React.FC<LoginFormProps> = () => {
         );
         setShowAlert(true);
 
-        // Redirigir según el rol después de 1.5 segundos
         setTimeout(() => {
-          if (data.role === "admin") {
-            navigate("/admin");
-          } else {
-            // Si tienes otras rutas para otros roles, añádelas aquí
-            navigate("/dashboard"); // O la ruta que corresponda
-          }
+          const dashboardRoutes: Record<string, string> = {
+            admin: '/admin',
+            waiter: '/mesero',     
+            cocinero: '/cocina',
+            user: '/caja',
+          };
+          
+          const redirectTo = dashboardRoutes[data.role] || '/';
+          navigate(redirectTo);
         }, 1500);
       }
     } catch (err) {

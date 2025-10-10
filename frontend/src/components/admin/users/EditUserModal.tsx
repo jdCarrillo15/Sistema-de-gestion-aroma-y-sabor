@@ -363,7 +363,7 @@ const EditUserModal: React.FC<EditUserModalProps> = ({
                   disabled={isSubmitting}
                 >
                   <option value="cocinero">Cocinero</option>
-                  <option value="mesero">Mesero</option>
+                  <option value="waiter">Mesero</option>
                   <option value="user">Caja</option>
                   <option value="admin">Administrador</option>
                 </select>

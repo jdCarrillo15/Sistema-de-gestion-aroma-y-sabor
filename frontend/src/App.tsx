@@ -7,6 +7,8 @@ import UsuariosPage from "./pages/admin/UsuariosPage";
 import InventarioPage from "./pages/admin/InventarioPage";
 import TurnosPage from "./pages/admin/TurnosPage";
 import VentasPage from "./pages/admin/VentasPage";
+import MeseroLayout from "./components/mesero/MeseroLayout";
+import MesasPage from "./pages/mesero/MesasPage";
 import ProtectedRoute from "./components/ProtectedRoute";
 
 function App() {
@@ -14,10 +16,11 @@ function App() {
     <BrowserRouter>
       <Routes>
         <Route path="/" element={<LoginPage />} />
+        
         <Route
           path="/admin"
           element={
-            <ProtectedRoute>
+            <ProtectedRoute allowedRoles={['admin']}>
               <AdminLayout />
             </ProtectedRoute>
           }
@@ -28,6 +31,17 @@ function App() {
           <Route path="inventario" element={<InventarioPage />} />
           <Route path="turnos" element={<TurnosPage />} />
           <Route path="ventas" element={<VentasPage />} />
+        </Route>
+
+        <Route
+          path="/mesero"
+          element={
+            <ProtectedRoute allowedRoles={['waiter']}>
+              <MeseroLayout />
+            </ProtectedRoute>
+          }
+        >
+          <Route index element={<MesasPage />} />
         </Route>
       </Routes>
     </BrowserRouter>
