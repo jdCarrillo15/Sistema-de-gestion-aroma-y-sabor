@@ -38,10 +38,12 @@ export async function login(req, res) {
             httpOnly: true,
 
 
-            secure: true, // true en producción con HTTPS
+            secure: false, // true en producción con HTTPS
 
 
-            sameSite: "strict"
+            sameSite: "lax",
+
+            path:"/"
 
         });
 
