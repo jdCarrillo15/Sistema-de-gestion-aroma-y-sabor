@@ -32,7 +32,7 @@ const OrderCard: React.FC<OrderCardProps> = ({
             <h3 className="order-table">{order.table_name}</h3>
             <span className="order-status pending">Pendiente</span>
           </div>
-          <p className="order-time">#{order.id} • {order.created_at}</p>
+          <p className="order-time"> {order.created_at}</p>
         </div>
       </div>
 

@@ -1,6 +1,3 @@
-//const API_BASE_URL = "http://localhost:3000";
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
-
 export interface OrderItem {
   id: string;
   product_name: string;
@@ -29,4 +26,17 @@ export interface Bill {
 export interface PaidBill extends Bill {
   payment_method: 'Efectivo' | 'Tarjeta' | 'Transferencia';
   paid_at: string;
+}
+
+export interface ActiveTable {
+  id: string;
+  table: string;           
+  time: string;           
+  duration: string;        
+  items: {
+    name: string;
+    price: number;
+    units: number;
+  }[];
+  total: number;
 }

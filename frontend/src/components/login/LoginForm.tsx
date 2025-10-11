@@ -47,14 +47,16 @@ const LoginForm: React.FC<LoginFormProps> = () => {
         setShowAlert(true);
 
         setTimeout(() => {
+          const roleKey = String(data.role).toLowerCase();
           const dashboardRoutes: Record<string, string> = {
             admin: '/admin',
-            waiter: '/mesero',     
-            cocinero: '/cocina',
-            user: '/caja',
+            waiter: '/mesero',
+            kitchen: '/cocina',
+            caja: '/caja',
+      
           };
-          
-          const redirectTo = dashboardRoutes[data.role] || '/';
+
+          const redirectTo = dashboardRoutes[roleKey] || '/';
           navigate(redirectTo);
         }, 1500);
       }

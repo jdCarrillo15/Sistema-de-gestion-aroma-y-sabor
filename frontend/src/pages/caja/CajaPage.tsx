@@ -1,86 +1,75 @@
 import React, { useState, useEffect } from 'react';
-import { DollarSign, Users, FileText, ArrowLeft, MoreHorizontal } from 'lucide-react';
+import { DollarSign, Users, FileText, ArrowLeft } from 'lucide-react';
 import Button from '../../components/common/Button';
 import CocinaCajaMobileNav from '../../components/cocina/CocinaCajaMobileNav';
 import TableDetailModal from '../../components/caja/TableDetailModal';
 import '../../styles/caja/CajaPage.css';
+import { ActiveTable } from '../../services/cocina/cocinaTypes';
+import {
+  getActiveBills,
+  getPaidBills,
+  payBill,
+  calculateDuration,
+  formatTime,
+  formatPrice,
+  handleApiError,
+  type Bill,
+  type Product,
+} from '../../services/caja/CajaServices';
 
 type OrderItem = {
   name: string;
   price: number;
+  units: number;
 };
 
-type ActiveTable = {
-  id: number;
+type Item = {
+    name: string;
+    price: number;
+    units: number;
+}
+
+type PaymentHistoryItem = {
+  id: string;
+  table: string;
   time: string;
-  duration: string;
-  items: OrderItem[];
-  total: number;
+  amount: number;
+  method: 'Efectivo' | 'Tarjeta' | 'Transferencia';
+  status: 'paid';
 };
 
 const CajaPage: React.FC = () => {
   const [showReport, setShowReport] = useState(false);
   const [selectedTable, setSelectedTable] = useState<ActiveTable | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  
 
-  const [activeTables, setActiveTables] = useState<ActiveTable[]>([
-    {
-      id: 5,
-      time: '10:23',
-      duration: '15 min',
-      items: [
-        { name: '1x Empanada Pollo', price: 3300 },
-        { name: '2x Café', price: 2500 }
-      ],
-      total: 8300
-    },
-    {
-      id: 12,
-      time: '10:25',
-      duration: '13 min',
-      items: [
-        { name: '1x Bandeja Paisa', price: 18500 },
-        { name: '1x Jugo Natural', price: 4500 },
-        { name: '1x Arepa con Queso', price: 3000 },
-        { name: '2x Gaseosa', price: 5000 }
-      ],
-      total: 31500
-    },
-    {
-      id: 3,
-      time: '10:18',
-      duration: '20 min',
-      items: [
-        { name: '2x Arepa con Queso', price: 5000 },
-        { name: '1x Chocolate', price: 3000 }
-      ],
-      total: 8000
-    },
-    {
-      id: 8,
-      time: '10:28',
-      duration: '10 min',
-      items: [
-        { name: '1x Almuerzo Ejecutivo', price: 15000 },
-        { name: '1x Jugo Natural', price: 4000 },
-        { name: '1x Postre del día', price: 5000 }
-      ],
-      total: 24000
+  const [activeTables, setActiveTables] = useState<ActiveTable[]>([]);
+  const [paymentHistory, setPaymentHistory] = useState<PaymentHistoryItem[]>([]);
+  
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+
+  useEffect(() => {
+    loadActiveBills();
+
+    const interval = setInterval(() => {
+      loadActiveBills();
+      if (showReport) {
+        loadPaymentHistory();
+      }
+    }, 30000);
+
+    return () => clearInterval(interval);
+  }, [showReport]);
+
+  useEffect(() => {
+    if (showReport) {
+      loadPaymentHistory();
     }
-  ]);
+  }, [showReport]);
 
-  const reportData = {
-    collected: 42000,
-    orders: 4,
-    average: 10600,
-    history: [
-      { table: 'Mesa 7', time: '09:45', amount: 12500, method: 'Efectivo' as const, status: 'paid' as const },
-      { table: 'Mesa 1', time: '09:52', amount: 5600, method: 'Tarjeta' as const, status: 'paid' as const },
-      { table: 'Llevar #32', time: '10:05', amount: 8900, method: 'Efectivo' as const, status: 'paid' as const },
-      { table: 'Mesa 9', time: '10:12', amount: 15200, method: 'Transferencia' as const, status: 'paid' as const }
-    ],
-    totalDay: 42200
-  };
 
   useEffect(() => {
     if (isModalOpen) {
@@ -94,8 +83,108 @@ const CajaPage: React.FC = () => {
     };
   }, [isModalOpen]);
 
-  const handlePayOrder = (tableId: number) => {
-    setActiveTables(prev => prev.filter(table => table.id !== tableId));
+
+  const loadActiveBills = async () => {
+    try {
+      setIsLoading(true);
+      setError(null);
+
+      const response = await getActiveBills();
+
+      const transformedTables: ActiveTable[] = response.bills.map((bill: Bill) => {
+        // Debug: log products to inspect incoming price values
+        console.debug('bill.products:', bill.products);
+
+        const items: OrderItem[] = bill.products.map((product: Product) => {
+          const parsedPrice = Number(product.price);
+          const price = Number.isFinite(parsedPrice) ? parsedPrice : 0;
+
+          console.debug('product:', product, 'parsedPrice:', parsedPrice, 'final price:', price);
+
+          return {
+            name: `${product.units}x ${product.name}`,
+            price,
+            units: product.units,
+          };
+        });
+
+        const tableName = bill.table.startsWith('Mesa') 
+          ? bill.table 
+          : `Mesa ${bill.table}`;
+
+        return {
+          id: bill.id,
+          table: tableName,
+          time: formatTime(bill.created_at),
+          duration: calculateDuration(bill.created_at),
+          items,
+          total: bill.total,
+        };
+      });
+    
+      setActiveTables(transformedTables);
+      console.log(`${transformedTables.length} mesas activas cargadas`);
+    } catch (err) {
+      const errorMessage = handleApiError(err);
+      setError(errorMessage);
+      console.error('Error cargando cuentas activas:', err);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+
+  const loadPaymentHistory = async () => {
+    try {
+      const response = await getPaidBills();
+
+      const transformedHistory: PaymentHistoryItem[] = response.bills.map((bill: Bill) => {
+        const tableName = bill.table.startsWith('Mesa') 
+          ? bill.table 
+          : `Mesa ${bill.table}`;
+
+        return {
+          id: bill.id,
+          table: tableName,
+          time: formatTime(bill.paid_at || bill.created_at),
+          amount: bill.total,
+          method: bill.payment_method || 'Efectivo',
+          status: 'paid' as const,
+        };
+      });
+
+      transformedHistory.sort((a, b) => b.time.localeCompare(a.time));
+
+      setPaymentHistory(transformedHistory);
+      console.log(`${transformedHistory.length} pagos en el historial`);
+    } catch (err) {
+      console.error('Error cargando historial de pagos:', err);
+    }
+  };
+
+  const handlePayOrder = async (
+    tableId: string,
+    paymentMethod: 'Efectivo' | 'Tarjeta' | 'Transferencia' = 'Efectivo'
+  ) => {
+    try {
+      await payBill(tableId, paymentMethod);
+
+      setActiveTables((prev) => prev.filter((table) => table.id !== tableId));
+
+      if (showReport) {
+        setTimeout(() => loadPaymentHistory(), 500);
+      }
+
+      if (isModalOpen) {
+        handleCloseModal();
+      }
+
+      console.log(`Pago procesado para mesa ${tableId}`);
+    } catch (err) {
+      const errorMessage = handleApiError(err);
+      alert(`Error al procesar el pago: ${errorMessage}`);
+      console.error('Error pagando cuenta:', err);
+    }
   };
 
   const handleOpenModal = (table: ActiveTable) => {
@@ -108,12 +197,18 @@ const CajaPage: React.FC = () => {
     setSelectedTable(null);
   };
 
-  const formatPrice = (price: number): string => {
-    return `$${price.toLocaleString('es-CO')}`;
+  const calculateDayStats = () => {
+    const collected = paymentHistory.reduce((sum, payment) => sum + payment.amount, 0);
+    const orders = paymentHistory.length;
+    const average = orders > 0 ? Math.round(collected / orders) : 0;
+    
+    return { collected, orders, average };
   };
-
+  
+  const dayStats = calculateDayStats();
   const MAX_VISIBLE_ITEMS = 2;
-
+  
+  
   return (
     <>
       <div className="caja-page">
@@ -123,15 +218,29 @@ const CajaPage: React.FC = () => {
               <div className="caja-view-header-text">
                 <h1 className="caja-view-title">Panel de Caja</h1>
               </div>
-              <Button
-                className="btn-report"
-                onClick={() => setShowReport(true)}
-              >
+              <Button className="btn-report" onClick={() => setShowReport(true)}>
                 <FileText className="btn-icon" />
                 <span>Reporte</span>
               </Button>
             </div>
 
+            {/* Mensaje de error */}
+            {error && (
+              <div
+              style={{
+                padding: '1rem',
+                  marginBottom: '1rem',
+                  backgroundColor: '#fee2e2',
+                  border: '1px solid #fca5a5',
+                  borderRadius: '0.5rem',
+                  color: '#991b1b',
+                }}
+                >
+                <strong>Error:</strong> {error}
+              </div>
+            )}
+
+            {/* Tarjetas de resumen */}
             <div className="caja-summary-cards">
               <div className="caja-summary-card summary-card-orange">
                 <div className="caja-summary-card-content">
@@ -160,64 +269,79 @@ const CajaPage: React.FC = () => {
               </div>
             </div>
 
-            <div className="caja-tables-grid">
-              {activeTables.length === 0 ? (
-                <div className="caja-empty-state">
-                  <DollarSign className="caja-empty-icon" />
-                  <h3>No hay mesas activas</h3>
-                  <p>Las mesas con pedidos pendientes aparecerán aquí</p>
-                </div>
-              ) : (
-                activeTables.map((table) => (
-                  <div key={table.id} className="caja-table-card">
-                    <div className="caja-table-card-content">
-                      <div className="caja-table-card-header">
-                        <div className="caja-table-info">
-                          <h3 className="caja-table-number">Mesa {table.id}</h3>
-                          <p className="caja-table-time">{table.time} • {table.duration}</p>
-                        </div>
-                        <div className="caja-table-total">
-                          <p className="caja-total-label">TOTAL</p>
-                          <p className="caja-total-amount">{formatPrice(table.total)}</p>
-                        </div>
-                      </div>
-
-                      <div className="caja-table-details">
-                        <p className="caja-details-label">DETALLE:</p>
-                        {table.items.slice(0, MAX_VISIBLE_ITEMS).map((item, idx) => (
-                          <div key={idx} className="caja-detail-item">
-                            <span className="caja-item-name">{item.name}</span>
-                            <span className="caja-item-price">{formatPrice(item.price)}</span>
-                          </div>
-                        ))}
-                        
-                        {table.items.length > MAX_VISIBLE_ITEMS && (
-                          <button 
-                            className="caja-more-items-btn"
-                            onClick={() => handleOpenModal(table)}
-                          >
-                            <span>Ver más</span>
-                          </button>
-                        )}
-
-                        <div className="caja-details-total">
-                          <span className="caja-total-text">TOTAL:</span>
-                          <span className="caja-total-price">{formatPrice(table.total)}</span>
-                        </div>
-                      </div>
-
-                      <Button
-                        className="btn-pay"
-                        onClick={() => handlePayOrder(table.id)}
-                      >
-                        <DollarSign className="btn-icon" />
-                        <span>Pagar {formatPrice(table.total)}</span>
-                      </Button>
-                    </div>
+            {/* Grid de mesas activas */}
+            {isLoading ? (
+              <div
+                style={{
+                  textAlign: 'center',
+                  padding: '3rem',
+                  color: '#6b7280',
+                  fontSize: '1.1rem',
+                }}
+              >
+                Cargando cuentas activas...
+              </div>
+            ) : (
+              <div className="caja-tables-grid">
+                {activeTables.length === 0 ? (
+                  <div className="caja-empty-state">
+                    <DollarSign className="caja-empty-icon" />
+                    <h3>No hay mesas activas</h3>
+                    <p>Las mesas con pedidos pendientes aparecerán aquí</p>
                   </div>
-                ))
-              )}
-            </div>
+                ) : (
+                  activeTables.map((table) => (
+                    <div key={table.id} className="caja-table-card">
+                      <div className="caja-table-card-content">
+                        <div className="caja-table-card-header">
+                          <div className="caja-table-info">
+                            <h3 className="caja-table-number">{table.table}</h3>
+                            <p className="caja-table-time">
+                              {table.time} • {table.duration}
+                            </p>
+                          </div>
+                          <div className="caja-table-total">
+                            <p className="caja-total-label">TOTAL</p>
+                            <p className="caja-total-amount">{formatPrice(table.total)}</p>
+                          </div>
+                        </div>
+
+                        <div className="caja-table-details">
+                          <p className="caja-details-label">DETALLE:</p>
+                          {table.items.slice(0, MAX_VISIBLE_ITEMS).map((item, idx) => (
+                            <div key={idx} className="caja-detail-item">
+                              <span className="caja-item-name">{item.name}</span>
+                              <span className="caja-item-price">
+                                {formatPrice( item.price * item.units)}
+                              </span>
+                            </div>
+                          ))}
+
+                          {table.items.length > MAX_VISIBLE_ITEMS && (
+                            <button
+                              className="caja-more-items-btn"
+                              onClick={() => handleOpenModal(table)}
+                            >
+                              <span>Ver más (+{table.items.length - MAX_VISIBLE_ITEMS})</span>
+                            </button>
+                          )}
+
+                          <div className="caja-details-total">
+                            <span className="caja-total-text">TOTAL:</span>
+                            <span className="caja-total-price">{formatPrice(table.total)}</span>
+                          </div>
+                        </div>
+
+                        <Button className="btn-pay" onClick={() => handlePayOrder(table.id)}>
+                          <DollarSign className="btn-icon" />
+                          <span>Pagar {formatPrice(table.total)}</span>
+                        </Button>
+                      </div>
+                    </div>
+                  ))
+                )}
+              </div>
+            )}
           </div>
         ) : (
           <div className="caja-view-container">
@@ -225,62 +349,76 @@ const CajaPage: React.FC = () => {
               <div className="caja-view-header-text">
                 <h1 className="caja-view-title">Panel de Caja</h1>
               </div>
-              <Button
-                className="btn-back"
-                onClick={() => setShowReport(false)}
-              >
+              <Button className="btn-back" onClick={() => setShowReport(false)}>
                 <ArrowLeft className="btn-icon" />
                 <span>Volver</span>
               </Button>
             </div>
 
+            {/* Tarjeta de ventas del día */}
             <div className="caja-sales-card">
               <h3 className="caja-sales-title">Ventas del Día</h3>
               <div className="caja-sales-stats">
                 <div className="caja-sales-stat">
                   <p className="caja-stat-label">Recaudado</p>
-                  <p className="caja-stat-value">{formatPrice(reportData.collected)}</p>
+                  <p className="caja-stat-value">{formatPrice(dayStats.collected)}</p>
                 </div>
                 <div className="caja-sales-stat">
                   <p className="caja-stat-label">Pagadas</p>
-                  <p className="caja-stat-value">{reportData.orders}</p>
+                  <p className="caja-stat-value">{dayStats.orders}</p>
                 </div>
                 <div className="caja-sales-stat">
                   <p className="caja-stat-label">Promedio</p>
-                  <p className="caja-stat-value">{formatPrice(reportData.average)}</p>
+                  <p className="caja-stat-value">{formatPrice(dayStats.average)}</p>
                 </div>
               </div>
             </div>
 
+            {/* Historial de pagos */}
             <div className="caja-history-card">
               <div className="caja-history-content">
                 <h3 className="caja-history-title">Historial de Pagos</h3>
                 <div className="caja-history-list">
-                  {reportData.history.map((payment, idx) => (
-                    <div key={idx} className="caja-history-item">
-                      <div className="caja-payment-info">
-                        <p className="caja-payment-table">{payment.table}</p>
-                        <p className="caja-payment-time">{payment.time}</p>
-                        <span className={`caja-payment-method ${payment.method.toLowerCase()}`}>
-                          {payment.method}
-                        </span>
-                      </div>
-                      <p className="caja-payment-amount">{formatPrice(payment.amount)}</p>
+                  {paymentHistory.length === 0 ? (
+                    <div
+                      style={{
+                        textAlign: 'center',
+                        color: '#6b7280',
+                        padding: '2rem',
+                        fontSize: '0.95rem',
+                      }}
+                    >
+                      No hay pagos registrados hoy
                     </div>
-                  ))}
+                  ) : (
+                    paymentHistory.map((payment) => (
+                      <div key={payment.id} className="caja-history-item">
+                        <div className="caja-payment-info">
+                          <p className="caja-payment-table">{payment.table}</p>
+                          <p className="caja-payment-time">{payment.time}</p>
+                          <span className={`caja-payment-method ${payment.method.toLowerCase()}`}>
+                            {payment.method}
+                          </span>
+                        </div>
+                        <p className="caja-payment-amount">{formatPrice(payment.amount)}</p>
+                      </div>
+                    ))
+                  )}
                 </div>
               </div>
             </div>
 
+            {/* Total del día */}
             <div className="caja-total-day-card">
               <p className="caja-total-day-label">TOTAL DEL DÍA</p>
-              <p className="caja-total-day-amount">{formatPrice(reportData.totalDay)}</p>
+              <p className="caja-total-day-amount">{formatPrice(dayStats.collected)}</p>
             </div>
           </div>
         )}
         <CocinaCajaMobileNav />
       </div>
 
+      {/* Modal de detalles */}
       <TableDetailModal
         isOpen={isModalOpen}
         table={selectedTable}

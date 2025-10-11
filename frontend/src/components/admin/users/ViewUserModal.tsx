@@ -67,8 +67,7 @@ const ViewUserModal: React.FC<ViewUserModalProps> = ({
       cocinero: "Cocinero",
       mesero: "Mesero",
       waiter: "Mesero",
-      user: "Caja",
-      cashier: "Caja",
+      caja: "Caja",
     };
     return roleMap[role.toLowerCase()] || role;
   };

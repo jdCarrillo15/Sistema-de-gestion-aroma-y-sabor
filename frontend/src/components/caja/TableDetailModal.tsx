@@ -2,25 +2,13 @@ import React from 'react';
 import { X, DollarSign } from 'lucide-react';
 import Button from '../../components/common/Button';
 import '../../styles/caja/TableDetailModal.css';
-
-type OrderItem = {
-  name: string;
-  price: number;
-};
-
-type ActiveTable = {
-  id: number;
-  time: string;
-  duration: string;
-  items: OrderItem[];
-  total: number;
-};
+import { ActiveTable } from '../../services/cocina/cocinaTypes';
 
 interface TableDetailModalProps {
   isOpen: boolean;
   table: ActiveTable | null;
   onClose: () => void;
-  onPay: (tableId: number) => void;
+  onPay: (tableId: string) => void;
   formatPrice: (price: number) => string;
 }
 
@@ -29,14 +17,12 @@ const TableDetailModal: React.FC<TableDetailModalProps> = ({
   table,
   onClose,
   onPay,
-  formatPrice
+  formatPrice,
 }) => {
   if (!isOpen || !table) return null;
 
   const handleOverlayClick = (e: React.MouseEvent<HTMLDivElement>) => {
-    if (e.target === e.currentTarget) {
-      onClose();
-    }
+    if (e.target === e.currentTarget) onClose();
   };
 
   const handlePay = () => {
@@ -79,11 +65,8 @@ const TableDetailModal: React.FC<TableDetailModalProps> = ({
         </div>
 
         <div className="modal-footer">
-          <Button
-            className="btn-pay-modal"
-            onClick={handlePay}
-          >
-            <DollarSign className="c" />
+          <Button className="btn-pay-modal" onClick={handlePay}>
+            <DollarSign className="btn-icon" />
             <span>Pagar {formatPrice(table.total)}</span>
           </Button>
         </div>
