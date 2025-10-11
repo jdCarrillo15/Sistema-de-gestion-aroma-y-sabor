@@ -37,9 +37,7 @@ export async function login(req, res) {
 
             httpOnly: true,
 
-
             secure: false, // true en producción con HTTPS
-
 
             sameSite: "lax",
 
