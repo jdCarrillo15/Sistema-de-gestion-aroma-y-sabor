@@ -1,7 +1,7 @@
 import React from 'react';
 import { NavLink } from 'react-router-dom';
 import { Coffee, UtensilsCrossed } from 'lucide-react';
-import '../../styles/mesero/MeseroSidebar.css';
+import styles from '../../styles/mesero/MeseroSidebar.module.css';
 
 const menuItems = [
   { to: '/mesero', label: 'Mesas', icon: UtensilsCrossed },
@@ -9,18 +9,18 @@ const menuItems = [
 
 const MeseroSidebar: React.FC = () => {
   return (
-    <aside className="mesero-sidebar">
-      <div className="sidebar-header">
-        <div className="logo-box">
-          <Coffee className="logo-icon" />
+    <aside className={styles.meseroSidebar}>
+      <div className={styles.sidebarHeader}>
+        <div className={styles.logoBox}>
+          <Coffee className={styles.logoIcon} />
         </div>
-        <div className="brand-box">
-          <h3 className="brand-title">Aroma y Sabor</h3>
-          <p className="brand-sub">Panel Mesero</p>
+        <div className={styles.brandBox}>
+          <h3 className={styles.brandTitle}>Aroma y Sabor</h3>
+          <p className={styles.brandSub}>Panel Mesero</p>
         </div>
       </div>
 
-      <nav className="sidebar-nav">
+      <nav className={styles.sidebarNav}>
         {menuItems.map((item) => {
           const Icon = item.icon;
           return (
@@ -29,10 +29,10 @@ const MeseroSidebar: React.FC = () => {
                 to={item.to}
                 end={item.to === '/mesero'}
                 className={({ isActive }) =>
-                  `sidebar-link ${isActive ? 'active' : ''}`
+                  `${styles.sidebarLink} ${isActive ? styles.active : ''}`
                 }
               >
-                <Icon className="link-icon" />
+                <Icon className={styles.linkIcon} />
                 <span>{item.label}</span>
               </NavLink>
             </li>

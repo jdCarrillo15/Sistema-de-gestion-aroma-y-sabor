@@ -1,4 +1,4 @@
-.mesero-topbar {
+.meseroTopbar {
   display: flex;
   align-items: center;
   background: white;
@@ -7,20 +7,20 @@
   padding: 0 1.5rem;
 }
 
-.topbar-container {
+.topbarContainer {
   display: flex;
   align-items: center;
   justify-content: space-between;
   width: 100%;
 }
 
-.topbar-search {
+.topbarSearch {
   position: relative;
   flex: 1;
   max-width: 400px;
 }
 
-.search-icon {
+.searchIcon {
   position: absolute;
   left: 0.75rem;
   top: 50%;
@@ -30,7 +30,7 @@
   height: 20px;
 }
 
-.search-input {
+.searchInput {
   width: 100%;
   padding: 0.5rem 0.75rem 0.5rem 2.5rem;
   border: 1px solid #d1d5db;
@@ -42,24 +42,24 @@
   background: #fafafa;
 }
 
-.search-input:focus {
+.searchInput:focus {
   border-color: #f97316;
   box-shadow: 0 0 0 3px rgba(249, 115, 22, 0.1);
   background: white;
 }
 
-.topbar-right {
+.topbarRight {
   display: flex;
   align-items: center;
   gap: 1rem;
 }
 
 /* User Dropdown Container */
-.topbar-user-dropdown {
+.topbarUserDropdown {
   position: relative;
 }
 
-.topbar-user-button {
+.topbarUserButton {
   display: flex;
   align-items: center;
   gap: 0.75rem;
@@ -73,11 +73,11 @@
   z-index: 1001;
 }
 
-.topbar-user-button:hover {
+.topbarUserButton:hover {
   background: #f9fafb;
 }
 
-.user-avatar {
+.userAvatar {
   width: 40px;
   height: 40px;
   border-radius: 50%;
@@ -89,38 +89,38 @@
   flex-shrink: 0;
 }
 
-.user-info {
+.userInfo {
   display: flex;
   flex-direction: column;
   align-items: flex-start;
   text-align: left;
 }
 
-.user-name {
+.userName {
   font-size: 0.9rem;
   font-weight: 600;
   color: #111827;
   line-height: 1.2;
 }
 
-.user-role {
+.userRole {
   font-size: 0.75rem;
   color: #6b7280;
   line-height: 1.2;
 }
 
-.dropdown-icon {
+.dropdownIcon {
   color: #6b7280;
   transition: transform 0.2s ease;
   flex-shrink: 0;
 }
 
-.dropdown-icon.open {
+.dropdownIcon.open {
   transform: rotate(180deg);
 }
 
 /* Dropdown Backdrop (solo móvil) */
-.dropdown-backdrop {
+.dropdownBackdrop {
   display: none;
   position: fixed;
   top: 0;
@@ -132,7 +132,7 @@
 }
 
 /* Dropdown Menu */
-.dropdown-menu {
+.dropdownMenu {
   position: absolute;
   top: calc(100% + 0.5rem);
   right: 0;
@@ -156,17 +156,17 @@
   }
 }
 
-.dropdown-header {
+.dropdownHeader {
   padding: 1rem;
 }
 
-.dropdown-user-info {
+.dropdownUserInfo {
   display: flex;
   align-items: center;
   gap: 0.75rem;
 }
 
-.dropdown-avatar {
+.dropdownAvatar {
   width: 48px;
   height: 48px;
   border-radius: 50%;
@@ -178,27 +178,27 @@
   flex-shrink: 0;
 }
 
-.dropdown-name {
+.dropdownName {
   font-size: 0.95rem;
   font-weight: 600;
   color: #111827;
   margin: 0 0 0.25rem 0;
 }
 
-.dropdown-email {
+.dropdownEmail {
   font-size: 0.85rem;
   color: #6b7280;
   margin: 0;
   word-break: break-all;
 }
 
-.dropdown-divider {
+.dropdownDivider {
   height: 1px;
   background: #e5e7eb;
   margin: 0.5rem 0;
 }
 
-.dropdown-item {
+.dropdownItem {
   width: 100%;
   display: flex;
   align-items: center;
@@ -213,55 +213,55 @@
   text-align: left;
 }
 
-.dropdown-item:hover {
+.dropdownItem:hover {
   background: #f9fafb;
 }
 
-.dropdown-item:first-of-type {
+.dropdownItem:first-of-type {
   border-radius: 0;
 }
 
-.dropdown-item:last-of-type {
+.dropdownItem:last-of-type {
   border-radius: 0 0 12px 12px;
 }
 
-.logout-item {
+.logoutItem {
   color: #dc2626;
   font-weight: 500;
 }
 
-.logout-item:hover {
+.logoutItem:hover {
   background: #fef2f2;
 }
 
 /* Responsive */
 @media (max-width: 768px) {
-  .mesero-topbar {
+  .meseroTopbar {
     padding: 0 1rem;
   }
 
-  .topbar-search {
+  .topbarSearch {
     max-width: 200px;
   }
 
-  .user-info {
+  .userInfo {
     display: none;
   }
 
-  .dropdown-icon {
+  .dropdownIcon {
     display: none;
   }
 
-  .topbar-user-button {
+  .topbarUserButton {
     padding: 0.5rem;
   }
 
   /* Mostrar backdrop en móvil */
-  .dropdown-backdrop {
+  .dropdownBackdrop {
     display: block;
   }
 
-  .dropdown-menu {
+  .dropdownMenu {
     position: fixed;
     top: 64px;
     right: 0.5rem;
@@ -271,35 +271,35 @@
     z-index: 1000;
   }
 
-  .user-avatar {
+  .userAvatar {
     width: 36px;
     height: 36px;
   }
 
-  .user-avatar svg {
+  .userAvatar svg {
     width: 18px;
     height: 18px;
   }
 }
 
 @media (max-width: 480px) {
-  .mesero-topbar {
+  .meseroTopbar {
     padding: 0 0.75rem;
   }
 
-  .topbar-search {
+  .topbarSearch {
     display: none;
   }
 
-  .topbar-container {
+  .topbarContainer {
     justify-content: flex-end;
   }
 
-  .topbar-user-button {
+  .topbarUserButton {
     padding: 0.5rem;
   }
 
-  .dropdown-menu {
+  .dropdownMenu {
     position: fixed;
     top: 56px;
     right: 0.5rem;
@@ -309,29 +309,29 @@
     z-index: 1000;
   }
 
-  .dropdown-header {
+  .dropdownHeader {
     padding: 0.875rem;
   }
 
-  .dropdown-avatar {
+  .dropdownAvatar {
     width: 44px;
     height: 44px;
   }
 
-  .dropdown-avatar svg {
+  .dropdownAvatar svg {
     width: 22px;
     height: 22px;
   }
 
-  .dropdown-name {
+  .dropdownName {
     font-size: 0.9rem;
   }
 
-  .dropdown-email {
+  .dropdownEmail {
     font-size: 0.8rem;
   }
 
-  .dropdown-item {
+  .dropdownItem {
     padding: 0.875rem;
   }
 }

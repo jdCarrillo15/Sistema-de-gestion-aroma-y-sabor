@@ -4,7 +4,7 @@ import { Table } from '../../types/mesero';
 import TableCard from '../../components/mesero/TableCard';
 import TableModal from '../../components/mesero/TableModal';
 import { getBillById } from '../../services/mesero/billService';
-import '../../styles/mesero/MesasPage.css';
+import styles from '../../styles/mesero/MesasPage.module.css';
 
 const MesasPage: React.FC = () => {
   const [tables, setTables] = useState<Table[]>(mockTables);
@@ -43,9 +43,9 @@ const MesasPage: React.FC = () => {
 
   if(loading){
     return (
-      <div className="mesas-page">
-        <div className="loading-state">
-          <div className="spinner"></div>
+      <div className={styles.mesasPage}>
+        <div className={styles.loadingState}>
+          <div className={styles.spinner}></div>
           <p>Cargando mesas...</p>
         </div>
       </div>
@@ -77,45 +77,45 @@ const MesasPage: React.FC = () => {
   };
 
   return (
-    <div className="mesas-page">
-      <div className="mesas-header">
-        <h1 className="mesas-title">Gestión de Mesas</h1>
-        <p className="mesas-subtitle">Administra las mesas del restaurante</p>
+    <div className={styles.mesasPage}>
+      <div className={styles.mesasHeader}>
+        <h1 className={styles.mesasTitle}>Gestión de Mesas</h1>
+        <p className={styles.mesasSubtitle}>Administra las mesas del restaurante</p>
       </div>
 
       {/* Tarjetas de estadísticas */}
-      <div className="stats-grid">
-        <div className="stat-card stat-total">
-          <div className="stat-left">
+      <div className={styles.statsGrid}>
+        <div className={`${styles.statCard} ${styles.statTotal}`}>
+          <div className={styles.statLeft}>
             <div>
-              <p className="stat-value">{tables.length}</p>
-              <p className="stat-label">Mesas Totales</p>
+              <p className={styles.statValue}>{tables.length}</p>
+              <p className={styles.statLabel}>Mesas Totales</p>
             </div>
           </div>
         </div>
 
-        <div className="stat-card stat-occupied">
-          <div className="stat-left">
+        <div className={`${styles.statCard} ${styles.statOccupied}`}>
+          <div className={styles.statLeft}>
             <div>
-              <p className="stat-value">{tables.filter(t => t.status === 'occupied').length}</p>
-              <p className="stat-label">Mesas Ocupadas</p>
+              <p className={styles.statValue}>{tables.filter(t => t.status === 'occupied').length}</p>
+              <p className={styles.statLabel}>Mesas Ocupadas</p>
             </div>
           </div>
         </div>
 
-        <div className="stat-card stat-free">
-          <div className="stat-left">
+        <div className={`${styles.statCard} ${styles.statFree}`}>
+          <div className={styles.statLeft}>
             <div>
-              <p className="stat-value">{tables.filter(t => t.status === 'free').length}</p>
-              <p className="stat-label">Mesas Libres</p>
+              <p className={styles.statValue}>{tables.filter(t => t.status === 'free').length}</p>
+              <p className={styles.statLabel}>Mesas Libres</p>
             </div>
           </div>
         </div>
       </div>
 
-      <div className="mesas-section">
-        <h2 className="section-title">Mesas del Restaurante</h2>
-        <div className="mesas-grid">
+      <div className={styles.mesasSection}>
+        <h2 className={styles.sectionTitle}>Mesas del Restaurante</h2>
+        <div className={styles.mesasGrid}>
           {tables.map(table => (
             <TableCard
               key={table.id}

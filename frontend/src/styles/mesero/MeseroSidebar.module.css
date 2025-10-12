@@ -1,4 +1,4 @@
-.mesero-sidebar {
+.meseroSidebar {
   display: flex;
   flex-direction: column;
   background: white;
@@ -11,7 +11,7 @@
   z-index: 900;
 }
 
-.sidebar-header {
+.sidebarHeader {
   display: flex;
   align-items: center;
   gap: 12px;
@@ -19,7 +19,7 @@
   border-bottom: 1px solid #e5e7eb;
 }
 
-.logo-box {
+.logoBox {
   display: flex;
   align-items: center;
   justify-content: center;
@@ -29,18 +29,18 @@
   flex-shrink: 0;
 }
 
-.logo-icon {
+.logoIcon {
   color: white;
   width: 24px;
   height: 24px;
 }
 
-.brand-box {
+.brandBox {
   display: flex;
   flex-direction: column;
 }
 
-.brand-title {
+.brandTitle {
   font-size: 1rem;
   font-weight: 600;
   color: #111827;
@@ -48,25 +48,25 @@
   line-height: 1.2;
 }
 
-.brand-sub {
+.brandSub {
   font-size: 0.8rem;
   color: #6b7280;
   margin: 0;
   line-height: 1.2;
 }
 
-.sidebar-nav {
+.sidebarNav {
   flex: 1;
   list-style: none;
   padding: 1rem 0;
   margin: 0;
 }
 
-.sidebar-nav li {
+.sidebarNav li {
   margin: 0.25rem 0;
 }
 
-.sidebar-link {
+.sidebarLink {
   display: flex;
   align-items: center;
   gap: 12px;
@@ -79,32 +79,25 @@
   transition: all 0.2s ease;
 }
 
-.sidebar-link:hover {
+.sidebarLink:hover {
   background-color: #f9fafb;
   color: #f97316;
 }
 
-.sidebar-link.active {
+.sidebarLink.active {
   background-color: #fff7ed;
   color: #f97316;
   border-left-color: #f97316;
 }
 
-.link-icon {
+.linkIcon {
   width: 20px;
   height: 20px;
 }
 
-/* Responsive - En móvil el sidebar desaparece */
-@media (max-width: 1024px) {
-  .mesero-sidebar {
-    display: none;
-  }
-}
 
-/* En móvil, todo el espacio es para el contenido */
 @media (max-width: 1024px) {
-  .mesero-main {
-    margin-left: 0 !important;
+  .meseroSidebar {
+    display: none;
   }
 }
