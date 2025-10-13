@@ -3,6 +3,8 @@ import { NavLink, useNavigate } from "react-router-dom";
 import Button from "../common/Button.tsx";
 import { logoutUser } from "../../services/login/authService";
 import "../../styles/admin/Sidebar.css";
+import { disconnectSocket } from "../../services/sockets/socket.ts";
+import { useUser } from "../../context/userContext";
 import {
   Coffee,
   Users,
@@ -24,10 +26,21 @@ const menuItems = [
 
 const Sidebar: React.FC = () => {
   const navigate = useNavigate();
+  const { setUser } = useUser();
 
   const handleLogout = () => {
-    logoutUser();
-    navigate("/");
+    (async () => {
+      try {
+        await logoutUser();
+      } finally {
+        try {
+          setUser(null);
+        } catch (err) {
+          disconnectSocket();
+        }
+        navigate("/");
+      }
+    })();
   };
 
   return (
@@ -63,9 +76,9 @@ const Sidebar: React.FC = () => {
       </nav>
 
       <div className="sidebar-footer">
-        <Button 
-          type="button" 
-          variant="primary" 
+        <Button
+          type="button"
+          variant="primary"
           className="logout-btn"
           onClick={handleLogout}
         >

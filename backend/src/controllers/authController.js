@@ -11,56 +11,36 @@ export async function login(req, res) {
 
     try {
         const response = await fetch(
-
             `https://identitytoolkit.googleapis.com/v1/accounts:signInWithPassword?key=${process.env.FIREBASE_API_KEY}`,
             {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({ email, password, returnSecureToken: true })
             }
-
         );
-
         const data = await response.json();
-
         if (data.error) {
-
             return res.status(400).json({ success: false, error: data.error.message });
-
         }
-
 
         const sessionCookie = await admin.auth().createSessionCookie(data.idToken, { expiresIn });
         res.cookie("session", sessionCookie, {
-
             maxAge: expiresIn,
-
             httpOnly: true,
-
             secure: false, // true en producción con HTTPS
-
             sameSite: "lax",
-
-            path:"/"
-
+            path: "/"
         });
 
-
-
         const userDoc = await db.collection("users").doc(data.localId).get();
+        const role = userDoc.exists ? userDoc.data().role : "guest";
+        const name = userDoc.exists ? userDoc.data().user_name : "Usuario";
 
-        const role = userDoc.exists ? userDoc.data().role : "user";
-
-
-
-        res.json({ success: true, uid: data.localId, role });
+        res.json({ success: true, uid: data.localId, role, name });
 
     } catch (err) {
-
         console.error(err);
-
         res.status(500).json({ success: false, error: "Error al iniciar sesión" });
-
     }
 
 };
@@ -68,96 +48,45 @@ export async function login(req, res) {
 
 
 export async function logout(req, res) {
-
     res.clearCookie("session");
-
     res.json({ message: "Sesión cerrada" });
-
 };
 
 
 
 export async function resetPassword(req, res) {
-
     try {
-
         const { email } = req.body;
-
-
-
-
-
         await admin.auth().getUserByEmail(email);
-
-
-
         const url = `https://identitytoolkit.googleapis.com/v1/accounts:sendOobCode?key=${process.env.FIREBASE_API_KEY}`;
-
-
-
         const response = await fetch(url, {
-
             method: "POST",
-
             headers: { "Content-Type": "application/json" },
-
             body: JSON.stringify({
-
                 requestType: "PASSWORD_RESET",
-
                 email: email,
-
             }),
-
         });
-
-
 
         const data = await response.json();
-
-
-
         if (data.error) {
-
-
             return res.json({ success: false, error: data.error.message });
-
         }
-
-
-
         return res.status(200).json({
-
             success: true,
-
             message: "Correo de recuperación enviado correctamente",
-
         });
-
     } catch (err) {
-
         if (err.code === "auth/user-not-found") {
-
-
             return res.json({
-
                 success: false,
-
                 error: "El usuario no está registrado en el sistema",
-
             });
-
         }
-
-
 
         return res.status(500).json({
-
             success: false,
-
             error: "Error interno del servidor",
-
         });
-
     }
 }

@@ -39,7 +39,7 @@ const ProductCatalog: React.FC<ProductCatalogProps> = ({ isOpen, onClose, onSele
   };
 
 
-  const filteredProducts = products.filter(product => 
+  const filteredProducts = products.filter(product =>
     product.name.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
@@ -51,16 +51,16 @@ const ProductCatalog: React.FC<ProductCatalogProps> = ({ isOpen, onClose, onSele
 
   const handleAddToOrder = async () => {
     if (selectedProduct) {
-      setIsAdding(true); 
+      setIsAdding(true);
       try {
         await onSelectProduct(selectedProduct, quantity);
       } catch (error) {
         console.error('Error agregando producto:', error);
       } finally {
-        setIsAdding(false); 
+        setIsAdding(false);
         setSelectedProduct(null);
         setQuantity(1);
-        onClose(); 
+        onClose();
       }
     }
   };
@@ -77,7 +77,7 @@ const ProductCatalog: React.FC<ProductCatalogProps> = ({ isOpen, onClose, onSele
     <div className="catalog-backdrop" onClick={handleBackdropClick}>
       <div className="catalog-container" onClick={(e) => e.stopPropagation()}>
         <div className="catalog-content">
-          
+
           {/* Header */}
           <div className="catalog-header">
             <h2 className="catalog-title">Catálogo de Productos</h2>
@@ -145,16 +145,16 @@ const ProductCatalog: React.FC<ProductCatalogProps> = ({ isOpen, onClose, onSele
               <h4>{selectedProduct.name}</h4>
               <p>${selectedProduct.price.toLocaleString()} c/u</p>
             </div>
-            
+
             <div className="quantity-selector">
-              <button 
+              <button
                 className="qty-btn"
                 onClick={() => setQuantity(Math.max(1, quantity - 1))}
               >
                 -
               </button>
               <span className="qty-value">{quantity}</span>
-              <button 
+              <button
                 className="qty-btn"
                 onClick={() => setQuantity(quantity + 1)}
                 disabled={quantity >= (selectedProduct.stock || 0)}
@@ -167,8 +167,8 @@ const ProductCatalog: React.FC<ProductCatalogProps> = ({ isOpen, onClose, onSele
               <Button variant="secondary" onClick={() => setSelectedProduct(null)}>
                 Cancelar
               </Button>
-              <Button 
-                variant="primary" 
+              <Button
+                variant="primary"
                 onClick={handleAddToOrder}
                 disabled={selectedProduct.stock <= 0 || isAdding}
               >

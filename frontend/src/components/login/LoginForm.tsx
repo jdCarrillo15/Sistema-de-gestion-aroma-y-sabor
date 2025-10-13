@@ -5,6 +5,7 @@ import AlertModal from "../common/AlertModal.tsx";
 import { loginUser } from "../../services/login/authService.ts";
 import logo from "../../assets/logo.png";
 import "../../styles/login/LoginForm.css";
+import { useUser } from "../../context/userContext.tsx";
 
 interface LoginFormProps {
   onSubmit?: (email: string, password: string) => void;
@@ -18,6 +19,8 @@ const LoginForm: React.FC<LoginFormProps> = () => {
   const [rememberMe, setRememberMe] = useState(false);
   const [showForgotModal, setShowForgotModal] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+
+  const { setUser } = useUser();
 
   const [showAlert, setShowAlert] = useState(false);
   const [alertType, setAlertType] = useState<"success" | "error">("error");
@@ -39,6 +42,12 @@ const LoginForm: React.FC<LoginFormProps> = () => {
         );
         setShowAlert(true);
       } else {
+        setUser({
+          uid: data.uid,
+          name: data.name,
+          role: data.role,
+          email: email,
+        });
         setAlertType("success");
         setAlertTitle("¡Bienvenido!");
         setAlertMessage(
@@ -47,14 +56,16 @@ const LoginForm: React.FC<LoginFormProps> = () => {
         setShowAlert(true);
 
         setTimeout(() => {
+          const roleKey = String(data.role).toLowerCase();
           const dashboardRoutes: Record<string, string> = {
             admin: '/admin',
-            waiter: '/mesero',     
-            cocinero: '/cocina',
-            user: '/caja',
+            waiter: '/mesero',
+            kitchen: '/cocina',
+            cash: '/caja',
+
           };
-          
-          const redirectTo = dashboardRoutes[data.role] || '/';
+
+          const redirectTo = dashboardRoutes[roleKey] || '/';
           navigate(redirectTo);
         }, 1500);
       }
@@ -83,7 +94,7 @@ const LoginForm: React.FC<LoginFormProps> = () => {
     setShowForgotModal(false);
   };
 
-  const handleForgotPasswordSubmit = (_forgotEmail: string) => {};
+  const handleForgotPasswordSubmit = (_forgotEmail: string) => { };
 
   const handleAlertClose = () => {
     setShowAlert(false);

@@ -1,16 +1,16 @@
 import React, { useState, useEffect } from 'react';
 import { Table } from '../../types/mesero';
 import { Product } from '../../services/mesero/productService';
-import { 
-  getBillById, 
-  createBill, 
+import {
+  getBillById,
+  createBill,
   addProductToBill,
   removeProductFromBill,
   closeBillIfEmpty,
   deleteBill,
   updateProductsInBill,
   Bill,
-  BillProduct 
+  BillProduct
 } from '../../services/mesero/billService';
 import { getCurrentUser } from '../../services/login/authService';
 import ProductCatalog from './ProductCatalog';
@@ -41,7 +41,7 @@ const TableModal: React.FC<TableModalProps> = ({ isOpen, onClose, table, onUpdat
     title: '',
     message: '',
     type: 'info' as 'success' | 'error' | 'info' | 'warning',
-    onConfirm: () => {}
+    onConfirm: () => { }
   });
 
   // Estado para confirmaciones
@@ -49,7 +49,7 @@ const TableModal: React.FC<TableModalProps> = ({ isOpen, onClose, table, onUpdat
   const [confirmConfig, setConfirmConfig] = useState({
     title: '',
     message: '',
-    onConfirm: () => {}
+    onConfirm: () => { }
   });
 
   useEffect(() => {
@@ -104,7 +104,7 @@ const TableModal: React.FC<TableModalProps> = ({ isOpen, onClose, table, onUpdat
       }
 
       const newBill = await createBill(table.number.toString(), user.uid);
-      
+
       if (newBill) {
         setCurrentBill(newBill);
         onUpdateTable(table.id, {
@@ -132,9 +132,9 @@ const TableModal: React.FC<TableModalProps> = ({ isOpen, onClose, table, onUpdat
     setIsAddingProduct(true);
     try {
       const success = await addProductToBill(
-        currentBill.id, 
+        currentBill.id,
         product.id,
-        product.name, 
+        product.name,
         quantity
       );
 
@@ -165,10 +165,10 @@ const TableModal: React.FC<TableModalProps> = ({ isOpen, onClose, table, onUpdat
         setIsLoading(true);
         try {
           const result = await removeProductFromBill(currentBill.id, productId);
-          
+
           if (result.success) {
             await loadBill();
-            
+
             const updatedBill = await getBillById(currentBill.id);
             if (updatedBill && (!updatedBill.products || updatedBill.products.length === 0)) {
               showConfirmModal(
@@ -210,12 +210,12 @@ const TableModal: React.FC<TableModalProps> = ({ isOpen, onClose, table, onUpdat
 
     try {
       await closeBillIfEmpty(currentBill.id);
-      
+
       onUpdateTable(table.id, {
         status: 'free',
         current_bill_id: null
       });
-      
+
       onClose();
       showAlertModal('Éxito', 'Cuenta cerrada exitosamente', 'success');
     } catch (error) {
@@ -234,12 +234,12 @@ const TableModal: React.FC<TableModalProps> = ({ isOpen, onClose, table, onUpdat
         setIsLoading(true);
         try {
           await deleteBill(currentBill.id);
-          
+
           onUpdateTable(table.id, {
             status: 'free',
             current_bill_id: null
           });
-          
+
           onClose();
           showAlertModal('Éxito', 'Cuenta eliminada exitosamente', 'success');
         } catch (error) {
@@ -289,8 +289,8 @@ const TableModal: React.FC<TableModalProps> = ({ isOpen, onClose, table, onUpdat
               <div className="no-bill-state">
                 <h3>Esta mesa no tiene una cuenta abierta</h3>
                 <p>Crea una cuenta para comenzar a agregar productos</p>
-                <Button 
-                  variant="primary" 
+                <Button
+                  variant="primary"
                   onClick={handleCreateBill}
                   disabled={isCreatingBill}
                 >
@@ -311,8 +311,8 @@ const TableModal: React.FC<TableModalProps> = ({ isOpen, onClose, table, onUpdat
                 <div className="orders-section">
                   <div className="section-header">
                     <h3 className="section-title">Productos</h3>
-                    <Button 
-                      variant="primary" 
+                    <Button
+                      variant="primary"
                       className="add-product-btn"
                       onClick={() => setIsCatalogOpen(true)}
                       disabled={isAddingProduct}
@@ -332,7 +332,7 @@ const TableModal: React.FC<TableModalProps> = ({ isOpen, onClose, table, onUpdat
                   ) : (
                     <div className="orders-list">
                       {orders.map((order, index) => (
-                        <OrderItem 
+                        <OrderItem
                           key={`${order.id}-${index}`}
                           order={order}
                           onRemove={() => handleRemoveOrder(order.id)}
@@ -356,8 +356,8 @@ const TableModal: React.FC<TableModalProps> = ({ isOpen, onClose, table, onUpdat
           {currentBill && (
             <div className="table-modal-footer">
               <div className="footer-left">
-                <Button 
-                  variant="secondary" 
+                <Button
+                  variant="secondary"
                   onClick={handleDeleteBill}
                   disabled={isLoading}
                 >
@@ -369,8 +369,8 @@ const TableModal: React.FC<TableModalProps> = ({ isOpen, onClose, table, onUpdat
                   Cerrar
                 </Button>
                 {orders.length === 0 ? (
-                  <Button 
-                    variant="primary" 
+                  <Button
+                    variant="primary"
                     onClick={handleCloseBill}
                     disabled={isLoading}
                   >

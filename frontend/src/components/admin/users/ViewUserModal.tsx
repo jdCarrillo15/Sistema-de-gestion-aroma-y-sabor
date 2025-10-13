@@ -64,11 +64,9 @@ const ViewUserModal: React.FC<ViewUserModalProps> = ({
     if (!role) return "No especificado";
     const roleMap: { [key: string]: string } = {
       admin: "Administrador",
-      cocinero: "Cocinero",
-      mesero: "Mesero",
+      kitchen: "Cocinero",
       waiter: "Mesero",
-      user: "Caja",
-      cashier: "Caja",
+      cash: "Caja",
     };
     return roleMap[role.toLowerCase()] || role;
   };
@@ -123,7 +121,7 @@ const ViewUserModal: React.FC<ViewUserModalProps> = ({
           <div className="user-details">
             <div className="details-section">
               <h3 className="section-title">Datos de Usuario</h3>
-              
+
               <div className="detail-row">
                 <span className="detail-label">Nombre de usuario:</span>
                 <span className="detail-value">{user.user_name || "No especificado"}</span>
@@ -159,11 +157,11 @@ const ViewUserModal: React.FC<ViewUserModalProps> = ({
             {user.person && (
               <div className="details-section">
                 <h3 className="section-title">Información Personal</h3>
-                
+
                 <div className="detail-row">
                   <span className="detail-label">Nombre completo:</span>
                   <span className="detail-value">
-                    {user.person.first_name && user.person.last_name 
+                    {user.person.first_name && user.person.last_name
                       ? `${user.person.first_name} ${user.person.last_name}`
                       : "No especificado"
                     }
@@ -188,7 +186,7 @@ const ViewUserModal: React.FC<ViewUserModalProps> = ({
                 <div className="detail-row">
                   <span className="detail-label">Fecha de nacimiento:</span>
                   <span className="detail-value">
-                    {user.person.birthdate 
+                    {user.person.birthdate
                       ? new Date(user.person.birthdate).toLocaleDateString("es-ES")
                       : "No especificado"
                     }

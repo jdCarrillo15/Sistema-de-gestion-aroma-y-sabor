@@ -66,7 +66,7 @@ const UsuariosPage: React.FC = () => {
     try {
       const response = await getUsers();
       const usersData = Array.isArray(response) ? response : response?.users || [];
-      
+
       const mappedUsers: User[] = usersData.map((u: any) => ({
         id: u.id,
         user_name: u.user_name,
@@ -76,12 +76,12 @@ const UsuariosPage: React.FC = () => {
         created_at: u.created_at ?? new Date().toISOString(),
         person: u.person
           ? {
-              id: u.person.id,
-              first_name: u.person.first_name,
-              last_name: u.person.last_name,
-              birthdate: u.person.birthdate,
-              document_id: u.person.document_id,
-            }
+            id: u.person.id,
+            first_name: u.person.first_name,
+            last_name: u.person.last_name,
+            birthdate: u.person.birthdate,
+            document_id: u.person.document_id,
+          }
           : undefined,
       }));
 
@@ -249,8 +249,8 @@ const UsuariosPage: React.FC = () => {
           <h1 className="dashboard-title">Gestión de Usuarios</h1>
           <p className="dashboard-sub">Administra los usuarios del sistema</p>
         </div>
-        <Button 
-          className="btn-nuevo" 
+        <Button
+          className="btn-nuevo"
           onClick={() => setIsModalOpen(true)}
           disabled={isLoading}
         >
@@ -323,8 +323,8 @@ const UsuariosPage: React.FC = () => {
             <Users size={48} className="empty-icon" />
             <h3>No hay usuarios</h3>
             <p>Crea tu primer usuario para comenzar</p>
-            <Button 
-              className="btn-nuevo" 
+            <Button
+              className="btn-nuevo"
               onClick={() => setIsModalOpen(true)}
             >
               <Plus className="icono" />

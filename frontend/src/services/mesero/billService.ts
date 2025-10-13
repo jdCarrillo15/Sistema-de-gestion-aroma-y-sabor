@@ -1,4 +1,5 @@
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
+//const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
+const API_BASE_URL = "http://localhost:3000";
 
 export interface Bill {
   id: string;
@@ -6,13 +7,13 @@ export interface Bill {
   user_id: string;
   state: 'open' | 'closed';
   total: number;
-  products: BillProduct[];  
+  products: BillProduct[];
   created_at: any;
   user?: any;
 }
 
 export interface BillProduct {
-  id: string;  
+  id: string;
   name: string;
   units: number;
   process: 'pending' | 'preparing' | 'ready' | 'finished';
@@ -59,6 +60,24 @@ export async function getBillById(id: string): Promise<Bill | null> {
   }
 }
 
+export async function getActiveBills() {
+  try {
+    const response = await fetch(`${API_BASE_URL}/bills/activeBills`, {
+      credentials: "include",
+    });
+
+    if (!response.ok) {
+      throw new Error(`Error HTTP: ${response.status}`);
+    }
+
+    const data = await response.json();
+    return data.bills || [];
+  } catch (error) {
+    console.error("Error obteniendo cuentas activas:", error);
+    throw error;
+  }
+}
+
 export async function createBill(tableNumber: string, userId: string): Promise<Bill | null> {
   try {
     const response = await fetch(`${API_BASE_URL}/bills/createBill`, {
@@ -70,7 +89,7 @@ export async function createBill(tableNumber: string, userId: string): Promise<B
         user_id: userId,
         state: 'open',
         total: 0,
-        products: [] 
+        products: []
       })
     });
 
@@ -82,7 +101,7 @@ export async function createBill(tableNumber: string, userId: string): Promise<B
     const data = await response.json();
     const newBillId = data.id;
     const newBill = await getBillById(newBillId);
-    
+
     return newBill || null;
   } catch (error) {
     console.error("Error en createBill:", error);
@@ -92,9 +111,9 @@ export async function createBill(tableNumber: string, userId: string): Promise<B
 
 
 export async function addProductToBill(
-  billId: string, 
+  billId: string,
   productId: string,
-  productName: string, 
+  productName: string,
   units: number
 ): Promise<boolean> {
   try {
@@ -103,8 +122,8 @@ export async function addProductToBill(
       headers: { "Content-Type": "application/json" },
       credentials: "include",
       body: JSON.stringify({
-        products: [{  
-          id: productId,  
+        products: [{
+          id: productId,
           name: productName,
           units: units,
           process: 'pending'
@@ -126,7 +145,7 @@ export async function addProductToBill(
 }
 
 export async function removeProductFromBill(
-  billId: string, 
+  billId: string,
   productId: string
 ): Promise<{ success: boolean; total: number }> {
   try {

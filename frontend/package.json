@@ -16,7 +16,8 @@
     "lucide-react": "^0.544.0",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
-    "react-router-dom": "^7.9.1"
+    "react-router-dom": "^7.9.1",
+    "socket.io-client": "^4.8.1"
   },
   "devDependencies": {
     "@testing-library/jest-dom": "^6.8.0",

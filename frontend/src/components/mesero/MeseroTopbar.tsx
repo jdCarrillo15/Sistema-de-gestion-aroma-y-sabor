@@ -3,9 +3,11 @@ import { useNavigate } from 'react-router-dom';
 import { Search, User, LogOut, ChevronDown } from 'lucide-react';
 import { getCurrentUser, logoutUser } from '../../services/login/authService';
 import '../../styles/mesero/MeseroTopbar.css';
+import { useUser } from '../../context/userContext';
 
 const MeseroTopbar: React.FC = () => {
   const user = getCurrentUser();
+  const { setUser } = useUser();
   const navigate = useNavigate();
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
@@ -27,7 +29,7 @@ const MeseroTopbar: React.FC = () => {
     };
   }, [isDropdownOpen]);
 
- 
+
   useEffect(() => {
     if (isDropdownOpen) {
       document.body.style.overflow = 'hidden';
@@ -41,8 +43,17 @@ const MeseroTopbar: React.FC = () => {
   }, [isDropdownOpen]);
 
   const handleLogout = () => {
-    logoutUser();
-    navigate('/');
+    (async () => {
+      try {
+        await logoutUser();
+      } finally {
+        try {
+          setUser(null);
+        } catch (err) {
+        }
+        navigate('/');
+      }
+    })();
   };
 
   const toggleDropdown = () => {
@@ -63,7 +74,7 @@ const MeseroTopbar: React.FC = () => {
 
         <div className="topbar-right">
           <div className="topbar-user-dropdown" ref={dropdownRef}>
-            <button 
+            <button
               className="topbar-user-button"
               onClick={toggleDropdown}
               aria-expanded={isDropdownOpen}
@@ -76,9 +87,9 @@ const MeseroTopbar: React.FC = () => {
                 <span className="user-name">{user?.email?.split('@')[0] || 'Mesero'}</span>
                 <span className="user-role">Mesero</span>
               </div>
-              <ChevronDown 
-                className={`dropdown-icon ${isDropdownOpen ? 'open' : ''}`} 
-                size={20} 
+              <ChevronDown
+                className={`dropdown-icon ${isDropdownOpen ? 'open' : ''}`}
+                size={20}
               />
             </button>
 
@@ -86,7 +97,7 @@ const MeseroTopbar: React.FC = () => {
               <>
                 {/* Backdrop para móvil */}
                 <div className="dropdown-backdrop" onClick={() => setIsDropdownOpen(false)}></div>
-                
+
                 <div className="dropdown-menu">
                   <div className="dropdown-header">
                     <div className="dropdown-user-info">
@@ -99,10 +110,10 @@ const MeseroTopbar: React.FC = () => {
                       </div>
                     </div>
                   </div>
-                  
+
                   <div className="dropdown-divider"></div>
-                  
-                  <button 
+
+                  <button
                     className="dropdown-item logout-item"
                     onClick={handleLogout}
                   >
