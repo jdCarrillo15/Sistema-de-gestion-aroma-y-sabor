@@ -32,7 +32,6 @@ const CocinaPage: React.FC = () => {
           const existingOrder = updatedOrders.find((o) => o.id === orderId);
 
           if (existingOrder) {
-            // 🔍 Verificamos si el producto ya está en la orden
             const alreadyExists = existingOrder.items.some((item) => item.id === p.id);
             if (!alreadyExists) {
               existingOrder.items.push({
@@ -43,7 +42,6 @@ const CocinaPage: React.FC = () => {
               });
             }
           } else {
-            // Si no existe, creamos una nueva orden
             updatedOrders.unshift({
               id: orderId,
               table_name: p.table,
