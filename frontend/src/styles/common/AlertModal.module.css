@@ -1,4 +1,4 @@
-.alert-modal-backdrop {
+.backdrop {
   position: fixed;
   top: 0;
   left: 0;
@@ -9,7 +9,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  z-index: 1001;
+  z-index: 10001;
   animation: alertFadeIn 0.3s ease-out;
   padding: 20px;
 }
@@ -25,7 +25,7 @@
   }
 }
 
-.alert-modal-container {
+.container {
   position: relative;
   max-width: 400px;
   width: 100%;
@@ -43,7 +43,7 @@
   }
 }
 
-.alert-modal-content {
+.content {
   background: white;
   border-radius: 20px;
   box-shadow: 
@@ -56,7 +56,7 @@
   text-align: center;
 }
 
-.alert-modal-content::before {
+.content::before {
   position: absolute;
   top: 0;
   left: 0;
@@ -71,32 +71,32 @@
   50% { background-position: 100% 50%; }
 }
 
-.alert-modal-content::before {
+.content::before {
   background: linear-gradient(90deg, #8B4513, #D2691E, #FF8C00);
 }
 
-.success-icon ~ .alert-modal-content::before,
-.alert-modal-content:has(.success-icon)::before {
+.success svg::before,
+.content:has(.success) > ::before {
   background: linear-gradient(90deg, #4CAF50, #8BC34A, #CDDC39);
 }
 
-.error-icon ~ .alert-modal-content::before,
-.alert-modal-content:has(.error-icon)::before {
+.error svg::before,
+.content:has(.error) > ::before {
   background: linear-gradient(90deg, #F44336, #E91E63, #FF5722);
 }
 
-.warning-icon ~ .alert-modal-content::before,
-.alert-modal-content:has(.warning-icon)::before {
+.warning svg::before,
+.content:has(.warning) > ::before {
   background: linear-gradient(90deg, #FF9800, #FFC107, #FFEB3B);
 }
 
-.alert-modal-header {
+.header {
   display: flex;
   justify-content: flex-end;
   margin-bottom: 16px;
 }
 
-.alert-close-button {
+.closeButton {
   background: none;
   border: none;
   color: #A0A0A0;
@@ -109,13 +109,13 @@
   justify-content: center;
 }
 
-.alert-close-button:hover {
+.closeButton:hover {
   background: #F5F5F5;
   color: #8B4513;
   transform: rotate(90deg);
 }
 
-.alert-modal-icon {
+.icon {
   display: flex;
   justify-content: center;
   margin-bottom: 24px;
@@ -127,38 +127,37 @@
   50% { transform: scale(1.05); }
 }
 
-.alert-modal-icon svg {
+.icon svg {
   padding: 16px;
   border-radius: 20px;
   box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
 }
 
-/* Estilos específicos por tipo de alerta */
-.success-icon svg {
+.success svg {
   color: #4CAF50;
   background: linear-gradient(135deg, #E8F5E8, #F0FFF0);
   box-shadow: 0 8px 20px rgba(76, 175, 80, 0.2);
 }
 
-.error-icon svg {
+.error svg {
   color: #F44336;
   background: linear-gradient(135deg, #FFEBEE, #FFCDD2);
   box-shadow: 0 8px 20px rgba(244, 67, 54, 0.2);
 }
 
-.warning-icon svg {
+.warning svg {
   color: #FF9800;
   background: linear-gradient(135deg, #FFF3E0, #FFE0B2);
   box-shadow: 0 8px 20px rgba(255, 152, 0, 0.2);
 }
 
-.info-icon svg {
+.info svg {
   color: #2196F3;
   background: linear-gradient(135deg, #E3F2FD, #BBDEFB);
   box-shadow: 0 8px 20px rgba(33, 150, 243, 0.2);
 }
 
-.alert-modal-title {
+.title {
   color: #2C2C2C;
   font-size: 24px;
   font-weight: 700;
@@ -166,42 +165,42 @@
   letter-spacing: -0.025em;
 }
 
-.alert-modal-message {
+.message {
   color: #666;
   font-size: 16px;
   line-height: 1.6;
   margin: 0 0 32px 0;
 }
 
-.alert-modal-buttons {
+.buttons {
   display: flex;
   gap: 12px;
   justify-content: center;
 }
 
-.alert-modal-buttons .custom-button {
+.buttons button{
   min-width: 120px;
   flex: none;
 }
 
 @media (max-width: 480px) {
-  .alert-modal-backdrop {
+  .backdrop {
     padding: 16px;
   }
   
-  .alert-modal-content {
+  .content {
     padding: 24px;
   }
   
-  .alert-modal-title {
+  .title {
     font-size: 20px;
   }
   
-  .alert-modal-buttons {
+  .buttons {
     flex-direction: column;
   }
   
-  .alert-modal-buttons .custom-button {
+  .buttons .customButton {
     width: 100%;
     min-width: unset;
   }
