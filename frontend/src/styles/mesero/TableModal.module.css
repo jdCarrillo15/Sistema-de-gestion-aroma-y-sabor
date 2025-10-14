@@ -1,0 +1,489 @@
+/* TableModal.module.css */
+
+.tableModalBackdrop {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  backdrop-filter: blur(4px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  padding: 1rem;
+  animation: fadeIn 0.2s ease-out;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.tableModalContainer {
+  background: #ffffff;
+  width: 550px;
+  max-height: 90vh;
+  border-radius: 20px;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+  animation: slideUp 0.25s ease-in-out;
+  position: relative;
+}
+
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Header */
+.tableModalHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: #f8fafc;
+  border-bottom: 1px solid #e2e8f0;
+  padding: 16px 24px;
+}
+
+.headerInfo {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.modalTitle {
+  font-size: 1.3rem;
+  font-weight: 700;
+  color: #111827;
+  margin: 0;
+}
+
+.statusBadge {
+  padding: 4px 10px;
+  border-radius: 8px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  width: fit-content;
+}
+
+.statusBadge.free {
+  background: #dcfce7;
+  color: #166534;
+}
+
+.statusBadge.occupied {
+  background: #fee2e2;
+  color: #991b1b;
+}
+
+.closeBtn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: #6b7280;
+  transition: color 0.2s;
+  padding: 0.5rem;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.closeBtn:hover {
+  color: #111827;
+  background: rgba(0, 0, 0, 0.05);
+}
+
+/* Content */
+.tableModalContent {
+  flex: 1;
+  padding: 24px;
+  overflow-y: auto;
+}
+
+/* No Bill State */
+.noBillState {
+  text-align: center;
+  color: #374151;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: auto;
+  padding: 2rem 1rem;
+}
+
+.noBillState h3 {
+  font-size: 1.2rem;
+  font-weight: 700;
+  color: #111827;
+  margin-bottom: 8px;
+}
+
+.noBillState p {
+  color: #6b7280;
+  margin-bottom: 20px;
+  font-size: 0.95rem;
+}
+
+.noBillState button {
+  background: linear-gradient(90deg, #ea580c, #c2410c);
+  color: white;
+  font-weight: 600;
+  padding: 10px 20px;
+  border-radius: 10px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+  transition: all 0.2s;
+}
+
+.noBillState button:hover {
+  background: linear-gradient(90deg, #c2410c, #9a3412);
+}
+
+/* Loading State */
+.loadingState {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 3rem 1rem;
+  color: #6b7280;
+  min-height: 200px;
+}
+
+.loadingState p {
+  margin-top: 1rem;
+  font-size: 0.95rem;
+  font-weight: 500;
+}
+
+.spinner {
+  width: 40px;
+  height: 40px;
+  border: 4px solid #e5e7eb;
+  border-top-color: #f97316;
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* Orders Section */
+.ordersSection {
+  margin-top: 10px;
+}
+
+.sectionHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1rem;
+  gap: 1rem;
+}
+
+.sectionTitle {
+  font-size: 1.1rem;
+  font-weight: 700;
+  margin: 0;
+  color: #111827;
+}
+
+.addProductBtn {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  white-space: nowrap;
+}
+
+/* Empty Orders */
+.emptyOrders {
+  text-align: center;
+  padding: 3rem 1rem;
+  color: #6b7280;
+}
+
+.emptyOrders p {
+  margin: 0.5rem 0;
+  font-size: 1rem;
+  font-weight: 500;
+  color: #374151;
+}
+
+.emptyOrdersSubtitle {
+  font-size: 0.875rem !important;
+  color: #9ca3af !important;
+  font-weight: 400 !important;
+}
+
+/* Orders List */
+.ordersList {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+/* Total Section */
+.totalSection {
+  margin-top: 1.5rem;
+  padding-top: 1rem;
+  border-top: 2px solid #e5e7eb;
+  position: sticky;
+  bottom: 0;
+  background: #fff;
+  z-index: 5;
+  box-shadow: 0 -4px 10px rgba(0, 0, 0, 0.06);
+}
+
+.totalRow {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-weight: 600;
+  font-size: 1.15rem;
+}
+
+.totalLabel {
+  color: #374151;
+  font-size: 1.05rem;
+  font-weight: 500;
+}
+
+.totalAmount {
+  color: #f97316;
+  font-size: 1.35rem;
+  font-weight: 700;
+}
+
+/* Footer */
+.tableModalFooter {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 1rem;
+  padding: 1.5rem;
+  border-top: 2px solid #e5e7eb;
+  background: #fafafa;
+}
+
+.footerLeft {
+  display: flex;
+  gap: 0.75rem;
+}
+
+.footerRight {
+  display: flex;
+  gap: 0.75rem;
+}
+
+/* Botón de eliminar cuenta - rojo */
+.footerLeft button {
+  background: #fee2e2;
+  color: #dc2626;
+  border: 1px solid #fecaca;
+}
+
+.footerLeft button:hover:not(:disabled) {
+  background: #fecaca;
+  border-color: #dc2626;
+}
+
+/* Loading Overlay */
+.loadingOverlay {
+  position: absolute;
+  inset: 0;
+  background: rgba(255, 255, 255, 0.85);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  border-radius: 20px;
+  z-index: 10;
+}
+
+.loadingOverlay p {
+  margin-top: 1rem;
+  font-size: 0.95rem;
+  font-weight: 500;
+  color: #374151;
+}
+
+.loadingOverlay .spinner {
+  width: 40px;
+  height: 40px;
+  border: 4px solid #e5e7eb;
+  border-top-color: #ea580c;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .tableModalBackdrop {
+    padding: 0;
+    align-items: flex-end;
+  }
+
+  .tableModalContainer {
+    max-width: 100%;
+    width: 100%;
+    max-height: 95vh;
+    border-radius: 20px 20px 0 0;
+    margin-top: auto;
+  }
+
+  .tableModalHeader {
+    padding: 14px 20px;
+  }
+
+  .modalTitle {
+    font-size: 1.2rem;
+  }
+
+  .tableModalContent {
+    padding: 20px;
+  }
+
+  .sectionHeader {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .addProductBtn {
+    width: 100%;
+    justify-content: center;
+  }
+
+  .totalAmount {
+    font-size: 1.25rem;
+  }
+
+  .tableModalFooter {
+    flex-direction: column;
+    gap: 0.75rem;
+    padding: 1.25rem;
+  }
+
+  .footerLeft,
+  .footerRight {
+    width: 100%;
+    flex-direction: column;
+  }
+
+  .footerLeft button,
+  .footerRight button {
+    width: 100%;
+  }
+}
+
+@media (max-width: 640px) {
+  .tableModalHeader {
+    padding: 12px 16px;
+  }
+
+  .modalTitle {
+    font-size: 1.1rem;
+  }
+
+  .statusBadge {
+    font-size: 0.7rem;
+    padding: 3px 8px;
+  }
+
+  .tableModalContent {
+    padding: 16px;
+  }
+
+  .sectionTitle {
+    font-size: 1rem;
+  }
+
+  .emptyOrders {
+    padding: 2rem 1rem;
+  }
+
+  .totalSection {
+    margin-top: 1rem;
+    padding-top: 0.75rem;
+  }
+
+  .totalRow {
+    font-size: 1rem;
+  }
+
+  .totalLabel {
+    font-size: 0.95rem;
+  }
+
+  .totalAmount {
+    font-size: 1.15rem;
+  }
+
+  .tableModalFooter {
+    padding: 1rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .tableModalContainer {
+    border-radius: 16px 16px 0 0;
+  }
+
+  .tableModalHeader {
+    padding: 10px 14px;
+  }
+
+  .modalTitle {
+    font-size: 1rem;
+  }
+
+  .closeBtn {
+    padding: 0.375rem;
+  }
+
+  .tableModalContent {
+    padding: 14px;
+  }
+
+  .noBillState h3 {
+    font-size: 1.1rem;
+  }
+
+  .noBillState p {
+    font-size: 0.9rem;
+  }
+
+  .sectionTitle {
+    font-size: 0.95rem;
+  }
+
+  .addProductBtn {
+    font-size: 0.9rem;
+    padding: 0.6rem 1rem;
+  }
+
+  .emptyOrders p {
+    font-size: 0.9rem;
+  }
+
+  .emptyOrdersSubtitle {
+    font-size: 0.8rem !important;
+  }
+}

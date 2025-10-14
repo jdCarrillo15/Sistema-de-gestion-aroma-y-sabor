@@ -1,4 +1,5 @@
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
+const API_BASE_URL = "http://localhost:3000";
+//const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
 export async function loginUser(email: string, password: string) {
   try {
@@ -18,7 +19,8 @@ export async function loginUser(email: string, password: string) {
       localStorage.setItem("user", JSON.stringify({
         uid: data.uid,
         role: data.role,
-        email: email
+        name: data.name,
+        email: email,
       }));
     }
 
@@ -80,13 +82,23 @@ export function isCocina(): boolean {
 
 export function isCaja(): boolean {
   const user = getCurrentUser();
-  return user?.role === "caja"; 
+  return user?.role === "cash";
 }
 
 export function isAuthenticated(): boolean {
   return getCurrentUser() !== null;
 }
 
-export function logoutUser() {
+export async function logoutUser() {
   localStorage.removeItem("user");
+  try {
+    const response = await fetch(`${API_BASE_URL}/auth/logout`, {
+      method: 'POST',
+      credentials: 'include',
+    });
+
+    await response.json();
+  } catch (error) {
+    console.error("Error al cerrar sesión:", error);
+  }
 }

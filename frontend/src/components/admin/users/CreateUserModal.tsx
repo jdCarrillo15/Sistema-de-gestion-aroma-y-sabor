@@ -435,9 +435,9 @@ const CreateUserModal: React.FC<CreateUserModalProps> = ({
                 className="form-input"
                 disabled={isSubmitting}
               >
-                <option value="cocinero">Cocinero</option>
+                <option value="kitchen">Cocinero</option>
                 <option value="waiter">Mesero</option>
-                <option value="caja">Caja</option>
+                <option value="cash">Caja</option>
                 <option value="admin">Administrador</option>
               </select>
             </div>
@@ -457,16 +457,16 @@ const CreateUserModal: React.FC<CreateUserModalProps> = ({
             </div>
 
             <div className="modal-buttons">
-              <Button 
-                type="button" 
-                variant="secondary" 
+              <Button
+                type="button"
+                variant="secondary"
                 onClick={onClose}
                 disabled={isSubmitting}
               >
                 Cancelar
               </Button>
-              <Button 
-                type="submit" 
+              <Button
+                type="submit"
                 variant="primary"
                 disabled={isSubmitting}
               >

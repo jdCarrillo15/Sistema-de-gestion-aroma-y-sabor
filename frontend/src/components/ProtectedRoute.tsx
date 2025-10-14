@@ -7,27 +7,27 @@ interface ProtectedRouteProps {
   allowedRoles?: string[];
 }
 
-const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ 
-  children, 
-  allowedRoles 
+const ProtectedRoute: React.FC<ProtectedRouteProps> = ({
+  children,
+  allowedRoles
 }) => {
   const user = getCurrentUser();
 
-  
+
   if (!user) {
     return <Navigate to="/" replace />;
   }
 
-  
+
   if (allowedRoles && !allowedRoles.includes(user.role)) {
-    
+
     const dashboardRoutes: Record<string, string> = {
       admin: '/admin',
-      waiter: '/mesero',     
+      waiter: '/mesero',
       kitchen: '/cocina',
-      caja: '/caja',
+      cash: '/caja',
     };
-    
+
     const redirectTo = dashboardRoutes[user.role] || '/';
     return <Navigate to={redirectTo} replace />;
   }

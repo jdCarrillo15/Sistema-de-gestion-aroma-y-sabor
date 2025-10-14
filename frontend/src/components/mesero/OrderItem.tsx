@@ -1,8 +1,9 @@
+// OrderItem.tsx
 import React, { useState } from 'react';
 import { Trash2, Loader, Edit2, Check, X } from 'lucide-react';
 import { BillProduct } from '../../services/mesero/billService';
 import AlertModal from '../common/AlertModal';
-import '../../styles/mesero/OrderItem.css';
+import styles from '../../styles/mesero/OrderItem.module.css';
 
 interface OrderItemProps {
   order: BillProduct;
@@ -20,21 +21,20 @@ const OrderItem: React.FC<OrderItemProps> = ({
   const [editQuantity, setEditQuantity] = useState(order.units);
   const [isUpdating, setIsUpdating] = useState(false);
   
-  // Estados para el modal de confirmación
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const [showErrorAlert, setShowErrorAlert] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
 
   const getStatusBadge = (status: string) => {
     const statusConfig = {
-      pending: { label: 'Pendiente', className: 'pending' },
-      preparing: { label: 'Preparando', className: 'preparing' },
-      ready: { label: 'Listo', className: 'ready' },
-      finished: { label: 'Entregado', className: 'finished' }
+      pending: { label: 'Pendiente', className: styles.pending },
+      preparing: { label: 'Preparando', className: styles.preparing },
+      ready: { label: 'Listo', className: styles.ready },
+      finished: { label: 'Entregado', className: styles.finished }
     };
 
     const config = statusConfig[status as keyof typeof statusConfig] || statusConfig.pending;
-    return <span className={`order-status ${config.className}`}>{config.label}</span>;
+    return <span className={`${styles.orderStatus} ${config.className}`}>{config.label}</span>;
   };
 
   const handleDeleteClick = () => {
@@ -103,21 +103,21 @@ const OrderItem: React.FC<OrderItemProps> = ({
 
   return (
     <>
-      <div className={`order-item ${isDeleting ? 'deleting' : ''} ${isUpdating ? 'updating' : ''}`}>
-        <div className="order-info">
-          <div className="order-header">
-            <h4 className="order-name">{order.name}</h4>
+      <div className={`${styles.orderItem} ${isDeleting ? styles.deleting : ''} ${isUpdating ? styles.updating : ''}`}>
+        <div className={styles.orderInfo}>
+          <div className={styles.orderHeader}>
+            <h4 className={styles.orderName}>{order.name}</h4>
             {getStatusBadge(order.process)}
           </div>
           
-          {/* Cantidad editable */}
-          <div className="order-details">
+          <div className={styles.orderDetails}>
             {isEditing ? (
-              <div className="quantity-editor">
+              <div className={styles.quantityEditor}>
                 <button 
-                  className="qty-btn-small"
+                  className={styles.qtyBtnSmall}
                   onClick={() => setEditQuantity(Math.max(1, editQuantity - 1))}
                   disabled={isUpdating}
+                  type="button"
                 >
                   −
                 </button>
@@ -125,42 +125,47 @@ const OrderItem: React.FC<OrderItemProps> = ({
                   type="number"
                   value={editQuantity}
                   onChange={(e) => setEditQuantity(Math.max(1, parseInt(e.target.value) || 1))}
-                  className="qty-input"
+                  className={styles.qtyInput}
                   min="1"
                   disabled={isUpdating}
                 />
                 <button 
-                  className="qty-btn-small"
+                  className={styles.qtyBtnSmall}
                   onClick={() => setEditQuantity(editQuantity + 1)}
                   disabled={isUpdating}
+                  type="button"
                 >
                   +
                 </button>
-                <span className="qty-label">unidades</span>
+                <span className={styles.qtyLabel}>unidades</span>
               </div>
             ) : (
-              <span className="order-quantity">{order.units}x unidades</span>
+              <span className={styles.orderQuantity}>{order.units}x unidades</span>
             )}
           </div>
         </div>
-        
-        {/* Botones de acción */}
-        <div className="order-actions">
+        <div className={styles.orderActions}>
           {isEditing ? (
             <>
               <button 
-                className="action-btn save-btn" 
+                className={`${styles.actionBtn} ${styles.saveBtn}`}
                 onClick={handleSaveEdit}
                 title="Guardar cambios"
                 disabled={isUpdating}
+                type="button"
               >
-                {isUpdating ? <Loader size={18} className="spin" /> : <Check size={18} />}
+                {isUpdating ? (
+                  <Loader size={18} className={styles.spin} />
+                ) : (
+                  <Check size={18} />
+                )}
               </button>
               <button 
-                className="action-btn cancel-btn" 
+                className={`${styles.actionBtn} ${styles.cancelBtn}`}
                 onClick={handleCancelEdit}
                 title="Cancelar"
                 disabled={isUpdating}
+                type="button"
               >
                 <X size={18} />
               </button>
@@ -169,28 +174,33 @@ const OrderItem: React.FC<OrderItemProps> = ({
             <>
               {onUpdateQuantity && (
                 <button 
-                  className="action-btn edit-btn" 
+                  className={`${styles.actionBtn} ${styles.editBtn}`}
                   onClick={handleEditClick}
                   title="Editar cantidad"
                   disabled={isDeleting || isUpdating}
+                  type="button"
                 >
                   <Edit2 size={18} />
                 </button>
               )}
               <button 
-                className="action-btn remove-btn" 
+                className={`${styles.actionBtn} ${styles.removeBtn}`}
                 onClick={handleDeleteClick}
                 title="Eliminar producto"
                 disabled={isDeleting || isUpdating || !order.id}
+                type="button"
               >
-                {isDeleting ? <Loader size={18} className="spin" /> : <Trash2 size={18} />}
+                {isDeleting ? (
+                  <Loader size={18} className={styles.spin} />
+                ) : (
+                  <Trash2 size={18} />
+                )}
               </button>
             </>
           )}
         </div>
       </div>
 
-      {/* Modal de confirmación para eliminar */}
       {showDeleteConfirm && (
         <AlertModal
           isOpen={showDeleteConfirm}
@@ -205,7 +215,6 @@ const OrderItem: React.FC<OrderItemProps> = ({
         />
       )}
 
-      {/* Modal de error */}
       <AlertModal
         isOpen={showErrorAlert}
         onClose={() => setShowErrorAlert(false)}

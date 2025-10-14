@@ -1,0 +1,189 @@
+.mesasPage {
+  padding: 2rem;
+  background: #fafafa;
+  min-height: 100vh;
+}
+
+/* Header */
+.mesasHeader {
+  margin-bottom: 2rem;
+}
+
+.mesasTitle {
+  font-size: 2rem;
+  font-weight: 700;
+  color: #111827;
+  margin: 0 0 0.5rem 0;
+}
+
+.mesasSubtitle {
+  font-size: 1rem;
+  color: #6b7280;
+  margin: 0;
+}
+
+/* Stats Grid */
+.statsGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 1.5rem;
+  margin-bottom: 2.5rem;
+}
+
+.statCard {
+  border-radius: 12px;
+  padding: 1.5rem;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+}
+
+.statCard:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.12);
+}
+
+.statTotal {
+  background-color: #dbeafe;
+  border: 1px solid #60a5fa;
+  color: #1e3a8a;
+}
+
+.statOccupied {
+  background-color: #ffedd5;
+  border: 1px solid #fdba74;
+  color: #9a3412;
+}
+
+.statFree {
+  background-color: #dcfce7;
+  border: 1px solid #86efac;
+  color: #166534;
+}
+
+.statLeft {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.statValue {
+  font-size: 1.8rem;
+  font-weight: 700;
+  margin: 0;
+}
+
+.statLabel {
+  font-size: 0.9rem;
+  opacity: 0.9;
+  margin: 0;
+}
+
+/* Mesas Section */
+.mesasSection {
+  background: white;
+  border-radius: 16px;
+  padding: 2rem;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+}
+
+.sectionTitle {
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: #111827;
+  margin: 0 0 1.5rem 0;
+}
+
+/* Mesas Grid */
+.mesasGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 1.5rem;
+}
+
+/* Loading State */
+.loadingState {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 4rem 2rem;
+  color: #6b7280;
+  min-height: 400px;
+}
+
+.loadingState p {
+  margin-top: 1rem;
+  font-size: 1rem;
+  font-weight: 500;
+}
+
+.spinner {
+  width: 60px;
+  height: 60px;
+  border: 5px solid #fcd9b6;
+  border-top-color: #f97316;
+  border-radius: 50%;
+  animation: spin 0.9s linear infinite;
+  margin-bottom: 1rem;
+  box-shadow: 0 0 8px rgba(249, 115, 22, 0.4);
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .mesasPage {
+    padding: 1rem;
+  }
+
+  .statsGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .mesasGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .mesasTitle {
+    font-size: 1.5rem;
+  }
+
+  .mesasSection {
+    padding: 1.5rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .mesasPage {
+    padding: 0.75rem;
+  }
+
+  .mesasHeader {
+    margin-bottom: 1.5rem;
+  }
+
+  .statsGrid {
+    gap: 1rem;
+    margin-bottom: 2rem;
+  }
+
+  .statCard {
+    padding: 1.25rem;
+  }
+
+  .mesasSection {
+    padding: 1.25rem;
+  }
+
+  .mesasGrid {
+    gap: 1rem;
+  }
+}

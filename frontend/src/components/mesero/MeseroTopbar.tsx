@@ -2,10 +2,12 @@ import React, { useState, useRef, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Search, User, LogOut, ChevronDown } from 'lucide-react';
 import { getCurrentUser, logoutUser } from '../../services/login/authService';
-import '../../styles/mesero/MeseroTopbar.css';
+import styles from '../../styles/mesero/MeseroTopbar.module.css';
+import { useUser } from '../../context/userContext';
 
 const MeseroTopbar: React.FC = () => {
   const user = getCurrentUser();
+  const { setUser } = useUser();
   const navigate = useNavigate();
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
@@ -27,7 +29,6 @@ const MeseroTopbar: React.FC = () => {
     };
   }, [isDropdownOpen]);
 
- 
   useEffect(() => {
     if (isDropdownOpen) {
       document.body.style.overflow = 'hidden';
@@ -41,8 +42,17 @@ const MeseroTopbar: React.FC = () => {
   }, [isDropdownOpen]);
 
   const handleLogout = () => {
-    logoutUser();
-    navigate('/');
+    (async () => {
+      try {
+        await logoutUser();
+      } finally {
+        try {
+          setUser(null);
+        } catch (err) {
+        }
+        navigate('/');
+      }
+    })();
   };
 
   const toggleDropdown = () => {
@@ -50,60 +60,60 @@ const MeseroTopbar: React.FC = () => {
   };
 
   return (
-    <header className="mesero-topbar">
-      <div className="topbar-container">
-        <div className="topbar-search">
-          <Search className="search-icon" size={20} />
+    <header className={styles.meseroTopbar}>
+      <div className={styles.topbarContainer}>
+        <div className={styles.topbarSearch}>
+          <Search className={styles.searchIcon} size={20} />
           <input
             type="text"
             placeholder="Buscar mesa..."
-            className="search-input"
+            className={styles.searchInput}
           />
         </div>
 
-        <div className="topbar-right">
-          <div className="topbar-user-dropdown" ref={dropdownRef}>
-            <button 
-              className="topbar-user-button"
+        <div className={styles.topbarRight}>
+          <div className={styles.topbarUserDropdown} ref={dropdownRef}>
+            <button
+              className={styles.topbarUserButton}
               onClick={toggleDropdown}
               aria-expanded={isDropdownOpen}
               aria-haspopup="true"
             >
-              <div className="user-avatar">
+              <div className={styles.userAvatar}>
                 <User size={20} />
               </div>
-              <div className="user-info">
-                <span className="user-name">{user?.email?.split('@')[0] || 'Mesero'}</span>
-                <span className="user-role">Mesero</span>
+              <div className={styles.userInfo}>
+                <span className={styles.userName}>{user?.email?.split('@')[0] || 'Mesero'}</span>
+                <span className={styles.userRole}>Mesero</span>
               </div>
-              <ChevronDown 
-                className={`dropdown-icon ${isDropdownOpen ? 'open' : ''}`} 
-                size={20} 
+              <ChevronDown
+                className={`${styles.dropdownIcon} ${isDropdownOpen ? styles.open : ''}`}
+                size={20}
               />
             </button>
 
             {isDropdownOpen && (
               <>
                 {/* Backdrop para móvil */}
-                <div className="dropdown-backdrop" onClick={() => setIsDropdownOpen(false)}></div>
-                
-                <div className="dropdown-menu">
-                  <div className="dropdown-header">
-                    <div className="dropdown-user-info">
-                      <div className="dropdown-avatar">
+                <div className={styles.dropdownBackdrop} onClick={() => setIsDropdownOpen(false)}></div>
+
+                <div className={styles.dropdownMenu}>
+                  <div className={styles.dropdownHeader}>
+                    <div className={styles.dropdownUserInfo}>
+                      <div className={styles.dropdownAvatar}>
                         <User size={24} />
                       </div>
                       <div>
-                        <p className="dropdown-name">{user?.email?.split('@')[0] || 'Mesero'}</p>
-                        <p className="dropdown-email">{user?.email || ''}</p>
+                        <p className={styles.dropdownName}>{user?.email?.split('@')[0] || 'Mesero'}</p>
+                        <p className={styles.dropdownEmail}>{user?.email || ''}</p>
                       </div>
                     </div>
                   </div>
-                  
-                  <div className="dropdown-divider"></div>
-                  
-                  <button 
-                    className="dropdown-item logout-item"
+
+                  <div className={styles.dropdownDivider}></div>
+
+                  <button
+                    className={`${styles.dropdownItem} ${styles.logoutItem}`}
                     onClick={handleLogout}
                   >
                     <LogOut size={18} />

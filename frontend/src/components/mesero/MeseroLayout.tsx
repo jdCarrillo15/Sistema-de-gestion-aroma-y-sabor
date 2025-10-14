@@ -2,16 +2,15 @@ import React from 'react';
 import { Outlet } from 'react-router-dom';
 import MeseroSidebar from './MeseroSidebar';
 import MeseroTopbar from './MeseroTopbar';
-import '../../styles/mesero/MeseroLayout.css';
+import styles from '../../styles/mesero/MeseroLayout.module.css';
 
 const MeseroLayout: React.FC = () => {
   return (
-    <div className="mesero-layout">
+    <div className={styles.meseroLayout}>
       <MeseroSidebar />
-      
-      <div className="mesero-main">
+      <div className={styles.meseroMain}>
         <MeseroTopbar />
-        <main className="mesero-content">
+        <main className={styles.meseroContent}>
           <Outlet />
         </main>
       </div>

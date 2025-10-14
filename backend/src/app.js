@@ -1,18 +1,33 @@
-import express from "express";
+import { metricsMiddleware } from "./middleware/metrics.js";
+import productsRoutes from "./routes/productsRoutes.js";
+import metricsRoutes from "./routes/metricsRoutes.js"
+import usersRoutes from "./routes/usersRoutes.js";
+import billsRoutes from "./routes/billsRoutes.js";
 import rolesRoutes from "./routes/roleRoutes.js";
 import authRoutes from "./routes/authRoutes.js";
-import usersRoutes from "./routes/usersRoutes.js";
-import productsRoutes from "./routes/productsRoutes.js";
-import billsRoutes from "./routes/billsRoutes.js";
-import { metricsMiddleware } from "./middleware/metrics.js";
-import metricsRoutes from "./routes/metricsRoutes.js"
+import socketHandler from "./sockets/socket.js";
 import cookieParser from "cookie-parser";
+import { Server } from "socket.io";
+import express from "express";
 import dotenv from "dotenv";
+import http from "http";
 import cors from "cors";
 
 dotenv.config();
 
 const app = express();
+
+const server = http.createServer(app);
+
+const io = new Server(server, {
+  cors: {
+    origin: ["http://localhost:5173", "http://185.144.159.8:80"],
+    credentials: true,
+  },
+});
+
+socketHandler(io);
+
 
 app.use(express.json());
 app.use(cookieParser());
@@ -32,8 +47,8 @@ app.use(metricsRoutes);
 
 const PORT = process.env.PORT || 3000;
 
-app.listen(PORT, () => {
-    console.log(`Servidor corriendo en http://148.230.93.151:${PORT}`);
+server.listen(PORT, () => {
+  console.log(`Servidor corriendo en http://148.230.93.151:${PORT}`);
 });
 
 export default app;

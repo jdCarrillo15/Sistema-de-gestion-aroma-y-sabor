@@ -12,7 +12,7 @@ export const mockTables: Table[] = [
     id: '2',
     number: 2,
     capacity: 2,
-    current_bill_id: '051CanEqk2VVo6jBOrFW',
+    current_bill_id: '8s0xX7VNPstq9uE1IEFt',
   },
   {
     id: '3',
@@ -30,7 +30,7 @@ export const mockTables: Table[] = [
     id: '5',
     number: 5,
     capacity: 8,
-    current_bill_id: '2h5L8OVJPUVs4xfwaQOe',
+    current_bill_id: 'gDZWEdFTlohWLOWSeNBd',
   },
   {
     id: '6',

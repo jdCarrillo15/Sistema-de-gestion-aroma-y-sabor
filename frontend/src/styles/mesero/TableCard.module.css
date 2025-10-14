@@ -1,0 +1,227 @@
+.tableCard {
+  background: white;
+  border-radius: 12px;
+  padding: 1.25rem;
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  border: 2px solid transparent;
+  min-height: 180px;
+  display: flex;
+  flex-direction: column;
+}
+
+.tableCard:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 12px 24px rgba(0, 0, 0, 0.15);
+}
+
+/* Mesa Libre */
+.tableCard.free {
+  background: linear-gradient(135deg, #f9fafb 0%, #ffffff 100%);
+  border-color: #849ef7;
+}
+
+.tableCard.free:hover {
+  border-color: #10b981;
+  box-shadow: 0 12px 24px rgba(16, 185, 129, 0.2);
+}
+
+/* Mesa Ocupada */
+.tableCard.occupied {
+  background: linear-gradient(135deg, #FFF8E1 0%, #FFE0B2 100%);
+  border-color: #f97316;
+}
+
+.tableCard.occupied:hover {
+  border-color: #ea580c;
+  box-shadow: 0 12px 24px rgba(249, 115, 22, 0.25);
+}
+
+/* Header */
+.tableHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1rem;
+}
+
+.tableNumber {
+  margin: 0;
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: #111827;
+  display: flex;
+  align-items: baseline;
+}
+
+.tableLabel {
+  font-size: 1rem;
+  font-weight: 500;
+  color: #6b7280;
+  margin-right: 0.25rem;
+}
+
+.tableDigit {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #111827;
+}
+
+.statusBadge {
+  padding: 4px 12px;
+  border-radius: 16px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.statusBadge.free {
+  background: #d1fae5;
+  color: #065f46;
+}
+
+.statusBadge.occupied {
+  background: #fed7aa;
+  color: #9a3412;
+}
+
+.statusLabel {
+  display: block;
+}
+
+/* Info Section */
+.tableInfo {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  margin-bottom: 1rem;
+}
+
+.infoItem {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.9rem;
+  color: #374151;
+  padding: 0.5rem;
+  border-radius: 8px;
+  background: rgba(0, 0, 0, 0.02);
+}
+
+.infoItem.active {
+  background: rgba(249, 115, 22, 0.1);
+  color: #9a3412;
+  font-weight: 500;
+}
+
+.infoIcon {
+  flex-shrink: 0;
+  color: #6b7280;
+}
+
+.infoItem.active .infoIcon {
+  color: #f97316;
+}
+
+/* Footer */
+.tableFooter {
+  margin-top: auto;
+}
+
+.tableActionBtn {
+  width: 100%;
+  padding: 0.75rem;
+  border: none;
+  border-radius: 8px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  background: linear-gradient(135deg, #f97316 0%, #ea580c 100%);
+  color: white;
+  box-shadow: 0 2px 8px rgba(249, 115, 22, 0.3);
+}
+
+.tableActionBtn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(249, 115, 22, 0.4);
+}
+
+.tableActionBtn:active {
+  transform: translateY(0);
+}
+
+.tableCard.free .tableActionBtn {
+  background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+  box-shadow: 0 2px 8px rgba(16, 185, 129, 0.3);
+}
+
+.tableCard.free .tableActionBtn:hover {
+  box-shadow: 0 4px 12px rgba(16, 185, 129, 0.4);
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .tableCard {
+    min-height: 160px;
+    padding: 1rem;
+  }
+
+  .tableNumber {
+    font-size: 1.1rem;
+  }
+
+  .tableDigit {
+    font-size: 1.3rem;
+  }
+
+  .infoItem {
+    font-size: 0.85rem;
+  }
+
+  .tableActionBtn {
+    padding: 0.65rem;
+    font-size: 0.85rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .tableCard {
+    min-height: 150px;
+    padding: 0.875rem;
+  }
+
+  .tableHeader {
+    margin-bottom: 0.75rem;
+  }
+
+  .tableNumber {
+    font-size: 1rem;
+  }
+
+  .tableDigit {
+    font-size: 1.25rem;
+  }
+
+  .statusBadge {
+    font-size: 0.7rem;
+    padding: 3px 10px;
+  }
+
+  .tableInfo {
+    gap: 0.5rem;
+    margin-bottom: 0.75rem;
+  }
+
+  .infoItem {
+    font-size: 0.8rem;
+    padding: 0.4rem;
+  }
+
+  .tableActionBtn {
+    padding: 0.6rem;
+    font-size: 0.8rem;
+  }
+}

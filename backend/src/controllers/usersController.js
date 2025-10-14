@@ -45,19 +45,19 @@ export async function createUserAndPerson(req, res) {
     if (!data.email || !data.password) {
         return res.status(406).json({ error: "Email y password son obligatorios" });
     }
-    if((await checkEmailUnique(data.email))==false){
+    if ((await checkEmailUnique(data.email)) == false) {
         return res.status(409).json({ error: "El email ya está en uso" });
     }
-    if(data.password.length < 6){
+    if (data.password.length < 6) {
         console.log(data.password);
         return res.status(406).json({ error: "La contraseña debe tener al menos 6 caracteres" });
-    }else if(await checkPasswordStrength(data.password)==false ){
+    } else if (await checkPasswordStrength(data.password) == false) {
         return res.status(406).json({ error: "La contraseña debe contener al menos una mayúscula, una minúscula y un número" });
     }
     try {
         // 1. Crear usuario en Firebase Auth
         const userRecord = await admin.auth().createUser({
-            email: data.email, 
+            email: data.email,
             password: data.password
         });
         const authUid = userRecord.uid;
@@ -103,7 +103,7 @@ export async function checkEmailUnique(email) {
     } catch (error) {
         if (error.code === 'auth/user-not-found') {
             return true; // El email es único en Auth
-        }else return userQuery.empty; // true si el email es único
+        } else return userQuery.empty; // true si el email es único
     }
 }
 //Verificar robustes de contraseña
@@ -156,6 +156,8 @@ export async function updateUserById(req, res) {
             await admin.auth().updateUser(req.params.id, { email: data.email });
         }
 
+        console.log(data);
+
         await db.collection("users").doc(req.params.id).update(data);
         res.status(200).json({ message: "Usuario actualizado correctamente" });
 
@@ -164,7 +166,7 @@ export async function updateUserById(req, res) {
     }
 }
 
-export async function changeStateUser(req, res){
+export async function changeStateUser(req, res) {
     try {
         const userDoc = await db.collection("users").doc(req.params.id).get();
 
@@ -177,7 +179,7 @@ export async function changeStateUser(req, res){
         await db.collection("users").doc(req.params.id).update(data);
         res.status(200).json({ message: "Usuario actualizado correctamente" });
     } catch (error) {
-        
+
     }
 }
 export async function hardDeleteUser(req, res) {
@@ -188,10 +190,10 @@ export async function hardDeleteUser(req, res) {
             return res.status(400).json({ error: "Se requiere el ID del usuario" });
         }
 
-        if(admin.auth().currentUser && admin.auth().currentUser.uid === id){
+        if (admin.auth().currentUser && admin.auth().currentUser.uid === id) {
             return res.status(403).json({ error: "No se puede eliminar el usuario autenticado" });
         }
-        if((await checkUserExists(id))==false){
+        if ((await checkUserExists(id)) == false) {
             return res.status(404).json({ error: "Usuario no encontrado" });
         }
         // 1. Eliminar usuario de Firebase Auth
@@ -212,7 +214,7 @@ export async function hardDeleteUser(req, res) {
 
             // Eliminar el doc de users
             await userRef.delete();
-        }else{
+        } else {
             return res.status(404).json({ error: "Usuario no encontrado" });
         }
 
@@ -236,7 +238,7 @@ export async function checkUserExists(uid) {
         } else {
             throw error; // Otro error
         }
-    } 
+    }
 }
 
 

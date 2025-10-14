@@ -1,10 +1,11 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import ForgotPasswordModal from "./ForgotPasswordModal.tsx";
-import AlertModal from "../common/AlertModal.tsx";
-import { loginUser } from "../../services/login/authService.ts";
+import ForgotPasswordModal from "./ForgotPasswordModal";
+import AlertModal from "../common/AlertModal";
+import { loginUser } from "../../services/login/authService";
 import logo from "../../assets/logo.png";
-import "../../styles/login/LoginForm.css";
+import { useUser } from "../../context/userContext.tsx";
+import styles from "../../styles/login/LoginForm.module.css";
 
 interface LoginFormProps {
   onSubmit?: (email: string, password: string) => void;
@@ -18,6 +19,8 @@ const LoginForm: React.FC<LoginFormProps> = () => {
   const [rememberMe, setRememberMe] = useState(false);
   const [showForgotModal, setShowForgotModal] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+
+  const { setUser } = useUser();
 
   const [showAlert, setShowAlert] = useState(false);
   const [alertType, setAlertType] = useState<"success" | "error">("error");
@@ -39,6 +42,12 @@ const LoginForm: React.FC<LoginFormProps> = () => {
         );
         setShowAlert(true);
       } else {
+        setUser({
+          uid: data.uid,
+          name: data.name,
+          role: data.role,
+          email: email,
+        });
         setAlertType("success");
         setAlertTitle("¡Bienvenido!");
         setAlertMessage(
@@ -47,14 +56,16 @@ const LoginForm: React.FC<LoginFormProps> = () => {
         setShowAlert(true);
 
         setTimeout(() => {
+          const roleKey = String(data.role).toLowerCase();
           const dashboardRoutes: Record<string, string> = {
             admin: '/admin',
-            waiter: '/mesero',     
-            cocinero: '/cocina',
-            user: '/caja',
+            waiter: '/mesero',
+            kitchen: '/cocina',
+            cash: '/caja',
+
           };
-          
-          const redirectTo = dashboardRoutes[data.role] || '/';
+
+          const redirectTo = dashboardRoutes[roleKey] || '/';
           navigate(redirectTo);
         }, 1500);
       }
@@ -70,45 +81,32 @@ const LoginForm: React.FC<LoginFormProps> = () => {
     }
   };
 
-  const togglePasswordVisibility = () => {
-    setShowPassword(!showPassword);
-  };
-
+  const togglePasswordVisibility = () => setShowPassword(!showPassword);
   const handleForgotPassword = (e: React.MouseEvent) => {
     e.preventDefault();
     setShowForgotModal(true);
   };
 
-  const closeForgotModal = () => {
-    setShowForgotModal(false);
-  };
-
-  const handleForgotPasswordSubmit = (_forgotEmail: string) => {};
-
-  const handleAlertClose = () => {
-    setShowAlert(false);
-  };
-
+  const handleAlertClose = () => setShowAlert(false);
   const handleRetry = () => {
     setShowAlert(false);
-    const emailInput = document.getElementById("email");
-    if (emailInput) emailInput.focus();
+    document.getElementById("email")?.focus();
   };
 
   return (
     <>
-      <div className="login-form-container">
-        <div className="login-form-card">
-          <div className="login-header">
-            <div className="logo-container">
-              <img src={logo} alt="Logo" className="logo" />
+      <div className={styles.container}>
+        <div className={styles.card}>
+          <div className={styles.header}>
+            <div className={styles.logoContainer}>
+              <img src={logo} alt="Logo" className={styles.logo} />
             </div>
-            <p className="login-subtitle">El aroma de la perfección</p>
+            <p className={styles.subtitle}>El aroma de la perfección</p>
           </div>
 
-          <form onSubmit={handleSubmit} className="login-form">
-            <div className="form-group">
-              <label htmlFor="email" className="form-label">
+          <form onSubmit={handleSubmit} className={styles.form}>
+            <div className={styles.formGroup}>
+              <label htmlFor="email" className={styles.label}>
                 Correo Electrónico
               </label>
               <input
@@ -117,31 +115,31 @@ const LoginForm: React.FC<LoginFormProps> = () => {
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 placeholder="tucorreo@email.com"
-                className="form-input"
+                className={styles.input}
                 required
                 disabled={isLoading}
               />
             </div>
 
-            <div className="form-group">
-              <label htmlFor="password" className="form-label">
+            <div className={styles.formGroup}>
+              <label htmlFor="password" className={styles.label}>
                 Contraseña
               </label>
-              <div className="password-input-container">
+              <div className={styles.passwordContainer}>
                 <input
                   type={showPassword ? "text" : "password"}
                   id="password"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   placeholder="••••••••"
-                  className="form-input password-input"
+                  className={`${styles.input} ${styles.passwordInput}`}
                   required
                   disabled={isLoading}
                 />
                 <button
                   type="button"
                   onClick={togglePasswordVisibility}
-                  className="password-toggle"
+                  className={styles.passwordToggle}
                   aria-label={
                     showPassword ? "Ocultar contraseña" : "Mostrar contraseña"
                   }
@@ -176,30 +174,34 @@ const LoginForm: React.FC<LoginFormProps> = () => {
               </div>
             </div>
 
-            <div className="form-options">
-              <label className="checkbox-container">
+            <div className={styles.options}>
+              <label className={styles.checkboxContainer}>
                 <input
                   type="checkbox"
                   checked={rememberMe}
                   onChange={(e) => setRememberMe(e.target.checked)}
                   disabled={isLoading}
                 />
-                <span className="checkmark"></span>
+                <span className={styles.checkmark}></span>
                 Recordarme
               </label>
               <a
                 href="#"
-                className="forgot-password"
+                className={styles.forgotPassword}
                 onClick={handleForgotPassword}
               >
                 ¿Olvidaste tu contraseña?
               </a>
             </div>
 
-            <button type="submit" className="login-button" disabled={isLoading}>
+            <button
+              type="submit"
+              className={styles.button}
+              disabled={isLoading}
+            >
               {isLoading ? (
-                <div className="loading-container">
-                  <div className="spinner"></div>
+                <div className={styles.loadingContainer}>
+                  <div className={styles.spinner}></div>
                   <span>Iniciando sesión...</span>
                 </div>
               ) : (
@@ -212,8 +214,8 @@ const LoginForm: React.FC<LoginFormProps> = () => {
 
       {showForgotModal && (
         <ForgotPasswordModal
-          onClose={closeForgotModal}
-          onSubmit={handleForgotPasswordSubmit}
+          onClose={() => setShowForgotModal(false)}
+          onSubmit={() => { }}
         />
       )}
 

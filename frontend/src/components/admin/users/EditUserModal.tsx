@@ -41,11 +41,11 @@ const EditUserModal: React.FC<EditUserModalProps> = ({
       setUserName(user.user_name ?? "");
       setEmail(user.email ?? "");
       setRole(user.role ?? "");
-      
+
       // Normalizar state
       const userState = user.state?.toLowerCase();
       setState(userState === "activo" || userState === "active" ? "active" : "inactive");
-      
+
       setFirstName(user.person?.first_name ?? "");
       setLastName(user.person?.last_name ?? "");
       setBirthdate(user.person?.birthdate ?? "");
@@ -223,7 +223,7 @@ const EditUserModal: React.FC<EditUserModalProps> = ({
 
       // Llamar a onSubmit con el usuario completo
       await onSubmit(updatedUserForFrontend);
-      
+
       setIsConfirmOpen(false);
       onClose();
     } catch (error) {
@@ -362,9 +362,9 @@ const EditUserModal: React.FC<EditUserModalProps> = ({
                   className="form-input"
                   disabled={isSubmitting}
                 >
-                  <option value="cocinero">Cocinero</option>
+                  <option value="kitchen">Cocinero</option>
                   <option value="waiter">Mesero</option>
-                  <option value="user">Caja</option>
+                  <option value="cash">Caja</option>
                   <option value="admin">Administrador</option>
                 </select>
               </div>
@@ -452,16 +452,16 @@ const EditUserModal: React.FC<EditUserModalProps> = ({
               </div>
 
               <div className="modal-buttons">
-                <Button 
-                  type="button" 
-                  variant="secondary" 
+                <Button
+                  type="button"
+                  variant="secondary"
                   onClick={onClose}
                   disabled={isSubmitting}
                 >
                   Cancelar
                 </Button>
-                <Button 
-                  type="submit" 
+                <Button
+                  type="submit"
                   variant="primary"
                   disabled={isSubmitting}
                 >
