@@ -2,8 +2,8 @@ import { io, Socket } from "socket.io-client";
 
 let socket: Socket | null = null;
 
-const SOCKET_URL = "http://localhost:3000";
-//const SOCKET_URL = "http://185.144.159.8:3000";
+//const SOCKET_URL = "http://localhost:3000";
+const SOCKET_URL = "http://148.230.93.151/:3000";
 
 declare global {
   interface Window {
