@@ -21,7 +21,12 @@ const server = http.createServer(app);
 
 const io = new Server(server, {
   cors: {
-    origin: ["http://localhost:5173", "http://148.230.93.151:80"],
+    origin: [
+      "http://localhost:5173",
+      "http://148.230.93.151",
+      "https://cafearomaysabor.com",
+      "https://www.cafearomaysabor.com"
+    ],
     credentials: true,
   },
 });
@@ -32,7 +37,12 @@ socketHandler(io);
 app.use(express.json());
 app.use(cookieParser());
 app.use(cors({
-  origin: ["http://localhost:5173", "http://148.230.93.151"],
+  origin: [
+    "http://localhost:5173",
+    "http://148.230.93.151",
+    "https://cafearomaysabor.com",
+    "https://www.cafearomaysabor.com"
+  ],
   credentials: true
 }));
 
