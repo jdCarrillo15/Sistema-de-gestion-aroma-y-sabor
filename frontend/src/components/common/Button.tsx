@@ -1,5 +1,5 @@
 import React from "react";
-import "../../styles/common/Button.css";
+import styles from "../../styles/common/Button.module.css";
 
 interface ButtonProps {
   children: React.ReactNode;
@@ -18,7 +18,11 @@ const Button: React.FC<ButtonProps> = ({
   disabled = false,
   className = "",
 }) => {
-  const buttonClass = `custom-button ${variant === "primary" ? "primary-button" : "secondary-button"} ${className}`;
+  const buttonClass = `
+    ${styles.customButton} 
+    ${variant === "primary" ? styles.primaryButton : styles.secondaryButton} 
+    ${className}
+  `;
 
   return (
     <button

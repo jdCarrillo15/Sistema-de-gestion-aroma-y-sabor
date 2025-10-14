@@ -18,7 +18,7 @@ import OrderItem from './OrderItem';
 import Button from '../common/Button';
 import AlertModal from '../common/AlertModal';
 import { X, Plus } from 'lucide-react';
-import '../../styles/mesero/TableModal.css';
+import styles from '../../styles/mesero/TableModal.module.css';
 
 interface TableModalProps {
   isOpen: boolean;
@@ -266,27 +266,27 @@ const TableModal: React.FC<TableModalProps> = ({ isOpen, onClose, table, onUpdat
 
   return (
     <>
-      <div className="table-modal-backdrop" onClick={handleBackdropClick}>
-        <div className="table-modal-container" onClick={(e) => e.stopPropagation()}>
+      <div className={styles.tableModalBackdrop} onClick={handleBackdropClick}>
+        <div className={styles.tableModalContainer} onClick={(e) => e.stopPropagation()}>
 
           {/* Header */}
-          <div className="table-modal-header">
-            <div className="header-info">
-              <h2 className="modal-title">Mesa {table.number}</h2>
-              <span className={`status-badge ${table.status}`}>
+          <div className={styles.tableModalHeader}>
+            <div className={styles.headerInfo}>
+              <h2 className={styles.modalTitle}>Mesa {table.number}</h2>
+              <span className={`${styles.statusBadge} ${table.status === 'free' ? styles.free : styles.occupied}`}>
                 {table.status === 'free' ? 'Libre' : 'Ocupada'}
               </span>
             </div>
-            <button className="close-btn" onClick={onClose}>
+            <button className={styles.closeBtn} onClick={onClose}>
               <X size={24} />
             </button>
           </div>
 
           {/* Content */}
-          <div className="table-modal-content">
+          <div className={styles.tableModalContent}>
 
             {!currentBill && !isLoading && (
-              <div className="no-bill-state">
+              <div className={styles.noBillState}>
                 <h3>Esta mesa no tiene una cuenta abierta</h3>
                 <p>Crea una cuenta para comenzar a agregar productos</p>
                 <Button
@@ -300,20 +300,20 @@ const TableModal: React.FC<TableModalProps> = ({ isOpen, onClose, table, onUpdat
             )}
 
             {isLoading && (
-              <div className="loading-state">
-                <div className="spinner"></div>
+              <div className={styles.loadingState}>
+                <div className={styles.spinner}></div>
                 <p>Cargando cuenta...</p>
               </div>
             )}
 
             {currentBill && !isLoading && (
               <>
-                <div className="orders-section">
-                  <div className="section-header">
-                    <h3 className="section-title">Productos</h3>
+                <div className={styles.ordersSection}>
+                  <div className={styles.sectionHeader}>
+                    <h3 className={styles.sectionTitle}>Productos</h3>
                     <Button
                       variant="primary"
-                      className="add-product-btn"
+                      className={styles.addProductBtn}
                       onClick={() => setIsCatalogOpen(true)}
                       disabled={isAddingProduct}
                     >
@@ -323,14 +323,14 @@ const TableModal: React.FC<TableModalProps> = ({ isOpen, onClose, table, onUpdat
                   </div>
 
                   {orders.length === 0 ? (
-                    <div className="empty-orders">
+                    <div className={styles.emptyOrders}>
                       <p>No hay productos en esta cuenta</p>
-                      <p className="empty-orders-subtitle">
+                      <p className={styles.emptyOrdersSubtitle}>
                         Agrega productos usando el botón de arriba
                       </p>
                     </div>
                   ) : (
-                    <div className="orders-list">
+                    <div className={styles.ordersList}>
                       {orders.map((order, index) => (
                         <OrderItem
                           key={`${order.id}-${index}`}
@@ -343,10 +343,10 @@ const TableModal: React.FC<TableModalProps> = ({ isOpen, onClose, table, onUpdat
                   )}
                 </div>
 
-                <div className="total-section">
-                  <div className="total-row">
-                    <span className="total-label">Total</span>
-                    <span className="total-amount">${calculateTotal().toLocaleString()}</span>
+                <div className={styles.totalSection}>
+                  <div className={styles.totalRow}>
+                    <span className={styles.totalLabel}>Total</span>
+                    <span className={styles.totalAmount}>${calculateTotal().toLocaleString()}</span>
                   </div>
                 </div>
               </>
@@ -354,8 +354,8 @@ const TableModal: React.FC<TableModalProps> = ({ isOpen, onClose, table, onUpdat
           </div>
 
           {currentBill && (
-            <div className="table-modal-footer">
-              <div className="footer-left">
+            <div className={styles.tableModalFooter}>
+              <div className={styles.footerLeft}>
                 <Button
                   variant="secondary"
                   onClick={handleDeleteBill}
@@ -364,7 +364,7 @@ const TableModal: React.FC<TableModalProps> = ({ isOpen, onClose, table, onUpdat
                   Eliminar Cuenta
                 </Button>
               </div>
-              <div className="footer-right">
+              <div className={styles.footerRight}>
                 <Button variant="secondary" onClick={onClose}>
                   Cerrar
                 </Button>
@@ -386,8 +386,8 @@ const TableModal: React.FC<TableModalProps> = ({ isOpen, onClose, table, onUpdat
           )}
 
           {isAddingProduct && (
-            <div className="loading-overlay">
-              <div className="spinner"></div>
+            <div className={styles.loadingOverlay}>
+              <div className={styles.spinner}></div>
               <p>Agregando producto...</p>
             </div>
           )}

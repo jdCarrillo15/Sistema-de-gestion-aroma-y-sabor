@@ -1,0 +1,103 @@
+.meseroSidebar {
+  display: flex;
+  flex-direction: column;
+  background: white;
+  height: 100vh;
+  width: 250px;
+  position: fixed;
+  top: 0;
+  left: 0;
+  border-right: 1px solid #e5e7eb;
+  z-index: 900;
+}
+
+.sidebarHeader {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 1.5rem;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+.logoBox {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, #f97316 0%, #ea580c 100%);
+  border-radius: 12px;
+  padding: 8px;
+  flex-shrink: 0;
+}
+
+.logoIcon {
+  color: white;
+  width: 24px;
+  height: 24px;
+}
+
+.brandBox {
+  display: flex;
+  flex-direction: column;
+}
+
+.brandTitle {
+  font-size: 1rem;
+  font-weight: 600;
+  color: #111827;
+  margin: 0;
+  line-height: 1.2;
+}
+
+.brandSub {
+  font-size: 0.8rem;
+  color: #6b7280;
+  margin: 0;
+  line-height: 1.2;
+}
+
+.sidebarNav {
+  flex: 1;
+  list-style: none;
+  padding: 1rem 0;
+  margin: 0;
+}
+
+.sidebarNav li {
+  margin: 0.25rem 0;
+}
+
+.sidebarLink {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 0.75rem 1.5rem;
+  text-decoration: none;
+  color: #374151;
+  font-size: 0.95rem;
+  font-weight: 500;
+  border-left: 3px solid transparent;
+  transition: all 0.2s ease;
+}
+
+.sidebarLink:hover {
+  background-color: #f9fafb;
+  color: #f97316;
+}
+
+.sidebarLink.active {
+  background-color: #fff7ed;
+  color: #f97316;
+  border-left-color: #f97316;
+}
+
+.linkIcon {
+  width: 20px;
+  height: 20px;
+}
+
+
+@media (max-width: 1024px) {
+  .meseroSidebar {
+    display: none;
+  }
+}
