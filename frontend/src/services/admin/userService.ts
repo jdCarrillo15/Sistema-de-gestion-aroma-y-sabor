@@ -67,8 +67,6 @@ export async function createUser(userData: CreateUserRequest): Promise<{ message
 
 export async function getUsers(): Promise<{ users: UserResponse[] }> {
   try {
-    console.log("🔍 Iniciando getUsers request...");
-
     const response = await fetch(`${API_BASE_URL}/users/getusers`, {
       method: "GET",
       headers: {

@@ -49,7 +49,6 @@ export async function createUserAndPerson(req, res) {
         return res.status(409).json({ error: "El email ya está en uso" });
     }
     if (data.password.length < 6) {
-        console.log(data.password);
         return res.status(406).json({ error: "La contraseña debe tener al menos 6 caracteres" });
     } else if (await checkPasswordStrength(data.password) == false) {
         return res.status(406).json({ error: "La contraseña debe contener al menos una mayúscula, una minúscula y un número" });
@@ -155,8 +154,6 @@ export async function updateUserById(req, res) {
         if (data.email) {//Se actualiza el email de auth antes de actualizar en la BD
             await admin.auth().updateUser(req.params.id, { email: data.email });
         }
-
-        console.log(data);
 
         await db.collection("users").doc(req.params.id).update(data);
         res.status(200).json({ message: "Usuario actualizado correctamente" });

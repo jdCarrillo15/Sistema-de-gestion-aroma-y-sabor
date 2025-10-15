@@ -120,7 +120,7 @@ export async function getOrders(): Promise<OrderResponse> {
 
         return {
           id: bill.id,
-          table_name: bill.table.startsWith('Mesa') ? bill.table : `Mesa ${bill.table}`,
+          table_name: bill.table,
           items,
           status,
           created_at: formatTime(bill.created_at),

@@ -96,13 +96,17 @@ export async function createBill(req, res) {
     }
 
     const io = getIO();
-    io.to("cash").emit("nuevaCuenta", {
+
+    const newBillData = {
       id: billRef.id,
       table: data.table,
       total: data.total || 0,
       products: data.products || [],
       created_at: new Date().toISOString(),
-    });
+    };
+
+    io.to("cash").emit("nuevaCuenta", newBillData);
+    io.to("kitchen").emit("nuevaCuenta", newBillData);
 
     return res.status(201).json({
       message: "Cuenta creada correctamente",
@@ -182,28 +186,56 @@ export async function getActiveBills(req, res) {
 
 export async function updateBillById(req, res) {
   try {
-    const billDoc = await db.collection("bills").doc(req.params.id).get();
+    const billId = req.params.id;
+    const updateData = req.body;
 
-    if (!billDoc.exists) {
+    const billRef = db.collection("bills").doc(billId);
+    const billSnap = await billRef.get();
+
+    if (!billSnap.exists) {
       return res.status(404).json({ error: "Cuenta no encontrada" });
     }
 
-    const data = req.body;
+    const oldBill = billSnap.data();
 
-    await db.collection("bills").doc(req.params.id).update(data);
+    await billRef.update(updateData);
 
-    try {
-      const io = getIO();
-      io.to("cash").emit("cuentaActualizada", { id: req.params.id, data });
-    } catch (e) {
-      console.warn("No se pudo emitir evento de socket cuentaActualizada:", e.message);
+    const io = getIO();
+    //Si el estado pasa a 'paid' o 'closed', se libera la mesa
+    if (updateData.status === "paid" || updateData.status === "closed") {
+      const tablesRef = db.collection("tables");
+      const tableQuery = await tablesRef
+        .where("number", "==", Number(oldBill.table))
+        .limit(1)
+        .get();
+
+      if (!tableQuery.empty) {
+        const tableDoc = tableQuery.docs[0];
+        await tableDoc.ref.update({
+          status: "free",
+          current_bill_id: null,
+        });
+      }
+      io.to("cash").emit("cuentaEliminada", { id: billId });
+      io.to("waiter").emit("cuentaEliminada", { id: billId });
     }
 
-    res.status(200).json({ message: "Cuenta actualizada correctamente" });
+
+    io.to("cash").emit("cuentaActualizada", {
+      id: billId,
+      data: updateData,
+    });
+    io.to("kithen").emit("cuentaActualizada", {
+      id: billId,
+      data: updateData,
+    });
+
+    return res.status(200).json({ message: "Cuenta actualizada correctamente" });
   } catch (err) {
-    res
-      .status(500)
-      .json({ error: "Error al actualizar cuenta", details: err.message });
+    return res.status(500).json({
+      error: "Error al actualizar cuenta",
+      details: err.message,
+    });
   }
 }
 
@@ -239,12 +271,8 @@ export async function hardDeleteBill(req, res) {
 
     await billRef.delete();
 
-    try {
-      const io = getIO();
-      io.to("cash").emit("cuentaEliminada", { id });
-    } catch (e) {
-      console.warn("No se pudo emitir evento de socket cuentaEliminada:", e.message);
-    }
+    const io = getIO();
+    io.to("cash").emit("cuentaEliminada", { id });
 
     res.status(200).json({
       message: "Cuenta eliminada correctamente",
@@ -328,7 +356,12 @@ export async function addProductToBill(req, res) {
     io.to("kitchen").emit("nuevoProducto", kitchenPayload);
     io.to("cash").emit("cuentaActualizada", {
       id,
-      data: { products: updatedBill.products, total },
+      data: {
+        total,
+        products: updatedBill.products,
+        table: updatedBill.table,
+        created_at: updatedBill.created_at,
+      },
     });
 
     res.status(201).json({
@@ -432,12 +465,9 @@ export async function updateProductsInBill(req, res) {
     const total = await calculateTotal(currentProducts);
 
     await billRef.update({ products: currentProducts, total });
-    try {
-      const io = getIO();
-      io.to("cash").emit("cuentaActualizada", { id, data: { products: currentProducts, total } });
-    } catch (e) {
-      console.warn("No se pudo emitir cuentaActualizada tras updateProductsInBill:", e.message);
-    }
+
+    const io = getIO();
+    io.to("cash").emit("cuentaActualizada", { id, data: { products: currentProducts, total } });
 
     res.status(200).json({
       message: "Productos de la cuenta actualizados correctamente",
@@ -482,7 +512,7 @@ export async function closeBillIfEmpty(req, res) {
       }
 
       const io = getIO();
-      io.to("cash").emit("cuentaActualizada", { id, data: { status: "closed" } });
+      io.to("cash").emit("cuentaEliminada", { id });
 
       return res.status(200).json({ message: "Cuenta cerrada correctamente" });
     } else {

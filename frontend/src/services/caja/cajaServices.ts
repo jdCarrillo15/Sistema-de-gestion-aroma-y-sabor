@@ -109,8 +109,6 @@ export async function payBill(
     paymentMethod: 'Efectivo' | 'Tarjeta' | 'Transferencia'
 ): Promise<UpdateBillResponse> {
     try {
-        console.log(`Pagando cuenta ${billId} con método: ${paymentMethod}`);
-
         const response = await fetch(`${API_BASE_URL}/bills/updateBill/${billId}`, {
             method: "PUT",
             headers: {
@@ -129,7 +127,6 @@ export async function payBill(
             throw new Error(errorData.error || "Error procesando pago");
         }
 
-        console.log(`Cuenta ${billId} pagada exitosamente`);
         return await response.json();
     } catch (error) {
         console.error("Error in payBill service:", error);

@@ -18,8 +18,9 @@ const MesasPage: React.FC = () => {
     socket.emit("joinRoom", "waiter");
 
     socket.off("cuentaActualizada");
+    socket.off("cuentaEliminada");
+
     socket.on("cuentaActualizada", ({ id, data }) => {
-      console.log("Cuenta actualizada en tiempo real:", id, data);
       setTables(prev =>
         prev.map(table =>
           table.current_bill_id === id
@@ -29,9 +30,20 @@ const MesasPage: React.FC = () => {
       );
     });
 
+    socket.on("cuentaEliminada", ({ id }) => {
+      setTables(prev =>
+        prev.map(table =>
+          table.current_bill_id === id
+            ? { ...table, status: "free", current_bill_id: null }
+            : table
+        )
+      );
+    });
+
     return () => {
       socket.emit("leaveRoom", "waiter");
       socket.off("cuentaActualizada");
+      socket.off("cuentaEliminada");
     };
   }, []);
 

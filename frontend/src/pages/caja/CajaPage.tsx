@@ -70,7 +70,7 @@ const CajaPage: React.FC = () => {
 
             const newTable: ActiveTable = {
               id: newBill.id,
-              table: newBill.table.startsWith("Mesa") ? newBill.table : `Mesa ${newBill.table}`,
+              table: newBill.table,
               time: formatTime(newBill.created_at),
               duration: calculateDuration(newBill.created_at),
               items: (newBill.products || []).map((p: { units: any; name: any; price: any; }) => ({
@@ -208,9 +208,7 @@ const CajaPage: React.FC = () => {
           };
         });
 
-        const tableName = bill.table.startsWith('Mesa')
-          ? bill.table
-          : `Mesa ${bill.table}`;
+        const tableName = bill.table;
 
         return {
           id: bill.id,
