@@ -3,9 +3,9 @@ const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
 export interface Bill {
   id: string;
-  table: string;
+  table: number;
   user_id: string;
-  state: 'open' | 'closed';
+  status: 'open' | 'closed';
   total: number;
   products: BillProduct[];
   created_at: any;
@@ -78,7 +78,7 @@ export async function getActiveBills() {
   }
 }
 
-export async function createBill(tableNumber: string, userId: string): Promise<Bill | null> {
+export async function createBill(tableNumber: number, userId: string): Promise<Bill | null> {
   try {
     const response = await fetch(`${API_BASE_URL}/bills/createBill`, {
       method: "POST",
@@ -87,7 +87,7 @@ export async function createBill(tableNumber: string, userId: string): Promise<B
       body: JSON.stringify({
         table: tableNumber,
         user_id: userId,
-        state: 'open',
+        status: 'open',
         total: 0,
         products: []
       })

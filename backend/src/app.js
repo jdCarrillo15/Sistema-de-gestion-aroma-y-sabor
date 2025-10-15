@@ -3,6 +3,7 @@ import productsRoutes from "./routes/productsRoutes.js";
 import metricsRoutes from "./routes/metricsRoutes.js"
 import usersRoutes from "./routes/usersRoutes.js";
 import billsRoutes from "./routes/billsRoutes.js";
+import tableRoutes from "./routes/tableRoutes.js";
 import rolesRoutes from "./routes/roleRoutes.js";
 import authRoutes from "./routes/authRoutes.js";
 import socketHandler from "./sockets/socket.js";
@@ -53,6 +54,7 @@ app.use("/auth", authRoutes);
 app.use("/users", usersRoutes);
 app.use("/products", productsRoutes);
 app.use("/bills", billsRoutes);
+app.use("/tables", tableRoutes);
 app.use(metricsRoutes);
 
 const PORT = process.env.PORT || 3000;

@@ -16,7 +16,7 @@ export interface Order {
 
 export interface Bill {
   id: string;
-  table_name: string;
+  table_name: number;
   items: OrderItem[];
   total: number;
   created_at: string;
@@ -30,9 +30,9 @@ export interface PaidBill extends Bill {
 
 export interface ActiveTable {
   id: string;
-  table: string;           
-  time: string;           
-  duration: string;        
+  table: string;
+  time: string;
+  duration: string;
   items: {
     name: string;
     price: number;

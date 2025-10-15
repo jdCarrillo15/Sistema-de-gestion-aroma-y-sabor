@@ -6,7 +6,7 @@ export interface CreateUserRequest {
   email: string;
   password: string;
   role: string;
-  state: string;
+  status: string;
   first_name: string;
   last_name: string;
   birthdate: string;
@@ -17,7 +17,7 @@ export interface UpdateUserRequest {
   user_name?: string;
   email?: string;
   role?: string;
-  state?: string;
+  status?: string;
   person_id?: string;
   first_name?: string;
   last_name?: string;
@@ -30,7 +30,7 @@ export interface UserResponse {
   user_name: string;
   email: string;
   role: string;
-  state: string;
+  status: string;
   created_at: string;
   person?: {
     id?: string;
@@ -142,15 +142,15 @@ export async function updateUser(id: string, userData: UpdateUserRequest): Promi
   }
 }
 
-export async function changeUserState(id: string, state: string): Promise<{ message: string }> {
-  console.log("Changing user state:", id, state);
+export async function changeUserState(id: string, status: string): Promise<{ message: string }> {
+  console.log("Changing user state:", id, status);
   try {
     const response = await fetch(`${API_BASE_URL}/users/changeState/${id}`, {
       method: "PUT",
       headers: {
         "Content-Type": "application/json"
       },
-      body: JSON.stringify({ state }),
+      body: JSON.stringify({ status: status }),
       credentials: "include",
     });
 

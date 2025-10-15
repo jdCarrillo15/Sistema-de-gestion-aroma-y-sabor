@@ -21,7 +21,7 @@ export async function getBills(req, res) {
         }
 
         return {
-          state: data.state,
+          status: data.status,
           total: data.total,
           table: data.table,
           created_at: data.created_at,
@@ -53,14 +53,16 @@ export async function createBill(req, res) {
     const billsRef = db.collection("bills");
     const existingBillSnap = await billsRef
       .where("table", "==", data.table)
-      .where("state", "==", "open")
+      .where("status", "==", "open")
       .limit(1)
       .get();
 
-    // Validar si ya existe una cuenta abierta para esta mesa
+    // Verificar si ya existe una cuenta abierta
     if (!existingBillSnap.empty) {
       const existingBill = existingBillSnap.docs[0];
-      console.log(`Cuenta existente encontrada para la mesa ${data.table}: ${existingBill.id}`);
+      console.log(
+        `Cuenta existente encontrada para la mesa ${data.table}: ${existingBill.id}`
+      );
 
       return res.status(200).json({
         message: "Ya existe una cuenta abierta para esta mesa.",
@@ -69,40 +71,29 @@ export async function createBill(req, res) {
       });
     }
 
-    if (data.products && data.products.length > 0) {
-      for (const item of data.products) {
-        const productDoc = await db.collection("products").doc(item.id).get();
-
-        if (!productDoc.exists) {
-          return res.status(404).json({
-            error: `El producto ${item.id} no existe.`,
-          });
-        }
-
-        const productData = productDoc.data();
-        if (productData.stock < item.units) {
-          return res.status(400).json({
-            error: `No hay suficiente stock para ${productData.name}. Stock disponible: ${productData.stock}`,
-          });
-        }
-
-        await db
-          .collection("products")
-          .doc(item.id)
-          .update({
-            stock: admin.firestore.FieldValue.increment(-item.units),
-          });
-      }
-    }
-
     const billRef = await billsRef.add({
-      state: data.state || "open",
+      status: data.status || "open",
       total: data.total || 0,
       table: data.table,
       user_id: data.user_id,
       products: data.products || [],
       created_at: admin.firestore.FieldValue.serverTimestamp(),
     });
+
+    // Actualizar la mesa correspondiente
+    const tablesRef = db.collection("tables");
+    const tableQuery = await tablesRef
+      .where("number", "==", Number(data.table))
+      .limit(1)
+      .get();
+
+    if (!tableQuery.empty) {
+      const tableDoc = tableQuery.docs[0];
+      await tableDoc.ref.update({
+        current_bill_id: billRef.id,
+        status: "occupied",
+      });
+    }
 
     const io = getIO();
     io.to("cash").emit("nuevaCuenta", {
@@ -127,7 +118,6 @@ export async function createBill(req, res) {
   }
 }
 
-
 export async function getBillById(req, res) {
   try {
     const { id } = req.params;
@@ -149,7 +139,7 @@ export async function getBillById(req, res) {
 
     return res.json({
       id: id,
-      state: billData.state,
+      status: billData.status,
       total: billData.total,
       table: billData.table,
       user,
@@ -167,7 +157,7 @@ export async function getBillById(req, res) {
 export async function getActiveBills(req, res) {
   try {
     const billsSnap = await db.collection("bills")
-      .where("state", "==", "open")
+      .where("status", "==", "open")
       .get();
 
     if (billsSnap.empty) {
@@ -232,6 +222,21 @@ export async function hardDeleteBill(req, res) {
       return res.status(404).json({ error: "Cuenta no encontrada" });
     }
 
+    // Liberar la mesa asociada
+    const tablesRef = db.collection("tables");
+    const tableQuery = await tablesRef
+      .where("current_bill_id", "==", id)
+      .limit(1)
+      .get();
+
+    if (!tableQuery.empty) {
+      const tableDoc = tableQuery.docs[0];
+      await tableDoc.ref.update({
+        current_bill_id: null,
+        status: "free",
+      });
+    }
+
     await billRef.delete();
 
     try {
@@ -246,7 +251,7 @@ export async function hardDeleteBill(req, res) {
     });
   } catch (err) {
     res.status(500).json({
-      error: "Error al eliminar Cuenta",
+      error: "Error al eliminar cuenta",
       details: err.message,
     });
   }
@@ -449,7 +454,6 @@ export async function updateProductsInBill(req, res) {
 export async function closeBillIfEmpty(req, res) {
   try {
     const { id } = req.params;
-
     const billRef = db.collection("bills").doc(id);
     const billSnap = await billRef.get();
 
@@ -460,13 +464,26 @@ export async function closeBillIfEmpty(req, res) {
     const billData = billSnap.data();
 
     if (!billData.products || billData.products.length === 0) {
-      await billRef.update({ state: "closed" });
-      try {
-        const io = getIO();
-        io.to("cash").emit("cuentaActualizada", { id, data: { state: "closed" } });
-      } catch (e) {
-        console.warn("No se pudo emitir cuentaActualizada tras cerrar cuenta:", e.message);
+      await billRef.update({ status: "closed" });
+
+      //Liberar la mesa asociada
+      const tablesRef = db.collection("tables");
+      const tableQuery = await tablesRef
+        .where("current_bill_id", "==", id)
+        .limit(1)
+        .get();
+
+      if (!tableQuery.empty) {
+        const tableDoc = tableQuery.docs[0];
+        await tableDoc.ref.update({
+          current_bill_id: null,
+          status: "free",
+        });
       }
+
+      const io = getIO();
+      io.to("cash").emit("cuentaActualizada", { id, data: { status: "closed" } });
+
       return res.status(200).json({ message: "Cuenta cerrada correctamente" });
     } else {
       return res

@@ -26,7 +26,7 @@ export function authorize(action, resource) {
     return async (req, res, next) => {
         try {
 
-            const currentState = req.state || null;
+            const currentState = req.state || req.status || null;
             const hasAccess = await canAccess(req.user, action, resource, currentState, req.params.id);
 
             if (!hasAccess) {

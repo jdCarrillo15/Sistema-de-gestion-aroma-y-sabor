@@ -14,7 +14,7 @@ export type User = {
   user_name: string;
   email: string;
   role: string;
-  state: string;
+  status: string;
   created_at: string;
   person?: {
     id?: string;
@@ -47,17 +47,17 @@ const UsuariosPage: React.FC = () => {
     setSelectedUser(null);
   };
 
-  const normalizeState = (state: string): string => {
-    if (!state) return "Activo";
+  const normalizeState = (status: string): string => {
+    if (!status) return "Activo";
 
-    const lowerState = state.toLowerCase().trim();
+    const lowerState = status.toLowerCase().trim();
 
     if (lowerState === "activo" || lowerState === "active") {
       return "Activo";
     } else if (lowerState === "inactivo" || lowerState === "inactive") {
       return "Inactivo";
     }
-    return state.charAt(0).toUpperCase() + state.slice(1).toLowerCase();
+    return status.charAt(0).toUpperCase() + status.slice(1).toLowerCase();
   };
 
   // Cargar usuarios del backend
@@ -72,7 +72,7 @@ const UsuariosPage: React.FC = () => {
         user_name: u.user_name,
         email: u.email,
         role: u.role,
-        state: normalizeState(u.state ?? ""),
+        status: normalizeState(u.status ?? ""),
         created_at: u.created_at ?? new Date().toISOString(),
         person: u.person
           ? {
@@ -111,7 +111,7 @@ const UsuariosPage: React.FC = () => {
         email: userData.email,
         password: userData.password,
         role: userData.role,
-        state: userData.state,
+        status: userData.status,
         first_name: userData.first_name,
         last_name: userData.last_name,
         birthdate: userData.birthdate,
@@ -151,7 +151,7 @@ const UsuariosPage: React.FC = () => {
         user_name: updatedUser.user_name,
         email: updatedUser.email,
         role: updatedUser.role,
-        state: updatedUser.state,
+        status: updatedUser.status,
       };
 
       // Si hay datos de persona, incluirlos
@@ -231,8 +231,8 @@ const UsuariosPage: React.FC = () => {
 
   // Calcular estadísticas
   const totalUsers = users.length;
-  const activeUsers = users.filter(u => u.state.toLowerCase() === "activo").length;
-  const inactiveUsers = users.filter(u => u.state.toLowerCase() === "inactivo").length;
+  const activeUsers = users.filter(u => u.status.toLowerCase() === "activo").length;
+  const inactiveUsers = users.filter(u => u.status.toLowerCase() === "inactivo").length;
   const roleStats = users.reduce((acc, user) => {
     acc[user.role] = (acc[user.role] || 0) + 1;
     return acc;
@@ -353,9 +353,9 @@ const UsuariosPage: React.FC = () => {
                   <td className="role">{u.role}</td>
                   <td>
                     <span
-                      className={`estado ${u.state.toLowerCase() === "activo" ? "activo" : "inactivo"}`}
+                      className={`estado ${u.status.toLowerCase() === "activo" ? "activo" : "inactivo"}`}
                     >
-                      {u.state}
+                      {u.status}
                     </span>
                   </td>
                   <td>{new Date(u.created_at).toLocaleDateString("es-ES")}</td>

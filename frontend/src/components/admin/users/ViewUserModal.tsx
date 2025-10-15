@@ -33,15 +33,15 @@ const ViewUserModal: React.FC<ViewUserModalProps> = ({
 
   if (!isOpen || !user) return null;
 
-  const getFormattedState = (state: string) => {
-    if (!state) return "No especificado";
-    const lowerState = state.toLowerCase();
+  const getFormattedState = (status: string) => {
+    if (!status) return "No especificado";
+    const lowerState = status.toLowerCase();
     if (lowerState === "active" || lowerState === "activo") {
       return "Activo";
     } else if (lowerState === "inactive" || lowerState === "inactivo") {
       return "Inactivo";
     }
-    return state;
+    return status;
   };
 
   const formatDate = (dateString: string) => {
@@ -139,8 +139,8 @@ const ViewUserModal: React.FC<ViewUserModalProps> = ({
 
               <div className="detail-row">
                 <span className="detail-label">Estado:</span>
-                <span className={`detail-value status ${user.state?.toLowerCase() === "activo" || user.state?.toLowerCase() === "active" ? "active" : "inactive"}`}>
-                  {getFormattedState(user.state)}
+                <span className={`detail-value status ${user.status?.toLowerCase() === "activo" || user.status?.toLowerCase() === "active" ? "active" : "inactive"}`}>
+                  {getFormattedState(user.status)}
                 </span>
               </div>
 

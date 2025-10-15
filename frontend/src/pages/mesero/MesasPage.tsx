@@ -1,28 +1,29 @@
 import React, { useState, useEffect } from 'react';
-import { mockTables } from '../../services/mesero/mockData';
+import { getTables } from '../../services/mesero/tableService';
 import { Table } from '../../types/mesero';
 import TableCard from '../../components/mesero/TableCard';
 import TableModal from '../../components/mesero/TableModal';
-import { getActiveBills } from '../../services/mesero/billService';
 import { connectSocket } from '../../services/sockets/socket';
 import styles from '../../styles/mesero/MesasPage.module.css';
 
 const MesasPage: React.FC = () => {
-  const [tables, setTables] = useState<Table[]>(mockTables);
+  const [tables, setTables] = useState<Table[]>([]);
   const [selectedTable, setSelectedTable] = useState<Table | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [loading, setLoading] = useState(true);
+
 
   useEffect(() => {
     const socket = connectSocket();
     socket.emit("joinRoom", "waiter");
 
+    socket.off("cuentaActualizada");
     socket.on("cuentaActualizada", ({ id, data }) => {
       console.log("Cuenta actualizada en tiempo real:", id, data);
       setTables(prev =>
         prev.map(table =>
           table.current_bill_id === id
-            ? { ...table, ...{ current_bill_data: data } }
+            ? { ...table, current_bill_data: data }
             : table
         )
       );
@@ -34,39 +35,12 @@ const MesasPage: React.FC = () => {
     };
   }, []);
 
+
   useEffect(() => {
-    const loadTablesWithActiveBills = async () => {
+    const loadTables = async () => {
       try {
-        const activeBills = await getActiveBills();
-        console.log(activeBills);
-
-
-        const updatedTables: Table[] = mockTables.map(table => {
-          const matchingBill = activeBills.find(
-            (bill: { table: string; state?: string }) =>
-              bill.state === 'open' && (
-                bill.table === String(table.number) ||
-                bill.table === `Mesa ${table.number}` ||
-                bill.table.endsWith(`${table.number}`)
-              )
-          );
-
-          if (matchingBill) {
-            return {
-              ...table,
-              status: 'occupied' as const,
-              current_bill_id: matchingBill.id,
-            };
-          } else {
-            return {
-              ...table,
-              status: 'free' as const,
-              current_bill_id: null,
-            };
-          }
-        });
-
-        setTables(updatedTables);
+        const fetchedTables = await getTables();
+        setTables(fetchedTables);
       } catch (err) {
         console.error("Error cargando mesas:", err);
       } finally {
@@ -74,8 +48,9 @@ const MesasPage: React.FC = () => {
       }
     };
 
-    loadTablesWithActiveBills();
+    loadTables();
   }, []);
+
 
   if (loading) {
     return (
@@ -119,36 +94,25 @@ const MesasPage: React.FC = () => {
         <p className={styles.mesasSubtitle}>Administra las mesas del restaurante</p>
       </div>
 
-      {/* Tarjetas de estadísticas */}
+      {/* Estadísticas */}
       <div className={styles.statsGrid}>
         <div className={`${styles.statCard} ${styles.statTotal}`}>
-          <div className={styles.statLeft}>
-            <div>
-              <p className={styles.statValue}>{tables.length}</p>
-              <p className={styles.statLabel}>Mesas Totales</p>
-            </div>
-          </div>
+          <p className={styles.statValue}>{tables.length}</p>
+          <p className={styles.statLabel}>Mesas Totales</p>
         </div>
 
         <div className={`${styles.statCard} ${styles.statOccupied}`}>
-          <div className={styles.statLeft}>
-            <div>
-              <p className={styles.statValue}>{tables.filter(t => t.status === 'occupied').length}</p>
-              <p className={styles.statLabel}>Mesas Ocupadas</p>
-            </div>
-          </div>
+          <p className={styles.statValue}>{tables.filter(t => t.status === 'occupied').length}</p>
+          <p className={styles.statLabel}>Mesas Ocupadas</p>
         </div>
 
         <div className={`${styles.statCard} ${styles.statFree}`}>
-          <div className={styles.statLeft}>
-            <div>
-              <p className={styles.statValue}>{tables.filter(t => t.status === 'free').length}</p>
-              <p className={styles.statLabel}>Mesas Libres</p>
-            </div>
-          </div>
+          <p className={styles.statValue}>{tables.filter(t => t.status === 'free').length}</p>
+          <p className={styles.statLabel}>Mesas Libres</p>
         </div>
       </div>
 
+      {/* Lista de mesas */}
       <div className={styles.mesasSection}>
         <h2 className={styles.sectionTitle}>Mesas del Restaurante</h2>
         <div className={styles.mesasGrid}>

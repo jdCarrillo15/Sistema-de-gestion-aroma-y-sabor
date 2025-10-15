@@ -16,7 +16,7 @@ export interface Bill {
     products: Product[];
     total: number;
     created_at: any;
-    state: 'open' | 'closed' | 'paid';
+    status: 'open' | 'closed' | 'paid';
     user_id: string;
     user?: {
         id: string;
@@ -67,7 +67,7 @@ export async function getActiveBills(): Promise<BillsResponse> {
         const response = await getAllBills();
 
         const activeBills = response.bills.filter(
-            (bill: Bill) => bill.state === 'open'
+            (bill: Bill) => bill.status === 'open'
         );
 
         console.log(`${activeBills.length} cuentas activas encontradas`);
@@ -117,7 +117,7 @@ export async function payBill(
                 "Content-Type": "application/json"
             },
             body: JSON.stringify({
-                state: 'paid',
+                status: 'paid',
                 payment_method: paymentMethod,
                 paid_at: new Date().toISOString()
             }),
@@ -145,7 +145,7 @@ export async function getPaidBills(): Promise<BillsResponse> {
         const response = await getAllBills();
 
         const paidBills = response.bills.filter(
-            (bill: Bill) => bill.state === 'paid'
+            (bill: Bill) => bill.status === 'paid'
         );
 
         console.log(`${paidBills.length} cuentas pagadas encontradas`);

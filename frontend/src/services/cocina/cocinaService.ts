@@ -16,7 +16,7 @@ export interface Bill {
   products: Product[];
   total: number;
   created_at: any;
-  state: 'open' | 'closed' | 'paid';
+  status: 'open' | 'closed' | 'paid';
   user_id: string;
   user?: {
     id: string;
@@ -83,7 +83,7 @@ export async function getActiveBills(): Promise<BillResponse> {
     const response = await getAllBills();
 
     const activeBills = response.bills.filter(
-      (bill: Bill) => bill.state === 'open'
+      (bill: Bill) => bill.status === 'open'
     );
 
     return { bills: activeBills };

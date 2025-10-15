@@ -103,7 +103,7 @@ const TableModal: React.FC<TableModalProps> = ({ isOpen, onClose, table, onUpdat
         return;
       }
 
-      const newBill = await createBill(table.number.toString(), user.uid);
+      const newBill = await createBill(table.number, user.uid);
 
       if (newBill) {
         setCurrentBill(newBill);

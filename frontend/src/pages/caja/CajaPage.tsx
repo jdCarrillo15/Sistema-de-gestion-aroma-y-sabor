@@ -102,7 +102,7 @@ const CajaPage: React.FC = () => {
 
             return prev.map((t) => {
               if (t.id !== id) return t;
-              if (data.state === "paid" || data.state === "closed") {
+              if (data.status === "paid" || data.status === "closed") {
                 // Si se cerró, la removemos
                 return null;
               }
