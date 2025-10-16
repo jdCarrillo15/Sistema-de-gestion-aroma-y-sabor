@@ -8,14 +8,16 @@ interface OrderCardProps {
   order: Order;
   index: number;
   isNext: boolean;
-  onMarkReady: (id: string) => void;
+  onMarkReady: (billId: string, productIds: string[]) => void;
+  onMarkProductReady: (billId: string, productId: string) => void;
 }
 
-const OrderCard: React.FC<OrderCardProps> = ({ 
-  order, 
-  index, 
-  isNext, 
-  onMarkReady 
+const OrderCard: React.FC<OrderCardProps> = ({
+  order,
+  index,
+  isNext,
+  onMarkReady,
+  onMarkProductReady
 }) => {
   return (
     <div className={`order-card ${isNext ? 'next' : ''}`}>
@@ -36,12 +38,16 @@ const OrderCard: React.FC<OrderCardProps> = ({
         </div>
       </div>
 
-      <OrderItemsList items={order.items} />
+      <OrderItemsList
+        items={order.items}
+        billId={order.id}
+        onMarkProductReady={onMarkProductReady}
+      />
 
       <Button
         type="button"
         variant={isNext ? 'primary' : 'secondary'}
-        onClick={() => onMarkReady(order.id)}
+        onClick={() => onMarkReady(order.id, order.items.map(item => item.id))}
         className={`mark-ready-btn ${isNext ? 'primary' : ''}`}
       >
         {isNext ? '✓ Marcar como Listo' : 'Marcar Listo'}

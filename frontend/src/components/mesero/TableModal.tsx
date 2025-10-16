@@ -19,6 +19,7 @@ import Button from '../common/Button';
 import AlertModal from '../common/AlertModal';
 import { X, Plus } from 'lucide-react';
 import styles from '../../styles/mesero/TableModal.module.css';
+import { connectSocket } from '../../services/sockets/socket';
 
 interface TableModalProps {
   isOpen: boolean;
@@ -51,6 +52,31 @@ const TableModal: React.FC<TableModalProps> = ({ isOpen, onClose, table, onUpdat
     message: '',
     onConfirm: () => { }
   });
+
+  useEffect(() => {
+    if (!isOpen || !table.current_bill_id) return;
+
+    const socket = connectSocket();
+    console.log(" Mesero escuchando actualizaciones de productos...");
+
+    socket.on("productoActualizado", (updatedProduct: any) => {
+      if (updatedProduct.billId === table.current_bill_id) {
+        console.log("Producto actualizado en cocina:", updatedProduct);
+        setOrders((prevOrders) =>
+          prevOrders.map((item) =>
+            item.id === updatedProduct.productId
+              ? { ...item, process: updatedProduct.newState }
+              : item
+          )
+        );
+      }
+    });
+
+    return () => {
+      socket.off("productoActualizado");
+    };
+  }, [isOpen, table.current_bill_id]);
+
 
   useEffect(() => {
     if (isOpen) {

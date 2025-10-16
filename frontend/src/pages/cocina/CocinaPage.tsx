@@ -7,8 +7,8 @@ import '../../styles/cocina/CocinaPage.css';
 import {
   Order,
   getOrders,
-  markOrderReady,
-  handleApiError
+  handleApiError,
+  changeProductState,
 } from '../../services/cocina/cocinaService';
 import { connectSocket } from '../../services/sockets/socket';
 
@@ -22,38 +22,46 @@ const CocinaPage: React.FC = () => {
     const socket = connectSocket();
     socket.emit("joinRoom", "kitchen");
 
+    socket.on("nuevoProducto", () => {
+      loadData();
+      /*const productos = Array.isArray(payload) ? payload : [payload];
 
-    socket.on("nuevoProducto", (productos) => {
       setOrders((prevOrders) => {
         const updatedOrders = [...prevOrders];
 
-        productos.forEach((p: any) => {
-          const orderId = `${p.billId}`;
-          const existingOrder = updatedOrders.find((o) => o.id === orderId);
+        productos.forEach((p) => {
+          const billId = `${p.billId}`;
+          const existingOrder = updatedOrders.find((o) => o.id === billId);
 
           if (existingOrder) {
-            const alreadyExists = existingOrder.items.some((item) => item.id === p.id);
-            if (!alreadyExists) {
+            const item = existingOrder.items.find(i => i.id === p.id);
+
+            if (item) {
+              item.quantity += Number(p.units);
+            } else {
               existingOrder.items.push({
+                id: p.id,
                 product_name: p.name,
                 quantity: p.units,
-                id: p.id,
                 price: p.price,
+                process: p.process || "pending",
               });
             }
+            existingOrder.status = "pending";
           } else {
             updatedOrders.unshift({
-              id: orderId,
+              id: billId,
               table_name: p.table,
               items: [
                 {
+                  id: p.id,
                   product_name: p.name,
                   quantity: p.units,
-                  id: p.id,
                   price: p.price,
+                  process: p.process || "pending",
                 },
               ],
-              status: p.process === "ready" ? "ready" : "pending",
+              status: "pending",
               created_at: new Date().toISOString(),
               order_number: 0,
             });
@@ -64,22 +72,20 @@ const CocinaPage: React.FC = () => {
       });
     });
 
-    socket.on("productoActualizado", (updatedProduct) => {
+    socket.on("productoActualizado", (payload) => {
       setOrders((prevOrders) =>
         prevOrders.map((order) => {
-          if (order.table_name !== updatedProduct.table) return order;
+          if (order.id !== payload.billId) return order;
           const newItems = order.items.map((item) =>
-            item.product_name === updatedProduct.name
-              ? { ...item, process: updatedProduct.process }
+            item.id === payload.productId
+              ? { ...item, process: payload.newState }
               : item
           );
-          return {
-            ...order,
-            items: newItems,
-          };
+          return { ...order, items: newItems };
         })
-      );
+      );*/
     });
+
 
     socket.on("productoEliminado", ({ billId, productId }) => {
       setOrders((prevOrders) =>
@@ -98,11 +104,17 @@ const CocinaPage: React.FC = () => {
       );
     });
 
+    socket.on("cuentaEliminada", ({ id }) => {
+      console.log("Cuenta eliminada recibida en cocina:", id);
+      setOrders((prevOrders) => prevOrders.filter((order) => order.id !== id));
+    });
+
     return () => {
       socket.emit("leaveRoom", "kitchen");
       socket.off("nuevoProducto");
       socket.off("productoActualizado");
       socket.off("productoEliminado");
+      socket.off("cuentaEliminada");
     };
   }, []);
 
@@ -135,27 +147,55 @@ const CocinaPage: React.FC = () => {
     }
   };
 
-  const handleMarkReady = async (orderId: string) => {
+  const handleMarkReady = async (orderId: string, productIds: string[]) => {
     try {
-      console.log(`Marcando pedido ${orderId} como listo...`);
+      // Actualiza el estado de los pedidos en el frontend
+      setOrders((prev) =>
+        prev.map((order) =>
+          order.id === orderId
+            ? {
+              ...order,
+              status: "ready", // Marca el pedido como listo
+              items: order.items.map((item) =>
+                productIds.includes(item.id)
+                  ? { ...item, process: "ready" } // Marca los productos como listos
+                  : item
+              ),
+            }
+            : order
+        )
+      );
 
-      setOrders(orders.map(order =>
-        order.id === orderId ? { ...order, status: 'ready' as const } : order
-      ));
-
-      await markOrderReady(orderId);
-
-      setTimeout(() => loadData(), 500);
-
-      console.log(`Pedido ${orderId} marcado como listo`);
+      for (const productId of productIds) {
+        await changeProductState(orderId, productId, "ready");
+      }
     } catch (err) {
-      const errorMessage = handleApiError(err);
-      alert(`Error al marcar pedido como listo: ${errorMessage}`);
-      console.error('Error marcando pedido:', err);
+      console.error("Error marcando productos como listos:", err);
       loadData();
     }
   };
 
+
+  const handleMarkProductReady = async (billId: string, productId: string) => {
+    try {
+      await changeProductState(billId, productId, "ready");
+
+      setOrders((prevOrders) =>
+        prevOrders.map((order) => {
+          if (order.id !== billId) return order;
+          const newItems = order.items.map((item) =>
+            item.id === productId
+              ? { ...item, process: "ready" as const }
+              : item
+          );
+          return { ...order, items: newItems };
+        })
+      );
+    } catch (error) {
+      console.error("Error al marcar producto como listo:", error);
+      alert("Error al marcar producto como listo");
+    }
+  };
 
   const pendingOrders = orders.filter(o => o.status === 'pending');
   const readyOrders = orders.filter(o => o.status === 'ready');
@@ -244,7 +284,8 @@ const CocinaPage: React.FC = () => {
                     order={order}
                     index={index}
                     isNext={index === 0}
-                    onMarkReady={handleMarkReady}
+                    onMarkReady={(orderId: string, productIds: string[]) => handleMarkReady(orderId, productIds)}
+                    onMarkProductReady={handleMarkProductReady}
                   />
                 ))}
               </div>

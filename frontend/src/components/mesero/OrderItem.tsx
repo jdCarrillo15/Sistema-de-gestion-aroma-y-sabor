@@ -11,16 +11,16 @@ interface OrderItemProps {
   onUpdateQuantity?: (newQuantity: number) => void;
 }
 
-const OrderItem: React.FC<OrderItemProps> = ({ 
-  order, 
-  onRemove, 
+const OrderItem: React.FC<OrderItemProps> = ({
+  order,
+  onRemove,
   onUpdateQuantity
 }) => {
   const [isDeleting, setIsDeleting] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
   const [editQuantity, setEditQuantity] = useState(order.units);
   const [isUpdating, setIsUpdating] = useState(false);
-  
+
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const [showErrorAlert, setShowErrorAlert] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
@@ -109,11 +109,11 @@ const OrderItem: React.FC<OrderItemProps> = ({
             <h4 className={styles.orderName}>{order.name}</h4>
             {getStatusBadge(order.process)}
           </div>
-          
+
           <div className={styles.orderDetails}>
             {isEditing ? (
               <div className={styles.quantityEditor}>
-                <button 
+                <button
                   className={styles.qtyBtnSmall}
                   onClick={() => setEditQuantity(Math.max(1, editQuantity - 1))}
                   disabled={isUpdating}
@@ -129,7 +129,7 @@ const OrderItem: React.FC<OrderItemProps> = ({
                   min="1"
                   disabled={isUpdating}
                 />
-                <button 
+                <button
                   className={styles.qtyBtnSmall}
                   onClick={() => setEditQuantity(editQuantity + 1)}
                   disabled={isUpdating}
@@ -147,7 +147,7 @@ const OrderItem: React.FC<OrderItemProps> = ({
         <div className={styles.orderActions}>
           {isEditing ? (
             <>
-              <button 
+              <button
                 className={`${styles.actionBtn} ${styles.saveBtn}`}
                 onClick={handleSaveEdit}
                 title="Guardar cambios"
@@ -160,7 +160,7 @@ const OrderItem: React.FC<OrderItemProps> = ({
                   <Check size={18} />
                 )}
               </button>
-              <button 
+              <button
                 className={`${styles.actionBtn} ${styles.cancelBtn}`}
                 onClick={handleCancelEdit}
                 title="Cancelar"
@@ -173,7 +173,7 @@ const OrderItem: React.FC<OrderItemProps> = ({
           ) : (
             <>
               {onUpdateQuantity && (
-                <button 
+                <button
                   className={`${styles.actionBtn} ${styles.editBtn}`}
                   onClick={handleEditClick}
                   title="Editar cantidad"
@@ -183,7 +183,7 @@ const OrderItem: React.FC<OrderItemProps> = ({
                   <Edit2 size={18} />
                 </button>
               )}
-              <button 
+              <button
                 className={`${styles.actionBtn} ${styles.removeBtn}`}
                 onClick={handleDeleteClick}
                 title="Eliminar producto"

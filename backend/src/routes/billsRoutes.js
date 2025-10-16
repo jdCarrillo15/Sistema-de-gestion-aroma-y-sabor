@@ -12,10 +12,10 @@ router.put("/updateBill/:id", authenticate, loadResourceState("bills"), authoriz
 router.delete("/harddeleteBill/:id", authenticate, authorize("delete", "bills"), hardDeleteBill);
 router.post("/addProductToBill/:id", authenticate, authorize("update", "bills"), addProductToBill);
 router.post("/removeProductFromBill/:id", authenticate, authorize("update", "bills"), removeProductFromBill);
-router.put("/updateProductsInBill/:id", authenticate, authorize("update", "bills"), updateProductsInBill);
+router.put("/updateProductsInBill/:id", authenticate, loadResourceState("bills"), authorize("update", "bills"), updateProductsInBill);
 router.put("/closeBillIfEmpty/:id", authenticate, authorize("update", "bills"), closeBillIfEmpty);
 router.post("/calculateBillTotal/:id", authenticate, authorize("read", "bills"), calculateBillTotal);
-router.put("/changeProductStateInBill/:id", authenticate, authorize("update", "bills"), changeProductStateInBill);
+router.put("/changeProductStateInBill/:id", authenticate, loadResourceState("bills"), authorize("update", "bills"), changeProductStateInBill);
 
 
 export default router;

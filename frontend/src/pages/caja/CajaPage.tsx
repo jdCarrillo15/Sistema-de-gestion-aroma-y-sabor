@@ -103,19 +103,19 @@ const CajaPage: React.FC = () => {
             return prev.map((t) => {
               if (t.id !== id) return t;
               if (data.status === "paid" || data.status === "closed") {
-                // Si se cerró, la removemos
                 return null;
               }
-              // Actualiza los productos y total si existen
               return {
                 ...t,
                 total: data.total ?? t.total,
                 items:
-                  data.products?.map((p: { units: any; name: any; price: any; }) => ({
-                    name: `${p.units}x ${p.name}`,
-                    price: Number(p.price) || 0,
-                    units: p.units,
-                  })) ?? t.items,
+                  data.products
+                    ? mergeProducts(data.products).map((p) => ({
+                      name: `${p.units}x ${p.name}`,
+                      price: Number(p.price) || 0,
+                      units: p.units,
+                    }))
+                    : t.items,
               };
             }).filter(Boolean) as ActiveTable[];
           });
@@ -195,11 +195,11 @@ const CajaPage: React.FC = () => {
       const transformedTables: ActiveTable[] = response.bills.map((bill: Bill) => {
         console.debug('bill.products:', bill.products);
 
-        const items: OrderItem[] = bill.products.map((product: Product) => {
+        const mergedProducts = mergeProducts(bill.products);
+
+        const items: OrderItem[] = mergedProducts.map((product: Product) => {
           const parsedPrice = Number(product.price);
           const price = Number.isFinite(parsedPrice) ? parsedPrice : 0;
-
-          console.debug('product:', product, 'parsedPrice:', parsedPrice, 'final price:', price);
 
           return {
             name: `${product.units}x ${product.name}`,
@@ -230,7 +230,6 @@ const CajaPage: React.FC = () => {
       setIsLoading(false);
     }
   };
-
 
   const loadPaymentHistory = async () => {
     try {
@@ -306,6 +305,21 @@ const CajaPage: React.FC = () => {
   const dayStats = calculateDayStats();
   const MAX_VISIBLE_ITEMS = 2;
 
+  // Agrupa productos iguales sumando sus unidades
+  function mergeProducts(products: Product[]): Product[] {
+    const grouped: Record<string, Product> = {};
+
+    for (const p of products) {
+      const key = `${p.name}-${p.price}`;
+      if (grouped[key]) {
+        grouped[key].units += p.units;
+      } else {
+        grouped[key] = { ...p };
+      }
+    }
+
+    return Object.values(grouped);
+  }
 
   return (
     <>

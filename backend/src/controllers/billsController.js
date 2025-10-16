@@ -218,6 +218,7 @@ export async function updateBillById(req, res) {
       }
       io.to("cash").emit("cuentaEliminada", { id: billId });
       io.to("waiter").emit("cuentaEliminada", { id: billId });
+      io.to("kitchen").emit("cuentaEliminada", { id: billId });
     }
 
 
@@ -225,7 +226,7 @@ export async function updateBillById(req, res) {
       id: billId,
       data: updateData,
     });
-    io.to("kithen").emit("cuentaActualizada", {
+    io.to("kitchen").emit("cuentaActualizada", {
       id: billId,
       data: updateData,
     });
@@ -273,6 +274,7 @@ export async function hardDeleteBill(req, res) {
 
     const io = getIO();
     io.to("cash").emit("cuentaEliminada", { id });
+    io.to("kitchen").emit("cuentaEliminada", { id });
 
     res.status(200).json({
       message: "Cuenta eliminada correctamente",
@@ -356,12 +358,7 @@ export async function addProductToBill(req, res) {
     io.to("kitchen").emit("nuevoProducto", kitchenPayload);
     io.to("cash").emit("cuentaActualizada", {
       id,
-      data: {
-        total,
-        products: updatedBill.products,
-        table: updatedBill.table,
-        created_at: updatedBill.created_at,
-      },
+      data: { products: updatedBill.products, total },
     });
 
     res.status(201).json({
@@ -376,7 +373,6 @@ export async function addProductToBill(req, res) {
     });
   }
 }
-
 
 export async function removeProductFromBill(req, res) {
   const { id } = req.params;
@@ -468,6 +464,19 @@ export async function updateProductsInBill(req, res) {
 
     const io = getIO();
     io.to("cash").emit("cuentaActualizada", { id, data: { products: currentProducts, total } });
+    io.to("kitchen").emit("pedidoActualizado", {
+      billId: id,
+      products: products.map(p => ({
+        id: p.id,
+        name: p.name,
+        units: p.units,
+        process: p.process,
+        billId: id,
+        table: billData.table,
+        created_at: billData.created_at,
+      })),
+    });
+
 
     res.status(200).json({
       message: "Productos de la cuenta actualizados correctamente",
@@ -513,6 +522,7 @@ export async function closeBillIfEmpty(req, res) {
 
       const io = getIO();
       io.to("cash").emit("cuentaEliminada", { id });
+      io.to("kitchen").emit("cuentaEliminada", { id });
 
       return res.status(200).json({ message: "Cuenta cerrada correctamente" });
     } else {
@@ -582,33 +592,30 @@ export async function changeProductStateInBill(req, res) {
 
     const billData = billSnap.data();
     const products = billData.products || [];
-    const productIndex = products.findIndex((p) => p.id === productId);
-    if (productIndex === -1) return res.status(404).json({ error: "Producto no encontrado en la cuenta" });
 
-    products[productIndex].process = newState;
-    await billRef.update({ products });
+    const updatedProducts = products.map(p =>
+      p.id === productId ? { ...p, process: newState } : p
+    );
 
-    const updatedProduct = {
-      ...products[productIndex],
-      table: billData.table,
-      billId: id,
-    };
+    await billRef.update({ products: updatedProducts });
 
-    const product = products[productIndex];
-
-    const enrichedProduct = {
-      id: product.id,
-      name: product.name,
-      units: product.units,
-      process: product.process,
+    const io = getIO();
+    io.to("kitchen").emit("productoActualizado", {
       billId: id,
       table: billData.table,
-      created_at: billData.created_at,
-    };
+      productId,
+      newState,
+    });
+    io.to("waiter").emit("productoActualizado", {
+      billId: id,
+      table: billData.table,
+      productId,
+      newState,
+    });
 
     res.status(200).json({
       message: "Estado del producto actualizado correctamente",
-      updatedProduct,
+      updatedProductIds: products.filter(p => p.id === productId).map(p => p.id),
     });
   } catch (err) {
     console.error("Error al actualizar estado del producto:", err);
@@ -618,5 +625,6 @@ export async function changeProductStateInBill(req, res) {
     });
   }
 }
+
 
 

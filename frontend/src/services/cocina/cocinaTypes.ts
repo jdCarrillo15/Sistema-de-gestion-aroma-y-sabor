@@ -3,6 +3,7 @@ export interface OrderItem {
   product_name: string;
   quantity: number;
   price?: number;
+  process?: 'pending' | 'ready' | 'delivered';
 }
 
 export interface Order {

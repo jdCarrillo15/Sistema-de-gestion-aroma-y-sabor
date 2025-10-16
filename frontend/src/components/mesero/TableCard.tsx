@@ -25,7 +25,7 @@ const TableCard: React.FC<TableCardProps> = ({ table, onClick }) => {
   const statusInfo = getStatusInfo();
 
   return (
-    <div 
+    <div
       className={`${styles.tableCard} ${statusInfo.statusClass}`}
       onClick={onClick}
     >
@@ -44,7 +44,7 @@ const TableCard: React.FC<TableCardProps> = ({ table, onClick }) => {
           <Users size={16} className={styles.infoIcon} />
           <span>{table.capacity} personas</span>
         </div>
-        
+
         {table.status === 'occupied' && table.current_bill_id && (
           <div className={`${styles.infoItem} ${styles.active}`}>
             <Clock size={16} className={styles.infoIcon} />
