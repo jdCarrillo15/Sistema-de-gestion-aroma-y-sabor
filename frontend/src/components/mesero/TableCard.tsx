@@ -1,7 +1,9 @@
+// frontend/src/components/mesero/TableCard.tsx
 import React from 'react';
 import { Table } from '../../types/mesero';
-import { Users, Clock } from 'lucide-react';
+import { Users, Clock, Bell } from 'lucide-react';
 import styles from '../../styles/mesero/TableCard.module.css';
+import { useNotifications } from '../../context/notificationContext';
 
 interface TableCardProps {
   table: Table;
@@ -9,6 +11,18 @@ interface TableCardProps {
 }
 
 const TableCard: React.FC<TableCardProps> = ({ table, onClick }) => {
+  const { hasUnreadForTable, getUnreadCountForTable } = useNotifications();
+  
+  
+  const hasNotifications = table.current_bill_id 
+    ? hasUnreadForTable(table.current_bill_id)
+    : false;
+    
+  
+  const notificationCount = table.current_bill_id
+    ? getUnreadCountForTable(table.current_bill_id)
+    : 0;
+
   const getStatusInfo = () => {
     if (table.status === 'free') {
       return {
@@ -26,9 +40,19 @@ const TableCard: React.FC<TableCardProps> = ({ table, onClick }) => {
 
   return (
     <div
-      className={`${styles.tableCard} ${statusInfo.statusClass}`}
+      className={`${styles.tableCard} ${statusInfo.statusClass} ${hasNotifications ? styles.hasNotification : ''}`}
       onClick={onClick}
     >
+      
+      {hasNotifications && (
+        <div className={styles.notificationBadge}>
+          <Bell size={14} />
+          {notificationCount > 1 && (
+            <span className={styles.notificationCount}>{notificationCount}</span>
+          )}
+        </div>
+      )}
+
       <div className={styles.tableHeader}>
         <div className={styles.tableNumber}>
           <span className={styles.tableLabel}>Mesa </span>

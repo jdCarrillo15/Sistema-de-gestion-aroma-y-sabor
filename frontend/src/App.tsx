@@ -15,16 +15,15 @@ import CocinaPage from "./pages/cocina/CocinaPage";
 import ProtectedRoute from "./components/ProtectedRoute";
 import { SocketProvider } from "./context/socketContext";
 import { UserProvider } from "./context/userContext";
-
+import { NotificationProvider } from "./context/notificationContext";
 function App() {
   return (
     <UserProvider>
       <SocketProvider>
-        <BrowserRouter>
-          <Routes>
+        <NotificationProvider>
+          <BrowserRouter>
+            <Routes>
             <Route path="/" element={<LoginPage />} />
-
-            {/* Panel Admin */}
             <Route
               path="/admin"
               element={
@@ -74,10 +73,11 @@ function App() {
             >
               <Route index element={<CajaPage />} />
             </Route>
-          </Routes>
-        </BrowserRouter >
+            </Routes>
+          </BrowserRouter>
+        </NotificationProvider>
       </SocketProvider>
-    </UserProvider >
+    </UserProvider>
   );
 }
 

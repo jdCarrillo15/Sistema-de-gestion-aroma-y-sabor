@@ -1,3 +1,5 @@
+/* frontend/src/styles/mesero/TableCard.module.css */
+
 .tableCard {
   background: white;
   border-radius: 12px;
@@ -8,6 +10,8 @@
   min-height: 180px;
   display: flex;
   flex-direction: column;
+  position: relative; /* 👈 IMPORTANTE: para posicionar el badge */
+  overflow: visible; /* 👈 IMPORTANTE: para que el badge salga de la tarjeta */
 }
 
 .tableCard:hover {
@@ -35,6 +39,73 @@
 .tableCard.occupied:hover {
   border-color: #ea580c;
   box-shadow: 0 12px 24px rgba(249, 115, 22, 0.25);
+}
+
+/* 🔔 Mesa con notificación - Animación de pulso */
+.tableCard.hasNotification {
+  animation: pulse 2s ease-in-out infinite;
+  box-shadow: 0 0 20px rgba(249, 115, 22, 0.4) !important;
+  border-color: #f97316 !important;
+}
+
+@keyframes pulse {
+  0%, 100% {
+    box-shadow: 0 0 20px rgba(249, 115, 22, 0.4);
+    transform: scale(1);
+  }
+  50% {
+    box-shadow: 0 0 30px rgba(249, 115, 22, 0.6);
+    transform: scale(1.02);
+  }
+}
+
+/* 🔴 Badge de notificación en la esquina superior derecha */
+.notificationBadge {
+  position: absolute;
+  top: -10px;
+  right: -10px;
+  background: linear-gradient(135deg, #dc2626 0%, #ef4444 100%);
+  color: white;
+  border-radius: 50%;
+  width: 36px;
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 
+    0 4px 12px rgba(220, 38, 38, 0.5),
+    0 0 0 4px white;
+  animation: bounce 1s ease-in-out infinite;
+  z-index: 10;
+  border: 3px solid white;
+}
+
+@keyframes bounce {
+  0%, 100% {
+    transform: translateY(0) scale(1);
+  }
+  50% {
+    transform: translateY(-5px) scale(1.1);
+  }
+}
+
+/* Contador de notificaciones múltiples */
+.notificationCount {
+  position: absolute;
+  bottom: -6px;
+  right: -6px;
+  background: #7f1d1d;
+  color: white;
+  border-radius: 50%;
+  width: 20px;
+  height: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.7rem;
+  font-weight: 700;
+  border: 2px solid white;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
 }
 
 /* Header */
@@ -169,6 +240,26 @@
     padding: 1rem;
   }
 
+  .notificationBadge {
+    width: 32px;
+    height: 32px;
+    top: -8px;
+    right: -8px;
+  }
+
+  .notificationBadge svg {
+    width: 12px;
+    height: 12px;
+  }
+  
+  .notificationCount {
+    width: 18px;
+    height: 18px;
+    font-size: 0.65rem;
+    bottom: -5px;
+    right: -5px;
+  }
+
   .tableNumber {
     font-size: 1.1rem;
   }
@@ -191,6 +282,24 @@
   .tableCard {
     min-height: 150px;
     padding: 0.875rem;
+  }
+
+  .notificationBadge {
+    width: 28px;
+    height: 28px;
+    top: -7px;
+    right: -7px;
+  }
+
+  .notificationBadge svg {
+    width: 11px;
+    height: 11px;
+  }
+
+  .notificationCount {
+    width: 16px;
+    height: 16px;
+    font-size: 0.6rem;
   }
 
   .tableHeader {

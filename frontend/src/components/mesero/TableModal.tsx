@@ -20,6 +20,7 @@ import AlertModal from '../common/AlertModal';
 import { X, Plus } from 'lucide-react';
 import styles from '../../styles/mesero/TableModal.module.css';
 import { connectSocket } from '../../services/sockets/socket';
+import { useNotifications } from '../../context/notificationContext';
 
 interface TableModalProps {
   isOpen: boolean;
@@ -29,6 +30,7 @@ interface TableModalProps {
 }
 
 const TableModal: React.FC<TableModalProps> = ({ isOpen, onClose, table, onUpdateTable }) => {
+  const { markAsRead } = useNotifications();
   const [orders, setOrders] = useState<BillProduct[]>([]);
   const [isCatalogOpen, setIsCatalogOpen] = useState(false);
   const [currentBill, setCurrentBill] = useState<Bill | null>(null);
@@ -77,6 +79,13 @@ const TableModal: React.FC<TableModalProps> = ({ isOpen, onClose, table, onUpdat
     };
   }, [isOpen, table.current_bill_id]);
 
+  useEffect(() => {
+    if (isOpen && table.current_bill_id) {
+      
+      markAsRead(table.current_bill_id);
+      loadBill();
+    }
+  }, [isOpen, table.current_bill_id, markAsRead]);
 
   useEffect(() => {
     if (isOpen) {
@@ -394,19 +403,6 @@ const TableModal: React.FC<TableModalProps> = ({ isOpen, onClose, table, onUpdat
                 <Button variant="secondary" onClick={onClose}>
                   Cerrar
                 </Button>
-                {orders.length === 0 ? (
-                  <Button
-                    variant="primary"
-                    onClick={handleCloseBill}
-                    disabled={isLoading}
-                  >
-                    Cerrar Cuenta
-                  </Button>
-                ) : (
-                  <Button variant="primary" disabled={orders.length === 0}>
-                    Procesar Cuenta
-                  </Button>
-                )}
               </div>
             </div>
           )}
