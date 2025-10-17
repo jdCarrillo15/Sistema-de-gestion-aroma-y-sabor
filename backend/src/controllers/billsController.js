@@ -613,6 +613,17 @@ export async function changeProductStateInBill(req, res) {
       newState,
     });
 
+    if (newState === "ready") {
+      const productInfo = products.find(p => p.id === productId);
+      io.to("waiter").emit("productoListo", {
+        billId: id,
+        table: billData.table,
+        productId,
+        productName: productInfo?.name || "Producto",
+        timestamp: new Date().toISOString(),
+      });
+    }
+
     res.status(200).json({
       message: "Estado del producto actualizado correctamente",
       updatedProductIds: products.filter(p => p.id === productId).map(p => p.id),
