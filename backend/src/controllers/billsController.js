@@ -307,10 +307,12 @@ export async function addProductToBill(req, res) {
 
       const productData = productDoc.data();
 
-      if (productData.stock < item.units) {
-        return res.status(400).json({
-          error: `No hay suficiente stock para ${productData.name}. Stock disponible: ${productData.stock}`,
-        });
+      if (productData.type === "nonprepared") {
+        if (productData.stock < item.units) {
+          return res.status(400).json({
+            error: `No hay suficiente stock para ${productData.name}. Stock disponible: ${productData.stock}`,
+          });
+        }
       }
 
       await db.collection("products").doc(item.id).update({

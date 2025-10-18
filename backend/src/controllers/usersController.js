@@ -20,7 +20,6 @@ export async function getUsers(req, res) {
                         person = { id: personDoc.id, ...personDoc.data() };
                     }
                 }
-
                 return {
                     id: doc.id,
                     user_name: data.user_name,
@@ -28,7 +27,7 @@ export async function getUsers(req, res) {
                     role: data.role,
                     state: data.state,
                     person,
-                    created_at: admin.firestore.FieldValue.serverTimestamp(),
+                    created_at: data.created_at._seconds*1000 || "",
                 };
             })
         );
@@ -77,7 +76,7 @@ export async function createUserAndPerson(req, res) {
             user_name: data.user_name || "",
             role: data.role || "",
             email: data.email,
-            state: data.state || "active",
+            state: data.status || data.state || "active",
             created_at: admin.firestore.FieldValue.serverTimestamp()
         });
 
@@ -143,7 +142,7 @@ export async function getUserById(req, res) {
 
 export async function updateUserById(req, res) {
     try {
-        const userDoc = await db.collection("users").doc(req.params.id).get();
+        const userDoc = await getResourceDoc(req.params.id, "users");
 
         if (!userDoc.exists) {
             return res.status(404).json({ error: "Usuario no encontrado" });
