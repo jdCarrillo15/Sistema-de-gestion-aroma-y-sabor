@@ -1,4 +1,5 @@
 import { db, admin } from "../config/firebase.js";
+import { getResourceDoc } from "../services/resourceService.js";
 
 export async function login(req, res) {
 
@@ -7,10 +8,6 @@ export async function login(req, res) {
 
     if (!email || !password) {
         return res.status(400).json({ error: "Email y contraseña requeridos" });
-    }
-    const userDoc = await getResourceDoc("users", email);
-    if (userDoc.state != "active") {
-        return res.status(401).json({ error: "El usuario no está activo" });
     }
 
     try {
@@ -40,6 +37,10 @@ export async function login(req, res) {
         const role = userDoc.exists ? userDoc.data().role : "guest";
         const name = userDoc.exists ? userDoc.data().user_name : "Usuario";
 
+        if (userDoc.exists && userDoc.data().state != "active") {
+            return res.status(401).json({ error: "El usuario no está activo" });
+        }
+        
         res.json({ success: true, uid: data.localId, role, name });
 
     } catch (err) {
