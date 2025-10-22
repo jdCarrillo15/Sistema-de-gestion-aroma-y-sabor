@@ -143,8 +143,9 @@ export async function getUserById(req, res) {
 export async function updateUserById(req, res) {
     try {
         const userDoc = await getResourceDoc(req.params.id, "users");
+        console.log(req.body);
 
-        if (!userDoc.exists) {
+        if (userDoc == null) {
             return res.status(404).json({ error: "Usuario no encontrado" });
         }
 
@@ -155,6 +156,7 @@ export async function updateUserById(req, res) {
         }
 
         await db.collection("users").doc(req.params.id).update(data);
+        
         res.status(200).json({ message: "Usuario actualizado correctamente" });
 
     } catch (err) {

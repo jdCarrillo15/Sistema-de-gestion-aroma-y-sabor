@@ -26,7 +26,7 @@ const CreateUserModal: React.FC<CreateUserModalProps> = ({
   const [userName, setUserName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [role, setRole] = useState("user");
+  const [role, setRole] = useState("kitchen");
   const [status, setState] = useState("active");
 
   const [firstName, setFirstName] = useState("");
@@ -51,7 +51,7 @@ const CreateUserModal: React.FC<CreateUserModalProps> = ({
       setUserName("");
       setEmail("");
       setPassword("");
-      setRole("user");
+      setRole("kitchen");
       setState("active");
       setFirstName("");
       setLastName("");

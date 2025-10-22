@@ -1,5 +1,4 @@
 import { db, admin } from "../config/firebase.js";
-import { getResourceDoc } from "../services/resourceService.js";
 
 export async function login(req, res) {
 

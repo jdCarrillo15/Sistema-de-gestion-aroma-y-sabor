@@ -18,7 +18,7 @@ const EditUserModal: React.FC<EditUserModalProps> = ({
 }) => {
   const [userName, setUserName] = useState("");
   const [email, setEmail] = useState("");
-  const [role, setRole] = useState("");
+  const [role, setRole] = useState("kitchen");
   const [status, setState] = useState("active");
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
@@ -40,7 +40,7 @@ const EditUserModal: React.FC<EditUserModalProps> = ({
     if (isOpen && user) {
       setUserName(user.user_name ?? "");
       setEmail(user.email ?? "");
-      setRole(user.role ?? "");
+      setRole(user.role ?? "kitchen");
 
       // Normalizar state
       const userState = user.status?.toLowerCase();

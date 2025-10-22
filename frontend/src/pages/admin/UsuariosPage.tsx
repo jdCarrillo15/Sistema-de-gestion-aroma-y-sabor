@@ -72,7 +72,7 @@ const UsuariosPage: React.FC = () => {
         user_name: u.user_name,
         email: u.email,
         role: u.role,
-        status: normalizeState(u.status ?? ""),
+        status: normalizeState(u.status ?? u.state ?? ""),
         created_at: u.created_at ?? new Date().toISOString(),
         person: u.person
           ? {
