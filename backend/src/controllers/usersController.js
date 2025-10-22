@@ -20,7 +20,6 @@ export async function getUsers(req, res) {
                         person = { id: personDoc.id, ...personDoc.data() };
                     }
                 }
-
                 return {
                     id: doc.id,
                     user_name: data.user_name,
@@ -28,7 +27,7 @@ export async function getUsers(req, res) {
                     role: data.role,
                     state: data.state,
                     person,
-                    created_at: admin.firestore.FieldValue.serverTimestamp(),
+                    created_at: data.created_at._seconds*1000 || "",
                 };
             })
         );
@@ -49,7 +48,6 @@ export async function createUserAndPerson(req, res) {
         return res.status(409).json({ error: "El email ya está en uso" });
     }
     if (data.password.length < 6) {
-        console.log(data.password);
         return res.status(406).json({ error: "La contraseña debe tener al menos 6 caracteres" });
     } else if (await checkPasswordStrength(data.password) == false) {
         return res.status(406).json({ error: "La contraseña debe contener al menos una mayúscula, una minúscula y un número" });
@@ -78,7 +76,7 @@ export async function createUserAndPerson(req, res) {
             user_name: data.user_name || "",
             role: data.role || "",
             email: data.email,
-            state: data.state || "active",
+            state: data.status || data.state || "active",
             created_at: admin.firestore.FieldValue.serverTimestamp()
         });
 
@@ -144,7 +142,7 @@ export async function getUserById(req, res) {
 
 export async function updateUserById(req, res) {
     try {
-        const userDoc = await db.collection("users").doc(req.params.id).get();
+        const userDoc = await getResourceDoc(req.params.id, "users");
 
         if (!userDoc.exists) {
             return res.status(404).json({ error: "Usuario no encontrado" });
@@ -155,8 +153,6 @@ export async function updateUserById(req, res) {
         if (data.email) {//Se actualiza el email de auth antes de actualizar en la BD
             await admin.auth().updateUser(req.params.id, { email: data.email });
         }
-
-        console.log(data);
 
         await db.collection("users").doc(req.params.id).update(data);
         res.status(200).json({ message: "Usuario actualizado correctamente" });

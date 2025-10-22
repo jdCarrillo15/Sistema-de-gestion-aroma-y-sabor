@@ -16,7 +16,7 @@ export interface Bill {
   products: Product[];
   total: number;
   created_at: any;
-  state: 'open' | 'closed' | 'paid';
+  status: 'open' | 'closed' | 'paid';
   user_id: string;
   user?: {
     id: string;
@@ -31,6 +31,7 @@ export interface OrderItem {
   product_name: string;
   quantity: number;
   price?: number;
+  process?: 'pending' | 'ready' | 'delivered';
 }
 
 export interface Order {
@@ -83,7 +84,7 @@ export async function getActiveBills(): Promise<BillResponse> {
     const response = await getAllBills();
 
     const activeBills = response.bills.filter(
-      (bill: Bill) => bill.state === 'open'
+      (bill: Bill) => bill.status === 'open'
     );
 
     return { bills: activeBills };
@@ -95,51 +96,55 @@ export async function getActiveBills(): Promise<BillResponse> {
 
 export async function getOrders(): Promise<OrderResponse> {
   try {
-    console.log(" Obteniendo pedidos para cocina...");
+    console.log("Obteniendo pedidos para cocina...");
 
     const response = await getActiveBills();
 
     const orders: Order[] = response.bills
       .filter(bill => bill.products && bill.products.length > 0)
       .map((bill, _index) => {
+        // Asegurar que cada producto tenga process (si no existe, usar "pending")
         const items: OrderItem[] = bill.products.map(product => ({
           id: product.id,
           product_name: product.name,
           quantity: product.units,
-          price: product.price
+          price: product.price,
+          process: product.process || "pending",
         }));
 
-        const allReady = bill.products.every(p =>
-          p.process === 'ready' || p.process === 'delivered'
-        );
-        const status: 'pending' | 'ready' = allReady ? 'ready' : 'pending';
+        // Determinar si la orden completa está lista o pendiente
+        const allReady = items.every(p => p.process === "ready" || p.process === "delivered");
+        const status: "pending" | "ready" = allReady ? "ready" : "pending";
 
+        // Calcular el orden de aparición solo entre pendientes
         const pendingIndex = response.bills
-          .filter(b => b.products.some(p => p.process === 'pending'))
+          .filter(b => b.products?.some(p => (p.process || "pending") === "pending"))
           .findIndex(b => b.id === bill.id);
 
         return {
           id: bill.id,
-          table_name: bill.table.startsWith('Mesa') ? bill.table : `Mesa ${bill.table}`,
+          table_name: bill.table,
           items,
           status,
           created_at: formatTime(bill.created_at),
-          order_number: status === 'pending' ? pendingIndex + 1 : 0
+          order_number: status === "pending" ? pendingIndex + 1 : 0,
         };
       })
+      // Ordenar: pendientes primero, listos después
       .sort((a, b) => {
-        if (a.status === 'pending' && b.status === 'ready') return -1;
-        if (a.status === 'ready' && b.status === 'pending') return 1;
+        if (a.status === "pending" && b.status === "ready") return -1;
+        if (a.status === "ready" && b.status === "pending") return 1;
         return 0;
       });
 
-    console.log(` ${orders.length} pedidos obtenidos`);
+    console.log(`${orders.length} pedidos obtenidos`);
     return { orders };
   } catch (error) {
     console.error("Error in getOrders service:", error);
     throw error;
   }
 }
+
 
 export async function markOrderReady(orderId: string): Promise<{ message: string }> {
   try {
@@ -192,7 +197,11 @@ export async function changeProductState(
   newState: 'pending' | 'ready' | 'delivered'
 ): Promise<{ message: string }> {
   try {
-    console.log(`Cambiando estado del producto ${productId} a ${newState}...`);
+    if (!billId || !productId || !newState) {
+      throw new Error("Parámetros inválidos para changeProductState");
+    }
+
+    console.debug("changeProductState payload:", { billId, productId, newState });
 
     const response = await fetch(`${API_BASE_URL}/bills/changeProductStateInBill/${billId}`, {
       method: "PUT",
@@ -207,11 +216,10 @@ export async function changeProductState(
     });
 
     if (!response.ok) {
-      const errorData = await response.json();
+      const errorData = await response.json().catch(() => ({}));
       throw new Error(errorData.error || "Error cambiando estado del producto");
     }
 
-    console.log(`Estado del producto actualizado`);
     return await response.json();
   } catch (error) {
     console.error("Error in changeProductState service:", error);

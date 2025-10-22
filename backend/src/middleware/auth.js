@@ -25,8 +25,7 @@ export async function authenticate(req, res, next) {
 export function authorize(action, resource) {
     return async (req, res, next) => {
         try {
-
-            const currentState = req.state || null;
+            const currentState = req.state || req.status || null;
             const hasAccess = await canAccess(req.user, action, resource, currentState, req.params.id);
 
             if (!hasAccess) {
@@ -63,12 +62,11 @@ export function authorizeComposite(action) {
 export function loadResourceState(resourceCollection, idParam = "id") {
     return async (req, res, next) => {
         try {
-            console.log(req);
 
             const docId = req.params[idParam];
             const doc = await db.collection(resourceCollection).doc(docId).get();
             const data = doc.data();
-            req.state = data.state || null;
+            req.state = data.state || data.status || null;
 
             next();
         } catch (err) {

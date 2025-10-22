@@ -10,7 +10,7 @@ interface CreateUserModalProps {
     email: string;
     password: string;
     role: string;
-    state: string;
+    status: string;
     first_name: string;
     last_name: string;
     document_id: string;
@@ -27,7 +27,7 @@ const CreateUserModal: React.FC<CreateUserModalProps> = ({
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [role, setRole] = useState("user");
-  const [state, setState] = useState("active");
+  const [status, setState] = useState("active");
 
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
@@ -250,7 +250,7 @@ const CreateUserModal: React.FC<CreateUserModalProps> = ({
         email: email.trim(),
         password,
         role,
-        state,
+        status: status,
         first_name: firstName.trim(),
         last_name: lastName.trim(),
         document_id: documentId,
@@ -443,10 +443,10 @@ const CreateUserModal: React.FC<CreateUserModalProps> = ({
             </div>
 
             <div className="form-group">
-              <label htmlFor="state" className="form-label">Estado *</label>
+              <label htmlFor="status" className="form-label">Estado *</label>
               <select
-                id="state"
-                value={state}
+                id="status"
+                value={status}
                 onChange={(e) => setState(e.target.value)}
                 className="form-input"
                 disabled={isSubmitting}

@@ -8,6 +8,10 @@ export async function login(req, res) {
     if (!email || !password) {
         return res.status(400).json({ error: "Email y contraseña requeridos" });
     }
+    const userDoc = await getResourceDoc("users", email);
+    if (userDoc.state != "active") {
+        return res.status(401).json({ error: "El usuario no está activo" });
+    }
 
     try {
         const response = await fetch(

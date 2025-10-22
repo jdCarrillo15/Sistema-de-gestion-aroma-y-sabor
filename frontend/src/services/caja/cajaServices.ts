@@ -16,7 +16,7 @@ export interface Bill {
     products: Product[];
     total: number;
     created_at: any;
-    state: 'open' | 'closed' | 'paid';
+    status: 'open' | 'closed' | 'paid';
     user_id: string;
     user?: {
         id: string;
@@ -67,7 +67,7 @@ export async function getActiveBills(): Promise<BillsResponse> {
         const response = await getAllBills();
 
         const activeBills = response.bills.filter(
-            (bill: Bill) => bill.state === 'open'
+            (bill: Bill) => bill.status === 'open'
         );
 
         console.log(`${activeBills.length} cuentas activas encontradas`);
@@ -109,15 +109,13 @@ export async function payBill(
     paymentMethod: 'Efectivo' | 'Tarjeta' | 'Transferencia'
 ): Promise<UpdateBillResponse> {
     try {
-        console.log(`Pagando cuenta ${billId} con método: ${paymentMethod}`);
-
         const response = await fetch(`${API_BASE_URL}/bills/updateBill/${billId}`, {
             method: "PUT",
             headers: {
                 "Content-Type": "application/json"
             },
             body: JSON.stringify({
-                state: 'paid',
+                status: 'paid',
                 payment_method: paymentMethod,
                 paid_at: new Date().toISOString()
             }),
@@ -129,7 +127,6 @@ export async function payBill(
             throw new Error(errorData.error || "Error procesando pago");
         }
 
-        console.log(`Cuenta ${billId} pagada exitosamente`);
         return await response.json();
     } catch (error) {
         console.error("Error in payBill service:", error);
@@ -145,7 +142,7 @@ export async function getPaidBills(): Promise<BillsResponse> {
         const response = await getAllBills();
 
         const paidBills = response.bills.filter(
-            (bill: Bill) => bill.state === 'paid'
+            (bill: Bill) => bill.status === 'paid'
         );
 
         console.log(`${paidBills.length} cuentas pagadas encontradas`);

@@ -19,7 +19,7 @@ const EditUserModal: React.FC<EditUserModalProps> = ({
   const [userName, setUserName] = useState("");
   const [email, setEmail] = useState("");
   const [role, setRole] = useState("");
-  const [state, setState] = useState("active");
+  const [status, setState] = useState("active");
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
   const [birthdate, setBirthdate] = useState("");
@@ -43,7 +43,7 @@ const EditUserModal: React.FC<EditUserModalProps> = ({
       setRole(user.role ?? "");
 
       // Normalizar state
-      const userState = user.state?.toLowerCase();
+      const userState = user.status?.toLowerCase();
       setState(userState === "activo" || userState === "active" ? "active" : "inactive");
 
       setFirstName(user.person?.first_name ?? "");
@@ -193,7 +193,7 @@ const EditUserModal: React.FC<EditUserModalProps> = ({
         user_name: userName.trim(),
         email: email.trim(),
         role: role,
-        state: state,
+        status: status,
         // Datos de persona para actualizar
         first_name: firstName.trim(),
         last_name: lastName.trim(),
@@ -207,7 +207,7 @@ const EditUserModal: React.FC<EditUserModalProps> = ({
         user_name: userName.trim(),
         email: email.trim(),
         role: role,
-        state: state,
+        status: status,
         created_at: user.created_at,
         person: {
           id: user.person?.id,
@@ -370,10 +370,10 @@ const EditUserModal: React.FC<EditUserModalProps> = ({
               </div>
 
               <div className="form-group">
-                <label htmlFor="state" className="form-label">Estado *</label>
+                <label htmlFor="status" className="form-label">Estado *</label>
                 <select
-                  id="state"
-                  value={state}
+                  id="status"
+                  value={status}
                   onChange={(e) => setState(e.target.value)}
                   className="form-input"
                   disabled={isSubmitting}

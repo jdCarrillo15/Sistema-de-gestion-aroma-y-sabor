@@ -21,7 +21,7 @@ export async function getBills(req, res) {
         }
 
         return {
-          state: data.state,
+          status: data.status,
           total: data.total,
           table: data.table,
           created_at: data.created_at,
@@ -53,14 +53,16 @@ export async function createBill(req, res) {
     const billsRef = db.collection("bills");
     const existingBillSnap = await billsRef
       .where("table", "==", data.table)
-      .where("state", "==", "open")
+      .where("status", "==", "open")
       .limit(1)
       .get();
 
-    // Validar si ya existe una cuenta abierta para esta mesa
+    // Verificar si ya existe una cuenta abierta
     if (!existingBillSnap.empty) {
       const existingBill = existingBillSnap.docs[0];
-      console.log(`Cuenta existente encontrada para la mesa ${data.table}: ${existingBill.id}`);
+      console.log(
+        `Cuenta existente encontrada para la mesa ${data.table}: ${existingBill.id}`
+      );
 
       return res.status(200).json({
         message: "Ya existe una cuenta abierta para esta mesa.",
@@ -69,34 +71,8 @@ export async function createBill(req, res) {
       });
     }
 
-    if (data.products && data.products.length > 0) {
-      for (const item of data.products) {
-        const productDoc = await db.collection("products").doc(item.id).get();
-
-        if (!productDoc.exists) {
-          return res.status(404).json({
-            error: `El producto ${item.id} no existe.`,
-          });
-        }
-
-        const productData = productDoc.data();
-        if (productData.stock < item.units) {
-          return res.status(400).json({
-            error: `No hay suficiente stock para ${productData.name}. Stock disponible: ${productData.stock}`,
-          });
-        }
-
-        await db
-          .collection("products")
-          .doc(item.id)
-          .update({
-            stock: admin.firestore.FieldValue.increment(-item.units),
-          });
-      }
-    }
-
     const billRef = await billsRef.add({
-      state: data.state || "open",
+      status: data.status || "open",
       total: data.total || 0,
       table: data.table,
       user_id: data.user_id,
@@ -104,14 +80,33 @@ export async function createBill(req, res) {
       created_at: admin.firestore.FieldValue.serverTimestamp(),
     });
 
+    // Actualizar la mesa correspondiente
+    const tablesRef = db.collection("tables");
+    const tableQuery = await tablesRef
+      .where("number", "==", Number(data.table))
+      .limit(1)
+      .get();
+
+    if (!tableQuery.empty) {
+      const tableDoc = tableQuery.docs[0];
+      await tableDoc.ref.update({
+        current_bill_id: billRef.id,
+        status: "occupied",
+      });
+    }
+
     const io = getIO();
-    io.to("cash").emit("nuevaCuenta", {
+
+    const newBillData = {
       id: billRef.id,
       table: data.table,
       total: data.total || 0,
       products: data.products || [],
       created_at: new Date().toISOString(),
-    });
+    };
+
+    io.to("cash").emit("nuevaCuenta", newBillData);
+    io.to("kitchen").emit("nuevaCuenta", newBillData);
 
     return res.status(201).json({
       message: "Cuenta creada correctamente",
@@ -126,7 +121,6 @@ export async function createBill(req, res) {
     });
   }
 }
-
 
 export async function getBillById(req, res) {
   try {
@@ -149,7 +143,7 @@ export async function getBillById(req, res) {
 
     return res.json({
       id: id,
-      state: billData.state,
+      status: billData.status,
       total: billData.total,
       table: billData.table,
       user,
@@ -167,7 +161,7 @@ export async function getBillById(req, res) {
 export async function getActiveBills(req, res) {
   try {
     const billsSnap = await db.collection("bills")
-      .where("state", "==", "open")
+      .where("status", "==", "open")
       .get();
 
     if (billsSnap.empty) {
@@ -192,28 +186,57 @@ export async function getActiveBills(req, res) {
 
 export async function updateBillById(req, res) {
   try {
-    const billDoc = await db.collection("bills").doc(req.params.id).get();
+    const billId = req.params.id;
+    const updateData = req.body;
 
-    if (!billDoc.exists) {
+    const billRef = db.collection("bills").doc(billId);
+    const billSnap = await billRef.get();
+
+    if (!billSnap.exists) {
       return res.status(404).json({ error: "Cuenta no encontrada" });
     }
 
-    const data = req.body;
+    const oldBill = billSnap.data();
 
-    await db.collection("bills").doc(req.params.id).update(data);
+    await billRef.update(updateData);
 
-    try {
-      const io = getIO();
-      io.to("cash").emit("cuentaActualizada", { id: req.params.id, data });
-    } catch (e) {
-      console.warn("No se pudo emitir evento de socket cuentaActualizada:", e.message);
+    const io = getIO();
+    //Si el estado pasa a 'paid' o 'closed', se libera la mesa
+    if (updateData.status === "paid" || updateData.status === "closed") {
+      const tablesRef = db.collection("tables");
+      const tableQuery = await tablesRef
+        .where("number", "==", Number(oldBill.table))
+        .limit(1)
+        .get();
+
+      if (!tableQuery.empty) {
+        const tableDoc = tableQuery.docs[0];
+        await tableDoc.ref.update({
+          status: "free",
+          current_bill_id: null,
+        });
+      }
+      io.to("cash").emit("cuentaEliminada", { id: billId });
+      io.to("waiter").emit("cuentaEliminada", { id: billId });
+      io.to("kitchen").emit("cuentaEliminada", { id: billId });
     }
 
-    res.status(200).json({ message: "Cuenta actualizada correctamente" });
+
+    io.to("cash").emit("cuentaActualizada", {
+      id: billId,
+      data: updateData,
+    });
+    io.to("kitchen").emit("cuentaActualizada", {
+      id: billId,
+      data: updateData,
+    });
+
+    return res.status(200).json({ message: "Cuenta actualizada correctamente" });
   } catch (err) {
-    res
-      .status(500)
-      .json({ error: "Error al actualizar cuenta", details: err.message });
+    return res.status(500).json({
+      error: "Error al actualizar cuenta",
+      details: err.message,
+    });
   }
 }
 
@@ -232,21 +255,33 @@ export async function hardDeleteBill(req, res) {
       return res.status(404).json({ error: "Cuenta no encontrada" });
     }
 
+    // Liberar la mesa asociada
+    const tablesRef = db.collection("tables");
+    const tableQuery = await tablesRef
+      .where("current_bill_id", "==", id)
+      .limit(1)
+      .get();
+
+    if (!tableQuery.empty) {
+      const tableDoc = tableQuery.docs[0];
+      await tableDoc.ref.update({
+        current_bill_id: null,
+        status: "free",
+      });
+    }
+
     await billRef.delete();
 
-    try {
-      const io = getIO();
-      io.to("cash").emit("cuentaEliminada", { id });
-    } catch (e) {
-      console.warn("No se pudo emitir evento de socket cuentaEliminada:", e.message);
-    }
+    const io = getIO();
+    io.to("cash").emit("cuentaEliminada", { id });
+    io.to("kitchen").emit("cuentaEliminada", { id });
 
     res.status(200).json({
       message: "Cuenta eliminada correctamente",
     });
   } catch (err) {
     res.status(500).json({
-      error: "Error al eliminar Cuenta",
+      error: "Error al eliminar cuenta",
       details: err.message,
     });
   }
@@ -272,10 +307,12 @@ export async function addProductToBill(req, res) {
 
       const productData = productDoc.data();
 
-      if (productData.stock < item.units) {
-        return res.status(400).json({
-          error: `No hay suficiente stock para ${productData.name}. Stock disponible: ${productData.stock}`,
-        });
+      if (productData.type === "nonprepared") {
+        if (productData.stock < item.units) {
+          return res.status(400).json({
+            error: `No hay suficiente stock para ${productData.name}. Stock disponible: ${productData.stock}`,
+          });
+        }
       }
 
       await db.collection("products").doc(item.id).update({
@@ -338,7 +375,6 @@ export async function addProductToBill(req, res) {
     });
   }
 }
-
 
 export async function removeProductFromBill(req, res) {
   const { id } = req.params;
@@ -427,12 +463,22 @@ export async function updateProductsInBill(req, res) {
     const total = await calculateTotal(currentProducts);
 
     await billRef.update({ products: currentProducts, total });
-    try {
-      const io = getIO();
-      io.to("cash").emit("cuentaActualizada", { id, data: { products: currentProducts, total } });
-    } catch (e) {
-      console.warn("No se pudo emitir cuentaActualizada tras updateProductsInBill:", e.message);
-    }
+
+    const io = getIO();
+    io.to("cash").emit("cuentaActualizada", { id, data: { products: currentProducts, total } });
+    io.to("kitchen").emit("pedidoActualizado", {
+      billId: id,
+      products: products.map(p => ({
+        id: p.id,
+        name: p.name,
+        units: p.units,
+        process: p.process,
+        billId: id,
+        table: billData.table,
+        created_at: billData.created_at,
+      })),
+    });
+
 
     res.status(200).json({
       message: "Productos de la cuenta actualizados correctamente",
@@ -449,7 +495,6 @@ export async function updateProductsInBill(req, res) {
 export async function closeBillIfEmpty(req, res) {
   try {
     const { id } = req.params;
-
     const billRef = db.collection("bills").doc(id);
     const billSnap = await billRef.get();
 
@@ -460,13 +505,27 @@ export async function closeBillIfEmpty(req, res) {
     const billData = billSnap.data();
 
     if (!billData.products || billData.products.length === 0) {
-      await billRef.update({ state: "closed" });
-      try {
-        const io = getIO();
-        io.to("cash").emit("cuentaActualizada", { id, data: { state: "closed" } });
-      } catch (e) {
-        console.warn("No se pudo emitir cuentaActualizada tras cerrar cuenta:", e.message);
+      await billRef.update({ status: "closed" });
+
+      //Liberar la mesa asociada
+      const tablesRef = db.collection("tables");
+      const tableQuery = await tablesRef
+        .where("current_bill_id", "==", id)
+        .limit(1)
+        .get();
+
+      if (!tableQuery.empty) {
+        const tableDoc = tableQuery.docs[0];
+        await tableDoc.ref.update({
+          current_bill_id: null,
+          status: "free",
+        });
       }
+
+      const io = getIO();
+      io.to("cash").emit("cuentaEliminada", { id });
+      io.to("kitchen").emit("cuentaEliminada", { id });
+
       return res.status(200).json({ message: "Cuenta cerrada correctamente" });
     } else {
       return res
@@ -535,33 +594,41 @@ export async function changeProductStateInBill(req, res) {
 
     const billData = billSnap.data();
     const products = billData.products || [];
-    const productIndex = products.findIndex((p) => p.id === productId);
-    if (productIndex === -1) return res.status(404).json({ error: "Producto no encontrado en la cuenta" });
 
-    products[productIndex].process = newState;
-    await billRef.update({ products });
+    const updatedProducts = products.map(p =>
+      p.id === productId ? { ...p, process: newState } : p
+    );
 
-    const updatedProduct = {
-      ...products[productIndex],
-      table: billData.table,
-      billId: id,
-    };
+    await billRef.update({ products: updatedProducts });
 
-    const product = products[productIndex];
-
-    const enrichedProduct = {
-      id: product.id,
-      name: product.name,
-      units: product.units,
-      process: product.process,
+    const io = getIO();
+    io.to("kitchen").emit("productoActualizado", {
       billId: id,
       table: billData.table,
-      created_at: billData.created_at,
-    };
+      productId,
+      newState,
+    });
+    io.to("waiter").emit("productoActualizado", {
+      billId: id,
+      table: billData.table,
+      productId,
+      newState,
+    });
+
+    if (newState === "ready") {
+      const productInfo = products.find(p => p.id === productId);
+      io.to("waiter").emit("productoListo", {
+        billId: id,
+        table: billData.table,
+        productId,
+        productName: productInfo?.name || "Producto",
+        timestamp: new Date().toISOString(),
+      });
+    }
 
     res.status(200).json({
       message: "Estado del producto actualizado correctamente",
-      updatedProduct,
+      updatedProductIds: products.filter(p => p.id === productId).map(p => p.id),
     });
   } catch (err) {
     console.error("Error al actualizar estado del producto:", err);
@@ -571,5 +638,6 @@ export async function changeProductStateInBill(req, res) {
     });
   }
 }
+
 
 
