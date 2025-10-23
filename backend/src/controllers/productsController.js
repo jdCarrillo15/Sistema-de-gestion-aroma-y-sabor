@@ -102,6 +102,10 @@ export async function updateProductById(req, res) {
 
     const data = req.body;
 
+    if (Object.prototype.hasOwnProperty.call(data, "stock") && Number(data.stock) > 0) {
+      data.status = "active";
+    }
+
     await db.collection("products").doc(req.params.id).update(data);
     res.status(200).json({ message: "Producto actualizado correctamente" });
   } catch (err) {
