@@ -319,6 +319,10 @@ export async function addProductToBill(req, res) {
         stock: admin.firestore.FieldValue.increment(-item.units),
       });
 
+      if ((productData.stock - item.units) === 0) {
+        await db.collection("products").doc(item.id).update({ status: "inactive" });
+      }
+
       enrichedProducts.push({
         id: item.id,
         name: productData.name,
