@@ -1,0 +1,618 @@
+/* Contenedor Principal */
+.shiftAssignmentPage {
+  padding: 2rem;
+  max-width: 1400px;
+  margin: 0 auto;
+  animation: fadeIn 0.4s ease;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Header */
+.pageHeader {
+  margin-bottom: 2rem;
+}
+
+.pageTitle {
+  font-size: 2rem;
+  font-weight: 700;
+  color: #1a1a1a;
+  margin-bottom: 0.5rem;
+}
+
+.pageSubtitle {
+  color: #666;
+  font-size: 0.95rem;
+}
+
+/* Grid de Estadísticas */
+.statsGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 1.5rem;
+  margin-bottom: 2rem;
+}
+
+.statCard {
+  background: white;
+  padding: 1.5rem;
+  border-radius: 16px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  transition: all 0.3s ease;
+  animation: slideUp 0.5s ease;
+}
+
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.statCard:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+}
+
+.statIcon {
+  width: 48px;
+  height: 48px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.statIcon.calendar {
+  background: linear-gradient(135deg, #D2691E 0%, #FF8C00 100%);
+  color: white;
+}
+
+.statIcon.morning {
+  background: linear-gradient(135deg, #ffea00 0%, #FF8C00 100%);
+  color: white;
+}
+
+.statIcon.afternoon {
+  background: linear-gradient(135deg, #4facfe 0%, #00347c 100%);
+  color: white;
+}
+
+.statIcon.users {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+}
+
+.statContent {
+  flex: 1;
+}
+
+.statValue {
+  font-size: 1.75rem;
+  font-weight: 700;
+  color: #1a1a1a;
+  line-height: 1;
+  margin-bottom: 0.25rem;
+}
+
+.statLabel {
+  font-size: 0.875rem;
+  color: #666;
+}
+
+/* Calendario */
+.calendarContainer {
+  background: white;
+  border-radius: 20px;
+  padding: 2rem;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+  animation: slideUp 0.6s ease;
+}
+
+.calendarHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 2rem;
+  padding-bottom: 1.5rem;
+  border-bottom: 2px solid #f0f0f0;
+}
+
+.calendarMonth {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #1a1a1a;
+  text-transform: capitalize;
+}
+
+.calendarNav {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.navButton {
+  width: 40px;
+  height: 40px;
+  border-radius: 10px;
+  border: none;
+  background: #f5f5f5;
+  color: #333;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+}
+
+.navButton:hover {
+  background: #D2691E;
+  color: white;
+  transform: scale(1.05);
+}
+
+.calendarWeekdays {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 0.5rem;
+  margin-bottom: 1rem;
+}
+
+.weekday {
+  text-align: center;
+  font-weight: 600;
+  color: #666;
+  font-size: 0.875rem;
+  padding: 0.75rem;
+}
+
+.calendarGrid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 0.5rem;
+}
+
+.calendarDay {
+  aspect-ratio: 1;
+  border-radius: 12px;
+  border: 2px solid #f0f0f0;
+  padding: 0.5rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  position: relative;
+  background: white;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+}
+
+.calendarDay:hover {
+  border-color: #FF8C00;
+  transform: scale(1.05);
+  box-shadow: 0 4px 10px #8b4513;
+}
+
+.calendarDay.empty {
+  border: none;
+  cursor: default;
+}
+
+.calendarDay.empty:hover {
+  transform: none;
+  box-shadow: none;
+}
+
+.calendarDay.today {
+  background: linear-gradient(135deg, #8b4513a5 0%, #ff8c00 100%);
+  border-color: #FF8C00;
+}
+
+.calendarDay.today .dayNumber {
+  color: white;
+  font-weight: 700;
+}
+
+.dayNumber {
+  font-size: 1rem;
+  font-weight: 600;
+  color: #333;
+  margin-bottom: 0.25rem;
+}
+
+.dayShifts {
+  display: flex;
+  gap: 4px;
+  margin-top: auto;
+}
+
+.shiftIndicator {
+  width: 20px;
+  height: 20px;
+  border-radius: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  animation: popIn 0.3s ease;
+}
+
+@keyframes popIn {
+  0% {
+    transform: scale(0);
+  }
+  50% {
+    transform: scale(1.2);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+.shiftIndicator.morning {
+  background: linear-gradient(135deg, #ffea00 0%, #FF8C00 100%);
+}
+
+.shiftIndicator.afternoon {
+  background: linear-gradient(135deg, #4facfe 0%, #00347c 100%);
+}
+
+.shiftDot {
+  width: 8px;
+  height: 8px;
+  background: white;
+  border-radius: 50%;
+}
+
+/* Modales */
+.modalOverlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  animation: fadeIn 0.3s ease;
+  padding: 1rem;
+}
+
+.modal {
+  background: white;
+  border-radius: 20px;
+  padding: 2rem;
+  max-width: 500px;
+  width: 100%;
+  max-height: 90vh;
+  overflow-y: auto;
+  animation: slideUpModal 0.3s ease;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+}
+
+@keyframes slideUpModal {
+  from {
+    opacity: 0;
+    transform: translateY(40px) scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+.modalHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1.5rem;
+  padding-bottom: 1rem;
+  border-bottom: 2px solid #f0f0f0;
+}
+
+.modalTitle {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #1a1a1a;
+}
+
+.closeButton {
+  width: 36px;
+  height: 36px;
+  border-radius: 10px;
+  border: none;
+  background: #f5f5f5;
+  color: #666;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+}
+
+.closeButton:hover {
+  color: #8b4513;
+  transform: rotate(90deg);
+}
+
+/* Selección de Turno */
+.shiftSelection {
+  display: grid;
+  gap: 1rem;
+}
+
+.shiftOption {
+  padding: 1.5rem;
+  border-radius: 16px;
+  border: 2px solid #f0f0f0;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  background: white;
+}
+
+.shiftOption:hover {
+  border-color: #D2691E;
+  transform: translateX(8px);
+  box-shadow: 0 3px 12px #8b4513;
+}
+
+.shiftIcon {
+  width: 48px;
+  height: 48px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+
+.shiftIcon.morning {
+  background: linear-gradient(135deg, #ffea00 0%, #FF8C00 100%);
+  color: white;
+}
+
+.shiftIcon.afternoon {
+  background: linear-gradient(135deg, #4facfe 0%, #00347c 100%);
+  color: white;
+}
+
+.shiftInfo h3 {
+  font-size: 1.125rem;
+  font-weight: 600;
+  color: #1a1a1a;
+  margin-bottom: 0.25rem;
+}
+
+.shiftInfo p {
+  font-size: 0.875rem;
+  color: #666;
+}
+
+.usersList {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  margin-bottom: 1.5rem;
+}
+
+.userItem {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 1rem;
+  border-radius: 12px;
+  border: 2px solid #f0f0f0;
+  transition: all 0.2s ease;
+  cursor: pointer;
+}
+
+.userItem:hover {
+  border-color: #FF8C00;
+  background: #ff8c003a;
+}
+
+.userItem.selected {
+  border-color: #D2691E;
+  background: linear-gradient(
+    135deg,
+    #d2691e22 10%,
+    #ff8c002d 100%
+  );
+}
+
+.userCheckbox {
+  width: 24px;
+  height: 24px;
+  border-radius: 8px;
+  border: 2px solid #ddd;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+  flex-shrink: 0;
+}
+
+.userItem.selected .userCheckbox {
+  background: linear-gradient(135deg, #8b4513 0%, #D2691E 100%);
+  border-color: #D2691E;
+}
+
+.userInfo {
+  flex: 1;
+}
+
+.userName {
+  font-weight: 600;
+  color: #1a1a1a;
+  margin-bottom: 0.25rem;
+}
+
+.userEmail {
+  font-size: 0.875rem;
+  color: #666;
+}
+
+.roleSelect {
+  padding: 0.5rem 1rem;
+  border-radius: 8px;
+  border: 2px solid #e0e0e0;
+  font-size: 0.875rem;
+  font-weight: 500;
+  background: white;
+  color: #333;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  min-width: 120px;
+}
+
+.roleSelect:hover {
+  border-color: #8b4513;
+}
+
+.roleSelect:focus {
+  outline: none;
+  border-color: #8b4513;
+  box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+}
+
+/* Acciones del Modal */
+.modalActions {
+  display: flex;
+  gap: 1rem;
+  margin-top: 1.5rem;
+  padding-top: 1.5rem;
+  border-top: 2px solid #f0f0f0;
+}
+
+.button {
+  flex: 1;
+  padding: 0.875rem 1.5rem;
+  border-radius: 12px;
+  border: none;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  font-size: 0.95rem;
+}
+
+.buttonPrimary {
+  background: linear-gradient(135deg, #FF8C00 0%, #8b4513 100%);
+  color: white;
+}
+
+.buttonPrimary:hover:not(:disabled) {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 20px rgba(102, 126, 234, 0.4);
+}
+
+.buttonPrimary:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.buttonSecondary {
+  background: #f5f5f5;
+  color: #333;
+}
+
+.buttonSecondary:hover {
+  background: #e0e0e0;
+}
+
+@media (max-width: 768px) {
+  .shiftAssignmentPage {
+    padding: 1rem;
+  }
+
+  .pageTitle {
+    font-size: 1.5rem;
+  }
+
+  .statsGrid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1rem;
+  }
+
+  .calendarContainer {
+    padding: 1rem;
+  }
+
+  .calendarMonth {
+    font-size: 1.25rem;
+  }
+
+  .weekday {
+    font-size: 0.75rem;
+    padding: 0.5rem 0.25rem;
+  }
+
+  .calendarDay {
+    padding: 0.25rem;
+  }
+
+  .dayNumber {
+    font-size: 0.875rem;
+  }
+
+  .shiftIndicator {
+    width: 16px;
+    height: 16px;
+  }
+
+  .modal {
+    padding: 1.5rem;
+    margin: 1rem;
+  }
+
+  .modalActions {
+    flex-direction: column;
+  }
+}
+
+@media (max-width: 480px) {
+  .statsGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .statCard {
+    padding: 1rem;
+  }
+
+  .calendarGrid {
+    gap: 0.25rem;
+  }
+
+  .userItem {
+    flex-wrap: wrap;
+  }
+
+  .roleSelect {
+    width: 100%;
+    margin-top: 0.5rem;
+  }
+}
