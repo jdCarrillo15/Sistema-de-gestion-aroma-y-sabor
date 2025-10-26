@@ -7,6 +7,7 @@ import tableRoutes from "./routes/tableRoutes.js";
 import rolesRoutes from "./routes/roleRoutes.js";
 import authRoutes from "./routes/authRoutes.js";
 import reportsRoutes from "./routes/reportsRoutes.js";
+import shiftsRoutes from "./routes/shiftsRoutes.js";
 import socketHandler from "./sockets/socket.js";
 import cookieParser from "cookie-parser";
 import { Server } from "socket.io";
@@ -57,6 +58,7 @@ app.use("/products", productsRoutes);
 app.use("/bills", billsRoutes);
 app.use("/tables", tableRoutes);
 app.use("/reports", reportsRoutes);
+app.use("/shifts", shiftsRoutes);
 app.use(metricsRoutes);
 
 const PORT = process.env.PORT || 3000;
