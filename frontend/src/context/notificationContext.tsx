@@ -1,4 +1,3 @@
-// frontend/src/context/notificationContext.tsx
 import React, { createContext, useContext, useState, useEffect, useCallback } from "react";
 import { useSocket } from "./socketContext"; 
 
@@ -36,7 +35,7 @@ export function NotificationProvider({ children }: React.PropsWithChildren) {
     console.log("Socket disponible, configurando listeners de notificaciones");
 
     const handleProductoListo = (data: any) => {
-      console.log("🔔 Producto listo recibido:", data);
+      console.log(" Producto listo recibido:", data);
 
       
       const newNotification: Notification = {

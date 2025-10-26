@@ -1,3 +1,4 @@
+/* Modal backdrop */
 .modal-backdrop {
   position: fixed;
   top: 0;
@@ -27,7 +28,7 @@
   padding: 2rem;
 }
 
-/* Header del modal */
+
 .modal-header {
   display: flex;
   justify-content: flex-end;
@@ -49,7 +50,7 @@
   color: #374151;
 }
 
-/* Icono del modal */
+
 .modal-icon {
   display: flex;
   justify-content: center;
@@ -57,7 +58,7 @@
   color: #3b82f6;
 }
 
-/* Título y descripción */
+
 .modal-title {
   font-size: 1.5rem;
   font-weight: 700;
@@ -74,7 +75,7 @@
   line-height: 1.5;
 }
 
-/* Formulario */
+
 .modal-form {
   display: flex;
   flex-direction: column;
@@ -123,7 +124,7 @@
   margin-top: 2px;
 }
 
-/* Botones del modal */
+
 .modal-buttons {
   display: flex;
   gap: 12px;
@@ -131,7 +132,7 @@
   margin-top: 1.5rem;
 }
 
-/* Responsive */
+
 @media (max-width: 768px) {
   .modal-backdrop {
     padding: 0.5rem;
@@ -164,31 +165,4 @@
   .modal-title {
     font-size: 1.125rem;
   }
-}
-.spinner-small {
-  width: 16px;
-  height: 16px;
-  border: 2px solid #ffffff;
-  border-top-color: transparent;
-  border-radius: 50%;
-  animation: spin 0.6s linear infinite;
-  display: inline-block;
-  margin-right: 8px;
-  vertical-align: middle;
-}
-
-@keyframes spin {
-  to { transform: rotate(360deg); }
-}
-
-/* Estilos para elementos deshabilitados durante carga */
-.form-input:disabled,
-.close-button:disabled {
-  opacity: 0.6;
-  cursor: not-allowed;
-}
-
-.modal-buttons button:disabled {
-  opacity: 0.7;
-  cursor: not-allowed;
 }

@@ -13,6 +13,7 @@ import {
   TrendingUp,
   Activity,
   LogOut,
+  UtensilsCrossed,
 } from "lucide-react";
 
 const menuItems = [
@@ -22,6 +23,7 @@ const menuItems = [
   { to: "/admin/turnos", label: "Asignación de Turnos", icon: Clock },
   { to: "/admin/inventario", label: "Inventario", icon: Package },
   { to: "/admin/ventas", label: "Ventas por Turnos", icon: TrendingUp },
+  { to: "/admin/mesas", label: "Gestión de Mesas", icon: UtensilsCrossed},
 ];
 
 const Sidebar: React.FC = () => {
