@@ -1,6 +1,13 @@
 import { admin, db } from "../config/firebase.js";
 import { getIO } from "../sockets/socket.js";
 
+function computeProductDiff(oldProducts = [], newProducts = []) {
+  const diff = {};
+  for (const p of oldProducts) diff[p.name] = (diff[p.name] || 0) - p.quantity;
+  for (const p of newProducts) diff[p.name] = (diff[p.name] || 0) + p.quantity;
+  return diff;
+}
+
 export async function getBills(req, res) {
   try {
     const bill = await db.collection("bills").get();
@@ -71,14 +78,46 @@ export async function createBill(req, res) {
       });
     }
 
-    const billRef = await billsRef.add({
+    //Agregar el id del turno a la cuenta
+    let shiftId = null;
+    const userRef = db.collection("users").doc(data.user_id);
+    const userSnap = await userRef.get();
+
+    if (userSnap.exists) {
+      const userData = userSnap.data();
+      if (userData.current_shift_id) {
+        shiftId = userData.current_shift_id;
+      } else {
+        console.log(`El usuario ${userData.user_name} no esta en turno activo`);// Temporal: Permitir crear cuenta sin turno
+        //return res.status(400).json({ error: "El usuario no esta en turno activo." });
+      }
+    }
+
+    const billData = {
       status: data.status || "open",
       total: data.total || 0,
       table: data.table,
       user_id: data.user_id,
       products: data.products || [],
       created_at: admin.firestore.FieldValue.serverTimestamp(),
-    });
+    };
+
+    // Temporal: Solo agregar el turno si existe
+    if (shiftId) {
+      billData.shift_id = shiftId;
+      const shiftRef = db.collection("shifts").doc(shiftId);
+      const updates = {
+        total_sales: admin.firestore.FieldValue.increment(data.total || 0),
+        total_bills: admin.firestore.FieldValue.increment(1),
+      };
+      (data.products || []).forEach((p) => {
+        updates[`products_summary.${p.name}`] = admin.firestore.FieldValue.increment(p.quantity);
+      });
+      await shiftRef.update(updates);
+      console.log(`Turno ${shiftId} actualizado al crear cuenta.`);
+    }
+
+    const billRef = await billsRef.add(billData);
 
     // Actualizar la mesa correspondiente
     const tablesRef = db.collection("tables");
@@ -200,7 +239,20 @@ export async function updateBillById(req, res) {
 
     await billRef.update(updateData);
 
+    if (newBill.shift_id) {
+      const shiftRef = db.collection("shifts").doc(newBill.shift_id);
+      const productDiff = computeProductDiff(oldBill.products, newBill.products || []);
+      const totalDiff = (newBill.total || 0) - (oldBill.total || 0);
+
+      const updates = { total_sales: admin.firestore.FieldValue.increment(totalDiff) };
+      for (const [name, qty] of Object.entries(productDiff)) {
+        updates[`products_summary.${name}`] = admin.firestore.FieldValue.increment(qty);
+      }
+      await shiftRef.update(updates);
+    }
+
     const io = getIO();
+
     //Si el estado pasa a 'paid' o 'closed', se libera la mesa
     if (updateData.status === "paid" || updateData.status === "closed") {
       const tablesRef = db.collection("tables");
@@ -250,9 +302,23 @@ export async function hardDeleteBill(req, res) {
 
     const billRef = db.collection("bills").doc(id);
     const billSnap = await billRef.get();
+    const bill = billSnap.data();
+
 
     if (!billSnap.exists) {
       return res.status(404).json({ error: "Cuenta no encontrada" });
+    }
+
+    if (bill.shift_id) {
+      const shiftRef = db.collection("shifts").doc(bill.shift_id);
+      const updates = {
+        total_sales: admin.firestore.FieldValue.increment(-bill.total),
+        total_bills: admin.firestore.FieldValue.increment(-1),
+      };
+      (bill.products || []).forEach((p) => {
+        updates[`products_summary.${p.name}`] = admin.firestore.FieldValue.increment(-p.units);
+      });
+      await shiftRef.update(updates);
     }
 
     // Liberar la mesa asociada
@@ -349,6 +415,23 @@ export async function addProductToBill(req, res) {
 
     const updatedBillSnap = await billRef.get();
     const updatedBill = updatedBillSnap.data();
+
+    //Actualizar el turno asociado
+    if (billData.shift_id) {
+      const shiftRef = db.collection("shifts").doc(billData.shift_id);
+
+      const shiftUpdates = {
+        total_sales: admin.firestore.FieldValue.increment(total - (billData.total || 0)),
+      };
+
+      enrichedProducts.forEach((p) => {
+        shiftUpdates[`products_summary.${p.name}`] =
+          admin.firestore.FieldValue.increment(p.units);
+      });
+
+      await shiftRef.update(shiftUpdates);
+      console.log(`Turno ${billData.shift_id} actualizado tras agregar productos.`);
+    }
 
     const kitchenPayload = enrichedProducts.map((p) => ({
       id: p.id,
