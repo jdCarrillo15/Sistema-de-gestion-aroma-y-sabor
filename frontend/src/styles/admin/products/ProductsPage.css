@@ -1,4 +1,26 @@
-/* Estilos para la vista de tarjetas de productos */
+.dashboard-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 24px;
+  gap: 16px;
+}
+
+.dashboard-header .primary-btn {
+  padding: 10px 20px;
+  font-size: 14px;
+  height: auto;
+  min-width: auto;
+  width: auto; 
+  max-width: fit-content; 
+  flex-shrink: 0; 
+}
+
+.dashboard-header .primary-btn .icono {
+  width: 18px;
+  height: 18px;
+}
+
 .productos-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
@@ -128,6 +150,8 @@
 }
 
 
+
+
 /* Estado vacío */
   .empty-state {
     grid-column: 1 / -1;
@@ -160,6 +184,7 @@
     color: #6b7280;
     margin: 0 0 24px 0;
   }
+
 
   @media (max-width: 768px) {
     .productos-grid {
