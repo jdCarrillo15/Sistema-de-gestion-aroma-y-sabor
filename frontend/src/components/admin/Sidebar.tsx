@@ -44,7 +44,7 @@ const Sidebar: React.FC = () => {
   };
 
   return (
-    <aside className="sidebar open">
+    <aside className="sidebar">
       <div className="sidebar-header">
         <div className="logo-box">
           <Coffee className="logo-icon" />

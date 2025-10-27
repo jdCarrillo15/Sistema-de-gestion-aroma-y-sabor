@@ -429,7 +429,6 @@
 
 .userItem:hover {
   border-color: #FF8C00;
-  background: #ff8c003a;
 }
 
 .userItem.selected {
@@ -454,7 +453,7 @@
 }
 
 .userItem.selected .userCheckbox {
-  background: linear-gradient(135deg, #8b4513 0%, #D2691E 100%);
+ background: linear-gradient(135deg, #8b4513 0%, #D2691E 100%);
   border-color: #D2691E;
 }
 
