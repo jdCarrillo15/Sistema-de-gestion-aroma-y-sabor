@@ -6,7 +6,7 @@ import EditTableModal from "../../components/admin/tables/EditTableModal";
 import ConfirmModal from "../../components/admin/ConfirmModal";
 import AlertModal from "../../components/common/AlertModal";
 import ViewTableModal from "../../components/admin/tables/ViewTableModal";
-import "../../styles/admin/products/ProductsPage.css";
+import "../../styles/admin/tables/TablesPage.css";
 import meseroStyles from "../../styles/mesero/MesasPage.module.css";
 import { getTables, createTable, updateTable, deleteTable } from "../../services/admin/tableService";
 

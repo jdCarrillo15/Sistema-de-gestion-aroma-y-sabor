@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import Button from "../../common/Button";
 import { UtensilsCrossed } from "lucide-react";
-import "../../../styles/admin/products/CreateProductModal.css";
+import "../../../styles/admin/tables/CreateTableModal.css";
 
 interface CreateTableModalProps {
   isOpen: boolean;

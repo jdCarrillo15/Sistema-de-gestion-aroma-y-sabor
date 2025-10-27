@@ -1,0 +1,397 @@
+/* Contenedor principal */
+.ventas-page {
+  padding: 2rem;
+  background: #fafafa;
+  min-height: 100vh;
+}
+
+/* Header */
+.ventas-header {
+  margin-bottom: 1.5rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 2rem;
+}
+
+.ventas-header h1 {
+  font-size: 1.8rem;
+  font-weight: 700;
+  color: #111827;
+  margin-bottom: 0.25rem;
+}
+
+.ventas-header p {
+  color: #6b7280;
+  font-size: 0.95rem;
+}
+
+/* Filtro de usuario */
+.filtro-usuario {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.filtro-usuario label {
+  font-size: 0.9rem;
+  font-weight: 500;
+  color: #374151;
+  white-space: nowrap;
+}
+
+.select-filtro {
+  padding: 0.5rem 0.75rem;
+  border: 1px solid #d1d5db;
+  border-radius: 6px;
+  font-size: 0.9rem;
+  color: #374151;
+  background-color: white;
+  cursor: pointer;
+  min-width: 200px;
+  transition: all 0.2s ease;
+}
+
+.select-filtro:focus {
+  outline: none;
+  border-color: #3b82f6;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+}
+
+.select-filtro:hover {
+  border-color: #9ca3af;
+}
+
+/* Tabla de ventas */
+.ventas-tabla-container {
+  background: #fff;
+  border-radius: 12px;
+  padding: 1.5rem;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+  margin-top: 2rem;
+}
+
+.ventas-tabla {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.95rem;
+}
+
+.ventas-tabla th,
+.ventas-tabla td {
+  padding: 1rem;
+  text-align: left;
+}
+
+.ventas-tabla th {
+  font-weight: 600;
+  color: #374151;
+  font-size: 0.9rem;
+  border-bottom: 2px solid #e5e7eb;
+}
+
+.ventas-tabla tbody tr {
+  transition: background 0.2s ease;
+  border-bottom: 1px solid #f3f4f6;
+}
+
+.ventas-tabla tbody tr:hover {
+  background: #f9fafb;
+}
+
+.ventas-tabla tbody tr:last-child {
+  border-bottom: none;
+}
+
+/* Estados */
+.estado {
+  display: inline-block;
+  padding: 4px 12px;
+  border-radius: 16px;
+  font-weight: 600;
+  font-size: 0.85rem;
+  text-align: center;
+  min-width: 80px;
+}
+
+.estado.abierto {
+  background-color: #d4f8dc;
+  color: #1b7a2f;
+}
+
+.estado.cerrado {
+  background-color: #e0e7ff;
+  color: #4338ca;
+}
+
+/* Columnas específicas */
+.text-center {
+  text-align: center !important;
+}
+
+.usuario-nombre {
+  font-weight: 500;
+  color: #374151;
+}
+
+.ventas-amount {
+  font-weight: 600;
+  color: #059669;
+  font-size: 1rem;
+}
+
+.acciones-col {
+  text-align: center;
+  width: 150px;
+}
+
+/* Botón ver detalles */
+.btn-ver-detalles {
+  background: #3b82f6;
+  color: white;
+  border: none;
+  padding: 0.5rem 1rem;
+  border-radius: 6px;
+  font-size: 0.875rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.btn-ver-detalles:hover {
+  background: #2563eb;
+  transform: translateY(-1px);
+  box-shadow: 0 2px 4px rgba(59, 130, 246, 0.3);
+}
+
+/* Estados de carga y vacío */
+.loading-state,
+.empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 3rem 1rem;
+  text-align: center;
+}
+
+.loading-icon,
+.empty-icon {
+  color: #9ca3af;
+  margin-bottom: 1rem;
+}
+
+.loading-state p,
+.empty-state p {
+  color: #6b7280;
+  margin: 0.5rem 0 0 0;
+}
+
+.empty-state h3 {
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: #374151;
+  margin: 0 0 0.5rem 0;
+}
+
+/* Iconos de estadísticas */
+.stat-icon.ventas {
+  background-color: #d1fae5;
+}
+
+.stat-icon.facturas {
+  background-color: #dbeafe;
+}
+
+.stat-icon.activos {
+  background-color: #fef3c7;
+}
+
+.stat-icon.cerrados {
+  background-color: #e0e7ff;
+}
+
+/* Modal de detalles */
+.shift-details {
+  margin-top: 1.5rem;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.detail-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 14px 16px;
+  border-bottom: 1px solid #f3f4f6;
+  background: white;
+  transition: background-color 0.2s ease;
+}
+
+.detail-row:hover {
+  background: #f9fafb;
+}
+
+.detail-row:last-child {
+  border-bottom: none;
+}
+
+.detail-label {
+  font-weight: 500;
+  color: #374151;
+  font-size: 14px;
+}
+
+.detail-value {
+  color: #111827;
+  font-weight: 400;
+  text-align: right;
+}
+
+.ventas-highlight {
+  color: #059669;
+  font-weight: 700;
+  font-size: 1.1rem;
+}
+
+/* Divisor de sección */
+.detail-divider {
+  background: #f9fafb;
+  padding: 12px 16px;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+.detail-divider h3 {
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: #374151;
+  margin: 0;
+}
+
+/* Resumen de productos */
+.products-summary {
+  max-height: 300px;
+  overflow-y: auto;
+}
+
+.product-summary-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px 16px;
+  border-bottom: 1px solid #f3f4f6;
+  transition: background 0.2s ease;
+}
+
+.product-summary-row:hover {
+  background: #f9fafb;
+}
+
+.product-summary-row:last-child {
+  border-bottom: none;
+}
+
+.product-name {
+  color: #374151;
+  font-size: 14px;
+}
+
+.product-quantity {
+  color: #6b7280;
+  font-weight: 600;
+  font-size: 14px;
+  background: #f3f4f6;
+  padding: 4px 12px;
+  border-radius: 12px;
+}
+
+/* Scrollbar personalizado para resumen de productos */
+.products-summary::-webkit-scrollbar {
+  width: 6px;
+}
+
+.products-summary::-webkit-scrollbar-track {
+  background: #f1f1f1;
+  border-radius: 10px;
+}
+
+.products-summary::-webkit-scrollbar-thumb {
+  background: #c1c1c1;
+  border-radius: 10px;
+}
+
+.products-summary::-webkit-scrollbar-thumb:hover {
+  background: #a8a8a8;
+}
+
+/* Responsive */
+@media (max-width: 1024px) {
+  .ventas-tabla-container {
+    overflow-x: auto;
+  }
+  
+  .ventas-tabla {
+    min-width: 800px;
+  }
+}
+
+@media (max-width: 768px) {
+  .ventas-page {
+    padding: 1rem;
+  }
+  
+  .ventas-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 1rem;
+  }
+  
+  .ventas-header h1 {
+    font-size: 1.5rem;
+  }
+  
+  .filtro-usuario {
+    width: 100%;
+    flex-direction: column;
+    align-items: stretch;
+  }
+  
+  .select-filtro {
+    width: 100%;
+    min-width: auto;
+  }
+  
+  .ventas-tabla th,
+  .ventas-tabla td {
+    padding: 0.75rem 0.5rem;
+    font-size: 0.875rem;
+  }
+  
+  .estado {
+    min-width: 70px;
+    font-size: 0.75rem;
+    padding: 3px 8px;
+  }
+  
+  .btn-ver-detalles {
+    padding: 0.375rem 0.75rem;
+    font-size: 0.8rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .ventas-page {
+    padding: 0.75rem;
+  }
+  
+  .ventas-tabla-container {
+    padding: 1rem;
+    border-radius: 8px;
+  }
+  
+  .stats-grid {
+    grid-template-columns: 1fr;
+    gap: 1rem;
+  }
+}
