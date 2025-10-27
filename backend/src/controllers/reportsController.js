@@ -5,11 +5,16 @@ export async function getReports(req, res) {
         const {id} = req.params;
         const bills = await getBillsLast16Weeks();
         const weeklyAggregation = aggregateWeeklyReports(bills, id);
-        const formattedReports = Object.entries(weeklyAggregation).map(([_, agg]) => ({
+        let formattedReports = Object.entries(weeklyAggregation).map(([_, agg]) => ({
             initialDate: agg.rangeStart,
             quantity: agg.units,
             total: agg.total,
         }));
+
+        // Si se consulta por un producto específico, ocultar semanas sin ventas
+        if (id) {
+            formattedReports = formattedReports.filter(r => (r.quantity || 0) > 0 || (r.total || 0) > 0);
+        }
         res.status(200).json({ reports: formattedReports });
     } catch (error) {
         console.error("Error fetching reports:", error);
