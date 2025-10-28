@@ -1,9 +1,22 @@
 .cocina-caja-page {
-  padding: 1.5rem 1.5rem;
-  padding-bottom: 5rem;
-  max-width: 100%;
-  min-height: calc(100vh - 60px);
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  max-height: 100vh;
+  overflow-y: auto;
+  overflow-x: hidden;
+  padding: 1rem;
   background: #f9fafb;
+  /* Smooth scrolling */
+  scroll-behavior: smooth;
+  -webkit-overflow-scrolling: touch;
+}
+
+/* Wrapper interno para asegurar el scroll */
+.page-content-wrapper {
+  flex: 1;
+  min-height: 0;
 }
 
 .page-header {
@@ -12,6 +25,7 @@
   justify-content: space-between;
   align-items: flex-start;
   gap: 1rem;
+  flex-shrink: 0; /* Evita que el header se comprima */
 }
 
 .page-title {
@@ -112,7 +126,7 @@
   display: flex;
   align-items: center;
   gap: 0.5rem;
-  color: #f97316;
+  color: #d37e0e;
 }
 
 .section-title.ready {
@@ -316,9 +330,13 @@
   }
 }
 
-
 /* Mobile pequeño */
 @media (max-width: 480px) {
+  .cocina-caja-page {
+    padding: 1rem 0.75rem;
+    padding-bottom: 5rem; /* Espacio para navegación inferior */
+  }
+
   .caja-page {
     padding: 1rem 0.75rem;
     padding-bottom: 4.5rem;
@@ -488,7 +506,6 @@
 
 /* Print styles */
 @media print {
-
   .btn-report,
   .btn-back,
   .btn-pay {
@@ -505,7 +522,6 @@
     break-inside: avoid;
     box-shadow: none;
     border: 1px solid #d1d5db;
-
   }
 
   .caja-sales-card {
@@ -518,4 +534,23 @@
   .caja-stat-value {
     color: black !important;
   }
+}
+
+/* Customización de scrollbar (opcional pero mejora la UX) */
+.cocina-caja-page::-webkit-scrollbar {
+  width: 8px;
+}
+
+.cocina-caja-page::-webkit-scrollbar-track {
+  background: #f1f5f9;
+  border-radius: 4px;
+}
+
+.cocina-caja-page::-webkit-scrollbar-thumb {
+  background: #cbd5e1;
+  border-radius: 4px;
+}
+
+.cocina-caja-page::-webkit-scrollbar-thumb:hover {
+  background: #94a3b8;
 }

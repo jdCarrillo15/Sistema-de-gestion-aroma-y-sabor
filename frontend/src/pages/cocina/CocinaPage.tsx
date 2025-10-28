@@ -207,9 +207,6 @@ const CocinaPage: React.FC = () => {
       <div className="page-header">
         <div>
           <h1 className="page-title">Cocina</h1>
-          <p className="page-subtitle">
-            Gestión de pedidos
-          </p>
         </div>
       </div>
 

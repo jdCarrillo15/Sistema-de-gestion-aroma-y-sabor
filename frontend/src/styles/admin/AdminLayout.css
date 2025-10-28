@@ -17,7 +17,6 @@
   width: 100%;
 }
 
-/* En desktop: agregar margen para el sidebar */
 @media (min-width: 768px) {
   .admin-main {
     margin-left: 260px;

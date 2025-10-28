@@ -18,9 +18,7 @@ const Topbar: React.FC = () => {
         {/* Sección derecha */}
         <div className="topbar-right">
           {/* Botón calendario */}
-          <button className="topbar-calendar-button">
-            <Calendar className="topbar-icon" />
-          </button>
+         
 
           {/* Usuario */}
           <div className="topbar-user">

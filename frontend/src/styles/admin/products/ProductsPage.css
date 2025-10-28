@@ -6,6 +6,37 @@
   padding: 0 4px;
 }
 
+.dasboradd-title {
+   font-size: 24px;
+  font-weight: 700;
+  color: #222;
+}
+
+.dashboard-header{
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1.5rem;
+}
+
+.contenedor-boton {
+  display: flex;
+  justify-content: flex-end; 
+  margin-bottom: 1rem; 
+}
+
+.btnNuevoUsuario {
+  width: fit-content;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  background-color: #a0522d; /* ejemplo de color */
+  color: white;
+  border-radius: 12px;
+  padding: 0.5rem 1rem;
+}
+
+
 .product-card {
   background: #ffffff;
   border: 1px solid #e5e7eb;

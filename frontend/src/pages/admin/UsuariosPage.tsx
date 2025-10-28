@@ -247,16 +247,17 @@ const UsuariosPage: React.FC = () => {
       <div className="usuarios-header">
         <div>
           <h1 className="dashboard-title">Gestión de Usuarios</h1>
-          <p className="dashboard-sub">Administra los usuarios del sistema</p>
         </div>
-        <Button
-          className="btn-nuevo"
-          onClick={() => setIsModalOpen(true)}
-          disabled={isLoading}
-        >
-          <Plus className="icono" />
-          Nuevo Usuario
-        </Button>
+        <div className="contenedor-boton">
+          <Button
+            className="btnNuevoUsuario"
+            onClick={() => setIsModalOpen(true)}
+            disabled={isLoading}
+          >
+            <Plus className="icono" />
+            Nuevo Usuario
+          </Button>
+        </div>
       </div>
 
       {/* Estadísticas */}
@@ -392,6 +393,70 @@ const UsuariosPage: React.FC = () => {
               ))}
             </tbody>
           </table>
+        )}
+
+        {/* Vista de Cards para Móvil */}
+        {users.length > 0 && (
+          <div className="usuarios-cards">
+            {users.map((u) => (
+              <div key={u.id} className="user-card">
+                <div className="user-card-header">
+                  <div className="user-card-info">
+                    <div className="user-card-name">{u.user_name}</div>
+                    <div className="user-card-email">{u.email}</div>
+                  </div>
+                  <span
+                    className={`estado ${u.status.toLowerCase() === "activo" ? "activo" : "inactivo"}`}
+                  >
+                    {u.status}
+                  </span>
+                </div>
+
+                <div className="user-card-details">
+                  <div className="user-card-detail">
+                    <span className="user-card-label">Rol</span>
+                    <span className="user-card-value">{u.role}</span>
+                  </div>
+                  <div className="user-card-detail">
+                    <span className="user-card-label">Fecha de inicio</span>
+                    <span className="user-card-value">
+                      {new Date(u.created_at).toLocaleDateString("es-ES")}
+                    </span>
+                  </div>
+                </div>
+
+                <div className="user-card-actions">
+                  <Button
+                    type="button"
+                    variant="secondary"
+                    className="btn-icon ver"
+                    onClick={() => openViewModal(u)}
+                    disabled={isLoading}
+                  >
+                    <Eye size={16} />
+                  </Button>
+                  <Button
+                    type="button"
+                    variant="secondary"
+                    className="btn-icon editar"
+                    onClick={() => openEditModal(u)}
+                    disabled={isLoading}
+                  >
+                    <Edit3 size={16} />
+                  </Button>
+                  <Button
+                    type="button"
+                    variant="secondary"
+                    className="btn-icon eliminar"
+                    onClick={() => handleDeleteClick(u.id)}
+                    disabled={isLoading}
+                  >
+                    <Trash2 size={16} />
+                  </Button>
+                </div>
+              </div>
+            ))}
+          </div>
         )}
       </div>
 
