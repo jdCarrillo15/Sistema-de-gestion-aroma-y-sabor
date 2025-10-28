@@ -1,5 +1,4 @@
 import React from 'react';
-import { Calendar } from 'lucide-react';
 import { getCurrentUser } from '../../services/login/authService';
 import '../../styles/cocina/CocinaCajaTopbar.css';
 

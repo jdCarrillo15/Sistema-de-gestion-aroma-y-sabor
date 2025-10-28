@@ -324,13 +324,6 @@ const UsuariosPage: React.FC = () => {
             <Users size={48} className="empty-icon" />
             <h3>No hay usuarios</h3>
             <p>Crea tu primer usuario para comenzar</p>
-            <Button
-              className="btn-nuevo"
-              onClick={() => setIsModalOpen(true)}
-            >
-              <Plus className="icono" />
-              Crear Usuario
-            </Button>
           </div>
         )}
 
