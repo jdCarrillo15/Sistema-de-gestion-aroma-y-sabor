@@ -1,12 +1,16 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Package, Search } from "lucide-react";
 import ProductModal from "../../components/admin/products/ProductModal";
+import LoadingSpinner from "../../components/common/LoadingSpinner";
 import styles from "../../styles/admin/InventarioPage.module.css";
 import AlertModal from "../../components/common/AlertModal";
-import { getProducts } from "../../services/admin/productService";
+import {
+  getProducts,
+  getReportsByProduct,
+} from "../../services/admin/productService";
 
 interface Product {
-  id: number;
+  id: string;
   name: string;
   price: number;
   process: string;
@@ -16,119 +20,49 @@ interface Product {
 }
 
 interface SalesData {
-  date: string;
+  initialDate: string;
   quantity: number;
   total: number;
 }
 
-const mockProducts: Product[] = [];
-
-// const mockProducts: Product[] = [
-//   {
-//     id: 1,
-//     name: "Empanada Pollo",
-//     price: 3300,
-//     process: "in process",
-//     status: "active",
-//     stock: 11,
-//     type: "nonprepared",
-//   },
-//   {
-//     id: 2,
-//     name: "Café Latte",
-//     price: 5500,
-//     process: "completed",
-//     status: "active",
-//     stock: 25,
-//     type: "prepared",
-//   },
-//   {
-//     id: 3,
-//     name: "Croissant",
-//     price: 4200,
-//     process: "completed",
-//     status: "active",
-//     stock: 8,
-//     type: "nonprepared",
-//   },
-//   {
-//     id: 4,
-//     name: "Capuchino",
-//     price: 4800,
-//     process: "in process",
-//     status: "active",
-//     stock: 30,
-//     type: "prepared",
-//   },
-//   {
-//     id: 5,
-//     name: "Brownie",
-//     price: 3800,
-//     process: "completed",
-//     status: "active",
-//     stock: 15,
-//     type: "nonprepared",
-//   },
-//   {
-//     id: 6,
-//     name: "Sandwich Jamón",
-//     price: 6500,
-//     process: "pending",
-//     status: "inactive",
-//     stock: 3,
-//     type: "nonprepared",
-//   },
-//   {
-//     id: 7,
-//     name: "Té Chai",
-//     price: 4000,
-//     process: "completed",
-//     status: "active",
-//     stock: 20,
-//     type: "prepared",
-//   },
-//   {
-//     id: 8,
-//     name: "Galletas Avena",
-//     price: 2500,
-//     process: "completed",
-//     status: "active",
-//     stock: 40,
-//     type: "nonprepared",
-//   },
-// ];
-
-const mockSalesData: SalesData[] = [
-  { date: "2023-2-15", quantity: 45, total: 49500 },
-  { date: "2025-10-15", quantity: 15, total: 49500 },
-  { date: "2025-10-16", quantity: 23, total: 75900 },
-  { date: "2025-10-17", quantity: 18, total: 59400 },
-  { date: "2025-10-18", quantity: 31, total: 102300 },
-  { date: "2025-10-19", quantity: 27, total: 89100 },
-  { date: "2025-10-20", quantity: 20, total: 66000 },
-  { date: "2025-10-21", quantity: 25, total: 82500 },
-  { date: "2025-10-22", quantity: 29, total: 95700 },
-  { date: "2026-2-15", quantity: 65, total: 49500 },
-  { date: "2026-2-16", quantity: 65, total: 49500 },
-];
-
 const InventarioPage: React.FC = () => {
   const [mockProducts, setProducts] = useState<Product[]>([]);
+  const [salesData, setSalesData] = useState<SalesData[]>([]);
   const [isAlertOpen, setIsAlertOpen] = useState(false);
   const [alertMessage, setAlertMessage] = useState("");
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const [isLoadingReports, setIsLoadingReports] = useState(false);
 
-  const handleProductClick = (product: Product) => {
-    setSelectedProduct(product);
-    setIsModalOpen(true);
+  const handleProductClick = async (product: Product) => {
+    try {
+      setIsLoadingReports(true);
+      setSelectedProduct(product);
+      setIsModalOpen(true);
+
+      const { reports } = await getReportsByProduct(product.id);
+
+      const mappedReports = reports.map((report) => ({
+        ...report,
+        date: report.initialDate,
+      }));
+
+      setSalesData(mappedReports);
+    } catch (error) {
+      console.error("Error al obtener reportes del producto:", error);
+    } finally {
+      setIsLoadingReports(false);
+    }
   };
 
   const handleCloseModal = () => {
     setIsModalOpen(false);
-    setTimeout(() => setSelectedProduct(null), 300);
+    setTimeout(() => {
+      setSelectedProduct(null);
+      setSalesData([]);
+    }, 300);
   };
 
   const formatPrice = (price: number) => {
@@ -140,7 +74,7 @@ const InventarioPage: React.FC = () => {
   };
 
   const loadProducts = async () => {
-    // setIsLoading(true);
+    setIsLoading(true);
     try {
       const response = await getProducts();
       const productsData = Array.isArray(response)
@@ -156,10 +90,13 @@ const InventarioPage: React.FC = () => {
       setAlertMessage(error.message || "Error al cargar los productos");
       setIsAlertOpen(true);
     } finally {
-      // setIsLoading(true);
+      setIsLoading(false);
     }
   };
-  loadProducts();
+
+  useEffect(() => {
+    loadProducts();
+  }, []);
 
   const getStatusColor = (status: string) => {
     return status === "active" ? styles.statusActive : styles.statusInactive;
@@ -199,56 +136,64 @@ const InventarioPage: React.FC = () => {
         />
       </div>
 
-      <div className={styles.productsGrid}>
-        {filteredProducts.map((product) => (
-          <div
-            key={product.id}
-            className={styles.productCard}
-            onClick={() => handleProductClick(product)}
-          >
-            <div className={styles.cardHeader}>
-              <h3 className={styles.productName}>{product.name}</h3>
-              <span
-                className={`${styles.statusBadge} ${getStatusColor(
-                  product.status
-                )}`}
+      {isLoading ? (
+        <LoadingSpinner size={48} message="Cargando productos..." />
+      ) : (
+        <>
+          <div className={styles.productsGrid}>
+            {filteredProducts.map((product) => (
+              <div
+                key={product.id}
+                className={styles.productCard}
+                onClick={() => handleProductClick(product)}
               >
-                {product.status === "active" ? "Activo" : "Inactivo"}
-              </span>
-            </div>
+                <div className={styles.cardHeader}>
+                  <h3 className={styles.productName}>{product.name}</h3>
+                  <span
+                    className={`${styles.statusBadge} ${getStatusColor(
+                      product.status
+                    )}`}
+                  >
+                    {product.status === "active" ? "Activo" : "Inactivo"}
+                  </span>
+                </div>
 
-            <div className={styles.cardBody}>
-              <div className={styles.priceSection}>
-                <span className={styles.priceLabel}>Precio</span>
-                <span className={styles.priceValue}>
-                  {formatPrice(product.price)}
-                </span>
+                <div className={styles.cardBody}>
+                  <div className={styles.priceSection}>
+                    <span className={styles.priceLabel}>Precio</span>
+                    <span className={styles.priceValue}>
+                      {formatPrice(product.price)}
+                    </span>
+                  </div>
+
+                  <div className={styles.stockSection}>
+                    <span className={styles.stockLabel}>Stock</span>
+                    <span
+                      className={`${styles.stockValue} ${getStockStatus(
+                        product.stock
+                      )}`}
+                    >
+                      {product.stock} unidades
+                    </span>
+                  </div>
+                </div>
+
+                <div className={styles.cardFooter}>
+                  <span className={styles.clickHint}>
+                    Click para ver detalles
+                  </span>
+                </div>
               </div>
-
-              <div className={styles.stockSection}>
-                <span className={styles.stockLabel}>Stock</span>
-                <span
-                  className={`${styles.stockValue} ${getStockStatus(
-                    product.stock
-                  )}`}
-                >
-                  {product.stock} unidades
-                </span>
-              </div>
-            </div>
-
-            <div className={styles.cardFooter}>
-              <span className={styles.clickHint}>Click para ver detalles</span>
-            </div>
+            ))}
           </div>
-        ))}
-      </div>
 
-      {filteredProducts.length === 0 && (
-        <div className={styles.emptyState}>
-          <Package size={48} className={styles.emptyIcon} />
-          <p className={styles.emptyText}>No se encontraron productos</p>
-        </div>
+          {filteredProducts.length === 0 && (
+            <div className={styles.emptyState}>
+              <Package size={48} className={styles.emptyIcon} />
+              <p className={styles.emptyText}>No se encontraron productos</p>
+            </div>
+          )}
+        </>
       )}
 
       {selectedProduct && (
@@ -256,7 +201,8 @@ const InventarioPage: React.FC = () => {
           isOpen={isModalOpen}
           onClose={handleCloseModal}
           product={selectedProduct}
-          salesData={mockSalesData}
+          salesData={salesData}
+          isLoadingReports={isLoadingReports}
         />
       )}
       <AlertModal

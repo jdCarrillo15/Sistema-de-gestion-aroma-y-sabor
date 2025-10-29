@@ -27,13 +27,38 @@ export interface ProductResponse {
   created_at?: string;
 }
 
-export async function createProduct(product: CreateProductRequest): Promise<{ message: string }> {
-  console.log("Creating product:", product);
+export async function getReportsByProduct(
+  id: string
+): Promise<{ reports: any[] }> {
+  try {
+    const response = await fetch(`${API_BASE_URL}/reports/getreports/${id}`, {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      credentials: "include",
+    });
+
+    if (!response.ok) {
+      const errorData = await response.json();
+      throw new Error(errorData.error || "Error obteniendo reportes");
+    }
+
+    return await response.json();
+  } catch (error) {
+    console.error("Error in getReportsByProduct service:", error);
+    throw error;
+  }
+}
+
+export async function createProduct(
+  product: CreateProductRequest
+): Promise<{ message: string }> {
   try {
     const response = await fetch(`${API_BASE_URL}/products/createproduct`, {
       method: "POST",
       headers: {
-        "Content-Type": "application/json"
+        "Content-Type": "application/json",
       },
       body: JSON.stringify(product),
       credentials: "include",
@@ -56,7 +81,7 @@ export async function getProducts(): Promise<{ products: ProductResponse[] }> {
     const response = await fetch(`${API_BASE_URL}/products/getproducts`, {
       method: "GET",
       headers: {
-        "Content-Type": "application/json"
+        "Content-Type": "application/json",
       },
       credentials: "include",
     });
@@ -78,7 +103,7 @@ export async function getProductById(id: string): Promise<ProductResponse> {
     const response = await fetch(`${API_BASE_URL}/products/getproduct/${id}`, {
       method: "GET",
       headers: {
-        "Content-Type": "application/json"
+        "Content-Type": "application/json",
       },
       credentials: "include",
     });
@@ -95,17 +120,22 @@ export async function getProductById(id: string): Promise<ProductResponse> {
   }
 }
 
-export async function updateProductById(id: string, productData: UpdateProductRequest): Promise<{ message: string }> {
-  console.log("Updating product:", id, productData);
+export async function updateProductById(
+  id: string,
+  productData: UpdateProductRequest
+): Promise<{ message: string }> {
   try {
-    const response = await fetch(`${API_BASE_URL}/products/updateproduct/${id}`, {
-      method: "PUT",
-      headers: {
-        "Content-Type": "application/json"
-      },
-      body: JSON.stringify(productData),
-      credentials: "include",
-    });
+    const response = await fetch(
+      `${API_BASE_URL}/products/updateproduct/${id}`,
+      {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(productData),
+        credentials: "include",
+      }
+    );
 
     if (!response.ok) {
       const errorData = await response.json();
@@ -119,16 +149,20 @@ export async function updateProductById(id: string, productData: UpdateProductRe
   }
 }
 
-export async function hardDeleteProduct(id: string): Promise<{ message: string }> {
-  console.log("Deleting product:", id);
+export async function hardDeleteProduct(
+  id: string
+): Promise<{ message: string }> {
   try {
-    const response = await fetch(`${API_BASE_URL}/products/harddeleteproduct/${id}`, {
-      method: "DELETE",
-      headers: {
-        "Content-Type": "application/json"
-      },
-      credentials: "include",
-    });
+    const response = await fetch(
+      `${API_BASE_URL}/products/harddeleteproduct/${id}`,
+      {
+        method: "DELETE",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        credentials: "include",
+      }
+    );
 
     if (!response.ok) {
       const errorData = await response.json();
@@ -143,7 +177,7 @@ export async function hardDeleteProduct(id: string): Promise<{ message: string }
 }
 
 export function handleApiError(error: any): string {
-  if (error instanceof TypeError && error.message.includes('fetch')) {
+  if (error instanceof TypeError && error.message.includes("fetch")) {
     return "Error de conexión. Verifica que el servidor esté funcionando.";
   }
 

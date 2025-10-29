@@ -10,6 +10,7 @@ import {
 } from "recharts";
 import { X } from "lucide-react";
 import styles from "../../../styles/admin/products/ProductModal.module.css";
+import LoadingSpinner from "../../common/LoadingSpinner";
 
 interface Product {
   name: string;
@@ -21,7 +22,7 @@ interface Product {
 }
 
 interface SalesData {
-  date: string;
+  initialDate: string;
   quantity: number;
   total: number;
 }
@@ -31,6 +32,7 @@ interface ProductModalProps {
   onClose: () => void;
   product: Product;
   salesData: SalesData[];
+  isLoadingReports?: boolean;
 }
 
 const ProductModal: React.FC<ProductModalProps> = ({
@@ -38,6 +40,7 @@ const ProductModal: React.FC<ProductModalProps> = ({
   onClose,
   product,
   salesData,
+  isLoadingReports = false,
 }) => {
   const handleBackdropClick = (e: React.MouseEvent<HTMLDivElement>) => {
     if (e.target === e.currentTarget) {
@@ -102,54 +105,58 @@ const ProductModal: React.FC<ProductModalProps> = ({
             <h3 className={styles.chartTitle}>
               Ventas de las últimas 14 semanas
             </h3>
-            <ResponsiveContainer width="100%" height={250}>
-              <LineChart
-                data={salesData}
-                margin={{ top: 5, right: 10, left: -20, bottom: 5 }}
-              >
-                <CartesianGrid strokeDasharray="3 3" stroke="#e0e0e0" />
-                <XAxis
-                  dataKey="date"
-                  tickFormatter={formatDate}
-                  tick={{ fontSize: 12 }}
-                  stroke="#666"
-                />
-                <YAxis tick={{ fontSize: 12 }} stroke="#666" />
-                <Tooltip
-                  content={({ active, payload }) => {
-                    if (active && payload && payload.length) {
-                      return (
-                        <div className={styles.tooltip}>
-                          <p className={styles.tooltipDate}>
-                            {new Date(
-                              payload[0].payload.date
-                            ).toLocaleDateString("es-ES", {
-                              day: "numeric",
-                              month: "long",
-                            })}
-                          </p>
-                          <p className={styles.tooltipQuantity}>
-                            Cantidad: {payload[0].payload.quantity} unidades
-                          </p>
-                          <p className={styles.tooltipTotal}>
-                            Total: {formatPrice(payload[0].payload.total)}
-                          </p>
-                        </div>
-                      );
-                    }
-                    return null;
-                  }}
-                />
-                <Line
-                  type="monotone"
-                  dataKey="quantity"
-                  stroke="#D97706"
-                  strokeWidth={3}
-                  dot={{ fill: "#D97706", r: 4 }}
-                  activeDot={{ r: 6 }}
-                />
-              </LineChart>
-            </ResponsiveContainer>
+            {isLoadingReports ? (
+              <LoadingSpinner size={32} message="Cargando reportes..." />
+            ) : (
+              <ResponsiveContainer width="100%" height={250}>
+                <LineChart
+                  data={salesData}
+                  margin={{ top: 5, right: 10, left: -20, bottom: 5 }}
+                >
+                  <CartesianGrid strokeDasharray="3 3" stroke="#e0e0e0" />
+                  <XAxis
+                    dataKey="initialDate"
+                    tickFormatter={formatDate}
+                    tick={{ fontSize: 12 }}
+                    stroke="#666"
+                  />
+                  <YAxis tick={{ fontSize: 12 }} stroke="#666" />
+                  <Tooltip
+                    content={({ active, payload }) => {
+                      if (active && payload && payload.length) {
+                        return (
+                          <div className={styles.tooltip}>
+                            <p className={styles.tooltipDate}>
+                              {new Date(
+                                payload[0].payload.initialDate
+                              ).toLocaleDateString("es-ES", {
+                                day: "numeric",
+                                month: "long",
+                              })}
+                            </p>
+                            <p className={styles.tooltipQuantity}>
+                              Cantidad: {payload[0].payload.quantity} unidades
+                            </p>
+                            <p className={styles.tooltipTotal}>
+                              Total: {formatPrice(payload[0].payload.total)}
+                            </p>
+                          </div>
+                        );
+                      }
+                      return null;
+                    }}
+                  />
+                  <Line
+                    type="monotone"
+                    dataKey="quantity"
+                    stroke="#D97706"
+                    strokeWidth={3}
+                    dot={{ fill: "#D97706", r: 4 }}
+                    activeDot={{ r: 6 }}
+                  />
+                </LineChart>
+              </ResponsiveContainer>
+            )}
           </div>
         </div>
       </div>
