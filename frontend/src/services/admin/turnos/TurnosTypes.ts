@@ -18,7 +18,7 @@ export type Assignment = {
 
 export type Turnos = {
   date: string;
-  type: TurnosType;
+  type: TurnosTypes;
   assignments: Assignment[];
 };
 
@@ -29,7 +29,7 @@ export const ROLE_LABELS: Record<Role, string> = {
   kitchen: "Cocina"
 };
 
-export const Turnos_LABELS: Record<TurnosType, { name: string; time: string }> = {
+export const Turnos_LABELS: Record<TurnosTypes, { name: string; time: string }> = {
   morning: {
     name: "Turno Mañana",
     time: "6:00 AM - 2:00 PM"

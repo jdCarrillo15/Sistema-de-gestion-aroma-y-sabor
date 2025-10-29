@@ -3,7 +3,7 @@ import { Calendar, Users, ChevronLeft, ChevronRight, Sun, Moon, X, Check } from 
 import styles from "../../styles/admin/TurnosPage.module.css";
 
 type ShiftType = "morning" | "afternoon";
-type Role = "waiter" | "admin" | "cash" | "kitchen";
+type Role = "waiter" | "cash" | "kitchen";
 
 type User = {
   id: string;
@@ -35,18 +35,13 @@ const TurnosPage: React.FC = () => {
   const [selectedAssignments, setSelectedAssignments] = useState<Assignment[]>([]);
 
   const users: User[] = [
-    { id: "1", name: "Diego", email: "diego@mesero.com", role: "waiter", status: "active" },
-    { id: "2", name: "Carol", email: "prueba@gmail.com", role: "admin", status: "inactive" },
-    { id: "3", name: "DiegoCaja", email: "diego@caja.com", role: "cash", status: "active" },
-    { id: "4", name: "BrayanMesero", email: "brayan.cifuentes@uptc.edu.co", role: "waiter", status: "active" },
-    { id: "5", name: "Carrillo", email: "juandavidcarrilloparra46@gmai.com", role: "admin", status: "active" },
+
   ];
 
   const activeUsers = users.filter(u => u.status === "active");
 
   const roleLabels: Record<Role, string> = {
     waiter: "Mesero",
-    admin: "Administrador",
     cash: "Cajero",
     kitchen: "Cocina"
   };
