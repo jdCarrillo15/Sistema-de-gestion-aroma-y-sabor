@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { DollarSign, Clock, TrendingUp, Package, AlertCircle } from "lucide-react";
+import { DollarSign, Clock, Package, AlertCircle } from "lucide-react";
 import { getShifts, type Shift } from "../../services/admin/shiftService";
 import { getUsers } from "../../services/admin/userService";
 import AlertModal from "../../components/common/AlertModal";
@@ -54,8 +54,8 @@ const VentasPage: React.FC = () => {
     
   const totalSales = filteredShifts.reduce((sum, shift) => sum + shift.total_sales, 0);
   const totalBills = filteredShifts.reduce((sum, shift) => sum + shift.total_bills, 0);
-  const openShifts = filteredShifts.filter(s => s.state === "open").length;
-  const closedShifts = filteredShifts.filter(s => s.state === "closed").length;
+  //const openShifts = filteredShifts.filter(s => s.state === "open").length;
+  //const closedShifts = filteredShifts.filter(s => s.state === "close").length;
 
   // Formatear fecha
   const formatDate = (dateString: any) => {
@@ -155,8 +155,7 @@ const VentasPage: React.FC = () => {
             </div>
           </div>
         </div>
-
-        <div className="stat-card">
+       {/* <div className="stat-card">
           <div className="stat-left">
             <div className="stat-icon activos">
               <Clock size={20} />
@@ -178,7 +177,7 @@ const VentasPage: React.FC = () => {
               <div className="stat-label">Turnos Cerrados</div>
             </div>
           </div>
-        </div>
+        </div>*/}
       </div>
 
       {/* Tabla de turnos */}
@@ -201,7 +200,7 @@ const VentasPage: React.FC = () => {
                 <th>Usuario</th>
                 <th>Fecha Inicio</th>
                 <th>Fecha Fin</th>
-                <th>Estado</th>
+                {/*<th>Estado</th>*/}
                 <th>Cuentas</th>
                 <th>Total Ventas</th>
                 <th className="acciones-col">Acciones</th>
@@ -213,11 +212,11 @@ const VentasPage: React.FC = () => {
                   <td className="usuario-nombre">{users[shift.user_id] || "Sin asignar"}</td>
                   <td>{formatDate(shift.started_at)}</td>
                   <td>{shift.finished_at ? formatDate(shift.finished_at) : "-"}</td>
-                  <td>
+                  {/*<td>
                     <span className={`estado ${shift.state === "open" ? "abierto" : "cerrado"}`}>
                       {shift.state === "open" ? "Abierto" : "Cerrado"}
                     </span>
-                  </td>
+                  </td>*/}
                   <td className="text-center">{shift.total_bills}</td>
                   <td className="ventas-amount">{formatCurrency(shift.total_sales)}</td>
                   <td className="text-center">
@@ -267,12 +266,12 @@ const VentasPage: React.FC = () => {
                   <span className="detail-label">Usuario:</span>
                   <span className="detail-value">{users[selectedShift.user_id] || "Sin asignar"}</span>
                 </div>
-                <div className="detail-row">
+                {/*<div className="detail-row">
                   <span className="detail-label">Estado:</span>
                   <span className={`estado ${selectedShift.state === "open" ? "abierto" : "cerrado"}`}>
                     {selectedShift.state === "open" ? "Abierto" : "Cerrado"}
                   </span>
-                </div>
+                </div>*/}
                 <div className="detail-row">
                   <span className="detail-label">Fecha Inicio:</span>
                   <span className="detail-value">{formatDate(selectedShift.started_at)}</span>
