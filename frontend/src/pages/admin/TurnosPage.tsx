@@ -35,7 +35,9 @@ const TurnosPage: React.FC = () => {
   const [selectedAssignments, setSelectedAssignments] = useState<Assignment[]>([]);
 
   const users: User[] = [
-
+    { id: "1", name: "Diego", email: "diego@mesero.com", role: "waiter", status: "active" },
+    { id: "3", name: "DiegoCaja", email: "diego@caja.com", role: "cash", status: "active" },
+    { id: "4", name: "BrayanMesero", email: "brayan.cifuentes@uptc.edu.co", role: "waiter", status: "active" },
   ];
 
   const activeUsers = users.filter(u => u.status === "active");
