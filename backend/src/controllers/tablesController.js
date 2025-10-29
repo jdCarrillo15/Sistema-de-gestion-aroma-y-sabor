@@ -118,7 +118,7 @@ export async function createTable(req, res) {
         const newTable = {
             number,
             capacity,
-            status: status || "available",
+            status: status || "free",
             current_bill_id: current_bill_id || null,
             created_at: admin.firestore.FieldValue.serverTimestamp(),
         };

@@ -376,7 +376,9 @@ describe("productsController", () => {
 
             await productsController.updateProductById(req, res);
 
-            expect(mockDoc.update).toHaveBeenCalledWith({ price: 99, stock: 2 });
+            expect(mockDoc.update).toHaveBeenCalledWith(
+                expect.objectContaining({ price: 99, stock: 2, status: "active" })
+            );
         });
     });
 

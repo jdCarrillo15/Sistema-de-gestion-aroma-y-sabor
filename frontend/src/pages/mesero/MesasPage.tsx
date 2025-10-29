@@ -7,6 +7,9 @@ import { connectSocket } from '../../services/sockets/socket';
 import styles from '../../styles/mesero/MesasPage.module.css';
 
 const MesasPage: React.FC = () => {
+  
+  const compareTables = (a: Table, b: Table) => (Number(a.number) || 0) - (Number(b.number) || 0);
+
   const [tables, setTables] = useState<Table[]>([]);
   const [selectedTable, setSelectedTable] = useState<Table | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -21,23 +24,28 @@ const MesasPage: React.FC = () => {
     socket.off("cuentaEliminada");
 
     socket.on("cuentaActualizada", ({ id, data }) => {
-      setTables(prev =>
-        prev.map(table =>
+      setTables(prev => {
+        const updated = prev.map(table =>
           table.current_bill_id === id
-            ? { ...table, current_bill_data: data }
+            ? ({ ...table, current_bill_data: data } as Table)
             : table
-        )
-      );
+        );
+        
+        updated.sort(compareTables);
+        return updated as Table[];
+      });
     });
 
     socket.on("cuentaEliminada", ({ id }) => {
-      setTables(prev =>
-        prev.map(table =>
+      setTables(prev => {
+        const updated = prev.map(table =>
           table.current_bill_id === id
-            ? { ...table, status: "free", current_bill_id: null }
+            ? ({ ...table, status: "free", current_bill_id: null } as Table)
             : table
-        )
-      );
+        );
+        updated.sort(compareTables);
+        return updated as Table[];
+      });
     });
 
     return () => {
@@ -52,6 +60,8 @@ const MesasPage: React.FC = () => {
     const loadTables = async () => {
       try {
         const fetchedTables = await getTables();
+      
+        fetchedTables.sort(compareTables);
         setTables(fetchedTables);
       } catch (err) {
         console.error("Error cargando mesas:", err);
@@ -86,13 +96,15 @@ const MesasPage: React.FC = () => {
   };
 
   const handleUpdateTable = (tableId: string, updates: Partial<Table>) => {
-    setTables(prev =>
-      prev.map(table =>
+    setTables(prev => {
+      const updated = prev.map(table =>
         table.id === tableId
           ? { ...table, ...updates }
           : table
-      )
-    );
+      );
+      updated.sort(compareTables);
+      return updated as Table[];
+    });
 
     if (selectedTable && selectedTable.id === tableId) {
       setSelectedTable({ ...selectedTable, ...updates });

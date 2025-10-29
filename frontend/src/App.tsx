@@ -16,6 +16,7 @@ import ProtectedRoute from "./components/ProtectedRoute";
 import { SocketProvider } from "./context/socketContext";
 import { UserProvider } from "./context/userContext";
 import { NotificationProvider } from "./context/notificationContext";
+import MesasPageP from "./pages/admin/MesasPage";
 function App() {
   return (
     <UserProvider>
@@ -38,6 +39,7 @@ function App() {
               <Route path="inventario" element={<InventarioPage />} />
               <Route path="turnos" element={<TurnosPage />} />
               <Route path="ventas" element={<VentasPage />} />
+              <Route path="mesas" element={<MesasPageP   />} />
             </Route>
 
             <Route
