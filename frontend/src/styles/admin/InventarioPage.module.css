@@ -1,0 +1,256 @@
+.inventarioPage {
+  padding: 1.5rem;
+  max-width: 100%;
+  margin: 0 auto;
+  min-height: 100vh;
+}
+
+.header {
+  margin-bottom: 2rem;
+}
+
+.titleSection {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin-bottom: 0.5rem;
+}
+
+.icon {
+  color: #D97706;
+}
+
+.title {
+  font-size: 2rem;
+  font-weight: 700;
+  color: #1F2937;
+  margin: 0;
+}
+
+.subtitle {
+  color: #6B7280;
+  font-size: 0.875rem;
+  margin: 0;
+  padding-left: 2.5rem;
+}
+
+.searchContainer {
+  position: relative;
+  margin-bottom: 2rem;
+  max-width: 500px;
+}
+
+.searchIcon {
+  position: absolute;
+  left: 1rem;
+  top: 50%;
+  transform: translateY(-50%);
+  color: #9CA3AF;
+}
+
+.searchInput {
+  width: 100%;
+  padding: 0.875rem 1rem 0.875rem 3rem;
+  border: 2px solid #E5E7EB;
+  border-radius: 12px;
+  font-size: 0.9375rem;
+  background: white;
+  transition: all 0.2s;
+  outline: none;
+}
+
+.searchInput:focus {
+  border-color: #D97706;
+  box-shadow: 0 0 0 3px rgba(217, 119, 6, 0.1);
+}
+
+.productsGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 1.25rem;
+  margin-bottom: 2rem;
+}
+
+.productCard {
+  background: white;
+  border-radius: 12px;
+  padding: 1.25rem;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  cursor: pointer;
+  transition: all 0.3s ease;
+  border: 2px solid transparent;
+}
+
+.productCard:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 12px 24px rgba(217, 119, 6, 0.15);
+  border-color: #D97706;
+}
+
+.productCard:active {
+  transform: translateY(-2px);
+}
+
+.cardHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 0.75rem;
+  margin-bottom: 1rem;
+  padding-bottom: 1rem;
+  border-bottom: 1px solid #F3F4F6;
+}
+
+.productName {
+  font-size: 1.125rem;
+  font-weight: 600;
+  color: #1F2937;
+  margin: 0;
+  line-height: 1.3;
+}
+
+.statusBadge {
+  padding: 0.25rem 0.625rem;
+  border-radius: 6px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  white-space: nowrap;
+  text-transform: uppercase;
+  letter-spacing: 0.025em;
+}
+
+.statusActive {
+  background: #D1FAE5;
+  color: #065F46;
+}
+
+.statusInactive {
+  background: #FEE2E2;
+  color: #991B1B;
+}
+
+.cardBody {
+  display: flex;
+  flex-direction: column;
+  gap: 0.875rem;
+  margin-bottom: 1rem;
+}
+
+.priceSection,
+.stockSection {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.priceLabel,
+.stockLabel {
+  font-size: 0.875rem;
+  color: #6B7280;
+  font-weight: 500;
+}
+
+.priceValue {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: #D97706;
+}
+
+.stockValue {
+  font-size: 0.9375rem;
+  font-weight: 600;
+  padding: 0.25rem 0.625rem;
+  border-radius: 6px;
+}
+
+.stockLow {
+  background: #FEE2E2;
+  color: #991B1B;
+}
+
+.stockMedium {
+  background: #FEF3C7;
+  color: #92400E;
+}
+
+.stockHigh {
+  background: #D1FAE5;
+  color: #065F46;
+}
+
+.cardFooter {
+  padding-top: 0.75rem;
+  border-top: 1px solid #F3F4F6;
+}
+
+.clickHint {
+  font-size: 0.8125rem;
+  color: #9CA3AF;
+  display: block;
+  text-align: center;
+}
+
+.emptyState {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 4rem 1rem;
+  text-align: center;
+}
+
+.emptyIcon {
+  color: #D1D5DB;
+  margin-bottom: 1rem;
+}
+
+.emptyText {
+  color: #6B7280;
+  font-size: 1rem;
+  margin: 0;
+}
+
+@media (max-width: 768px) {
+  .inventarioPage {
+    padding: 1rem;
+  }
+
+  .title {
+    font-size: 1.5rem;
+  }
+
+  .productsGrid {
+    grid-template-columns: 1fr;
+    gap: 1rem;
+  }
+
+  .searchContainer {
+    max-width: 100%;
+  }
+}
+
+@media (max-width: 480px) {
+  .inventarioPage {
+    padding: 0.75rem;
+  }
+
+  .header {
+    margin-bottom: 1.5rem;
+  }
+
+  .title {
+    font-size: 1.375rem;
+  }
+
+  .productCard {
+    padding: 1rem;
+  }
+
+  .productName {
+    font-size: 1rem;
+  }
+
+  .priceValue {
+    font-size: 1.125rem;
+  }
+}
