@@ -99,6 +99,8 @@ export async function createBill(req, res) {
       table: data.table,
       user_id: data.user_id,
       products: data.products || [],
+      units_total: (data.products || []).reduce((acc, p) => acc + (Number(p.units || p.quantity) || 0), 0),
+      product_ids: Array.from(new Set((data.products || []).map(p => p.id))).filter(Boolean),
       created_at: admin.firestore.FieldValue.serverTimestamp(),
     };
 
@@ -236,6 +238,13 @@ export async function updateBillById(req, res) {
     }
 
     const oldBill = billSnap.data();
+
+    if (Array.isArray(updateData.products)) {
+      updateData.units_total = updateData.products.reduce(
+        (acc, p) => acc + (Number(p.units) || 0),
+        0
+      );
+    }
 
     await billRef.update(updateData);
 
@@ -411,6 +420,8 @@ export async function addProductToBill(req, res) {
     await billRef.update({
       products: updatedProducts,
       total,
+      units_total: updatedProducts.reduce((acc, p) => acc + (Number(p.units) || 0), 0),
+      product_ids: admin.firestore.FieldValue.arrayUnion(...enrichedProducts.map(p => p.id).filter(Boolean)),
     });
 
     const updatedBillSnap = await billRef.get();
@@ -478,7 +489,11 @@ export async function removeProductFromBill(req, res) {
     const billData = billSnap.data();
     const updatedProducts = (billData.products || []).filter(p => p.id !== productId);
 
-    await billRef.update({ products: updatedProducts });
+    await billRef.update({
+      products: updatedProducts,
+      units_total: updatedProducts.reduce((acc, p) => acc + (Number(p.units) || 0), 0),
+      product_ids: Array.from(new Set(updatedProducts.map(p => p.id))).filter(Boolean),
+    });
 
     const io = getIO();
 
@@ -549,7 +564,12 @@ export async function updateProductsInBill(req, res) {
 
     const total = await calculateTotal(currentProducts);
 
-    await billRef.update({ products: currentProducts, total });
+    await billRef.update({
+      products: currentProducts,
+      total,
+      units_total: currentProducts.reduce((acc, p) => acc + (Number(p.units) || 0), 0),
+      product_ids: Array.from(new Set(currentProducts.map(p => p.id))).filter(Boolean),
+    });
 
     const io = getIO();
     io.to("cash").emit("cuentaActualizada", { id, data: { products: currentProducts, total } });

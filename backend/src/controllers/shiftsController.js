@@ -39,22 +39,19 @@ export async function getShifts(req, res) {
       return res.json({ shifts: [] });
     }
 
-    const shifts = await Promise.all(
-      snapshot.docs.map(async (doc) => {
-        const base = doc.data();
-        const agg = await aggregateShiftData(doc.id);
-        return {
-          id: doc.id,
-          user_id: base.user_id || null,
-          state: base.state || "open",
-          started_at: base.started_at || null,
-          finished_at: base.finished_at || null,
-          total_bills: agg.total_bills,
-          total_sales: agg.total_sales,
-          products_summary: agg.products_summary,
-        };
-      })
-    );
+    const shifts = snapshot.docs.map((doc) => {
+      const base = doc.data();
+      return {
+        id: doc.id,
+        user_id: base.user_id || null,
+        state: base.state || "open",
+        started_at: base.started_at || null,
+        finished_at: base.finished_at || null,
+        total_bills: base.total_bills,
+        total_sales: base.total_sales,
+        products_summary: base.products_summary,
+      };
+    });
 
     return res.json({ shifts });
   } catch (err) {
@@ -156,7 +153,6 @@ export async function getShiftById(req, res) {
     }
 
     const base = snap.data();
-    const agg = await aggregateShiftData(id);
 
     return res.json({
       id,
@@ -164,9 +160,9 @@ export async function getShiftById(req, res) {
       state: base.state || "open",
       started_at: base.started_at || null,
       finished_at: base.finished_at || null,
-      total_bills: agg.total_bills,
-      total_sales: agg.total_sales,
-      products_summary: agg.products_summary,
+      total_bills: base.total_bills,
+      total_sales: base.total_sales,
+      products_summary: base.products_summary,
     });
   } catch (err) {
     return res.status(500).json({
@@ -192,10 +188,6 @@ export async function updateShiftById(req, res) {
     const { started_at, finished_at, state, user_id } = req.body || {};
 
     const ref = db.collection("shifts").doc(id);
-    const snap = await ref.get();
-    if (!snap.exists) {
-      return res.status(404).json({ error: "Turno no encontrado" });
-    }
 
     const update = {};
     if (typeof user_id === "string") update.user_id = user_id;
@@ -220,7 +212,14 @@ export async function updateShiftById(req, res) {
       update.finished_at = admin.firestore.FieldValue.serverTimestamp();
     }
 
-    await ref.update(update);
+    try {
+      await ref.update(update);
+    } catch (e) {
+      if (e.code === 5) {
+        return res.status(404).json({ error: "Turno no encontrado" });
+      }
+      return res.status(500).json({ error: "Error al actualizar turno", details: e.message });
+    }
 
     const io = getIO();
     io.to("cash").emit("turnoActualizado", { id, data: update });
@@ -269,79 +268,6 @@ export async function deleteShift(req, res) {
   } catch (err) {
     return res.status(500).json({
       error: "Error al eliminar turno",
-      details: err.message,
-    });
-  }
-}
-
-/**
- * Obtiene la agregación de un turno por su ID
- * @param {*} shiftId
- * @returns
- */
-async function aggregateShiftData(shiftId) {
-  const billsSnap = await db
-    .collection("bills")
-    .where("shift_id", "==", shiftId)
-    .get();
-
-  let total_bills = 0;
-  let total_sales = 0;
-  const products_summary = {};
-
-  if (!billsSnap.empty) {
-    total_bills = billsSnap.size;
-    for (const doc of billsSnap.docs) {
-      const bill = doc.data();
-      total_sales += Number(bill.total) || 0;
-      const items = bill.products || [];
-      for (const it of items) {
-        const nameKey = it.name || it.id || "Desconocido";
-        const units = Number(it.units) || 0;
-        products_summary[nameKey] = (products_summary[nameKey] || 0) + units;
-      }
-    }
-  }
-
-  return { total_bills, total_sales, products_summary };
-}
-
-/**
- * Obtiene la agregación de un turno por su ID
- * @param {*} req
- * @param {*} res
- *
- * @returns
- * {
- * "id": "shiftId",
- * "user_id": "RivCWLOk3zcxqebSo2pzIB1xUnp2",
- * "state": "open",
- * "started_at": "2025-10-29T07:00:00-05:00",
- * "finished_at": null,
- * "total_bills": 2,
- * "total_sales": 35600,
- * "products_summary": {
- *   "Cerveza Aguila": 1,
- *   "Empanada Pollo": 1,
- *   "Galletas de sal": 1,
- *   "Tea 250ml": 3,
- *   "Tinto": 5
- * }
- * }
- */
-export async function getShiftAggregate(req, res) {
-  try {
-    const { id } = req.params;
-    const shiftSnap = await db.collection("shifts").doc(id).get();
-    if (!shiftSnap.exists) {
-      return res.status(404).json({ error: "Turno no encontrado" });
-    }
-
-    const agg = await aggregateShiftData(id);
-    return res.status(200).json({ id, ...agg });
-  } catch (err) {
-    return res.status(500).json({
-      error: "Error al obtener agregación del turno",
       details: err.message,
     });
   }

@@ -1,5 +1,5 @@
 import express from "express";
-import { createShift, getShiftById, getShifts, updateShiftById, deleteShift, getShiftAggregate,  } from "../controllers/shiftsController.js";
+import { createShift, getShiftById, getShifts, updateShiftById, deleteShift  } from "../controllers/shiftsController.js";
 import { authenticate, authorize, loadResourceState } from "../middleware/auth.js";
 
 const router = express.Router();
@@ -7,7 +7,6 @@ const router = express.Router();
 router.get("/getShifts", authenticate, authorize("read", "shifts"), getShifts);
 router.post("/createShift", authenticate, authorize("create", "shifts"), createShift);
 router.get("/getShift/:id", authenticate, authorize("read", "shifts"), getShiftById);
-router.get("/getShiftAggregate/:id", authenticate, authorize("read", "shifts"), getShiftAggregate);
 router.put("/updateShift/:id", authenticate, loadResourceState("shifts"), authorize("update", "shifts"), updateShiftById);
 router.delete("/hardDeleteShift/:id", authenticate, authorize("delete", "shifts"), deleteShift);
 
