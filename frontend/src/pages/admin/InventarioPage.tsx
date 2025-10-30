@@ -30,11 +30,26 @@ const InventarioPage: React.FC = () => {
   const [salesData, setSalesData] = useState<SalesData[]>([]);
   const [isAlertOpen, setIsAlertOpen] = useState(false);
   const [alertMessage, setAlertMessage] = useState("");
+  const [alertTitle, setAlertTitle] = useState("");
+  const [alertType, setAlertType] = useState<
+    "success" | "error" | "info" | "warning"
+  >("info");
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [isLoadingReports, setIsLoadingReports] = useState(false);
+
+  const showAlert = (
+    title: string,
+    message: string,
+    type: "success" | "error" | "info" | "warning"
+  ) => {
+    setAlertTitle(title);
+    setAlertMessage(message);
+    setAlertType(type);
+    setIsAlertOpen(true);
+  };
 
   const handleProductClick = async (product: Product) => {
     try {
@@ -44,14 +59,29 @@ const InventarioPage: React.FC = () => {
 
       const { reports } = await getReportsByProduct(product.id);
 
-      const mappedReports = reports.map((report) => ({
-        ...report,
-        date: report.initialDate,
-      }));
-
-      setSalesData(mappedReports);
-    } catch (error) {
+      if (!reports || reports.length === 0) {
+        showAlert(
+          "Sin datos",
+          "No hay reportes de ventas disponibles para este producto.",
+          "info"
+        );
+        setSalesData([]);
+      } else {
+        const mappedReports = reports.map((report) => ({
+          ...report,
+          date: report.initialDate,
+        }));
+        setSalesData(mappedReports);
+      }
+    } catch (error: any) {
       console.error("Error al obtener reportes del producto:", error);
+      showAlert(
+        "Error al cargar reportes",
+        error.message ||
+          "No se pudieron cargar los reportes de ventas del producto. Por favor, intenta de nuevo.",
+        "error"
+      );
+      setSalesData([]);
     } finally {
       setIsLoadingReports(false);
     }
@@ -80,6 +110,15 @@ const InventarioPage: React.FC = () => {
       const productsData = Array.isArray(response)
         ? response
         : response?.products || [];
+
+      if (productsData.length === 0) {
+        showAlert(
+          "Sin productos",
+          "No hay productos disponibles en el inventario.",
+          "info"
+        );
+      }
+
       const mappedProducts: Product[] = productsData.map((prod) => ({
         ...prod,
         process: prod.process || "completed",
@@ -87,8 +126,13 @@ const InventarioPage: React.FC = () => {
       setProducts(mappedProducts);
     } catch (error: any) {
       console.error("Error cargando productos:", error);
-      setAlertMessage(error.message || "Error al cargar los productos");
-      setIsAlertOpen(true);
+      showAlert(
+        "Error al cargar productos",
+        error.message ||
+          "No se pudieron cargar los productos del inventario. Por favor, verifica tu conexión e intenta de nuevo.",
+        "error"
+      );
+      setProducts([]);
     } finally {
       setIsLoading(false);
     }
@@ -187,10 +231,14 @@ const InventarioPage: React.FC = () => {
             ))}
           </div>
 
-          {filteredProducts.length === 0 && (
+          {filteredProducts.length === 0 && !isLoading && (
             <div className={styles.emptyState}>
               <Package size={48} className={styles.emptyIcon} />
-              <p className={styles.emptyText}>No se encontraron productos</p>
+              <p className={styles.emptyText}>
+                {searchTerm
+                  ? "No se encontraron productos con ese nombre"
+                  : "No hay productos en el inventario"}
+              </p>
             </div>
           )}
         </>
@@ -205,12 +253,13 @@ const InventarioPage: React.FC = () => {
           isLoadingReports={isLoadingReports}
         />
       )}
+
       <AlertModal
         isOpen={isAlertOpen}
         onClose={() => setIsAlertOpen(false)}
-        title={alertMessage.includes("exitosamente") ? "Éxito" : "Error"}
+        title={alertTitle}
         message={alertMessage}
-        type={alertMessage.includes("exitosamente") ? "success" : "error"}
+        type={alertType}
         buttonText="Cerrar"
       />
     </div>
