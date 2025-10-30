@@ -39,7 +39,7 @@ const MesasPage: React.FC = () => {
     try {
       const response = await getTables();
       const tablesData = Array.isArray(response) ? response : response?.tables || [];
-      // ordenar por número de mesa (ascendente)
+      
       const compareTables = (a: Table, b: Table) => (Number(a.number) || 0) - (Number(b.number) || 0);
       tablesData.sort(compareTables);
       setTables(tablesData);
