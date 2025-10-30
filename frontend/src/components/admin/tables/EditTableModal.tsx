@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import Button from "../../common/Button";
 import ConfirmModal from "./../ConfirmModal";
-import "../../../styles/admin/tables/EditTableModal.css";
+import styles from "../../../styles/admin/tables/EditTableModal.module.css";
 
 interface EditTableModalProps {
   isOpen: boolean;
@@ -126,15 +126,15 @@ const EditTableModal: React.FC<EditTableModalProps> = ({
   return (
     <>
       <div
-        className="modal-backdrop"
+        className={styles.modalBackdrop}
         onKeyDown={handleKeyDown}
         tabIndex={-1}
       >
-        <div className="modal-container">
-          <div className="modal-content">
-            <div className="modal-header">
+        <div className={styles.modalContainer}>
+          <div className={styles.modalContent}>
+            <div className={styles.modalHeader}>
               <button
-                className="close-button"
+                className={styles.closeButton}
                 onClick={onClose}
                 aria-label="Cerrar"
                 disabled={isSubmitting}
@@ -153,7 +153,7 @@ const EditTableModal: React.FC<EditTableModalProps> = ({
               </button>
             </div>
 
-            <div className="modal-icon">
+            <div className={styles.modalIcon}>
               <svg
                 width="64"
                 height="64"
@@ -167,46 +167,46 @@ const EditTableModal: React.FC<EditTableModalProps> = ({
               </svg>
             </div>
 
-            <h2 className="modal-title">Editar Mesa</h2>
-            <p className="modal-description">
+            <h2 className={styles.modalTitle}>Editar Mesa</h2>
+            <p className={styles.modalDescription}>
               Modifica la información de la mesa seleccionada.
             </p>
 
-            <form onSubmit={handleSubmit} className="modal-form">
-              <div className="form-group">
-                <label htmlFor="number" className="form-label">Número de mesa *</label>
+            <form onSubmit={handleSubmit} className={styles.modalForm}>
+              <div className={styles.formGroup}>
+                <label htmlFor="number" className={styles.formLabel}>Número de mesa *</label>
                 <input
                   type="text"
                   id="number"
                   value={number}
                   onChange={handleNumberChange}
-                  className={`form-input ${errors.number ? 'error' : ''}`}
+                  className={`${styles.formInput} ${errors.number ? styles.error : ''}`}
                   disabled={isSubmitting}
                   required
                 />
                 {errors.number && (
-                  <span className="error-message">{errors.number}</span>
+                  <span className={styles.errorMessage}>{errors.number}</span>
                 )}
               </div>
 
-              <div className="form-group">
-                <label htmlFor="capacity" className="form-label">Capacidad *</label>
+              <div className={styles.formGroup}>
+                <label htmlFor="capacity" className={styles.formLabel}>Capacidad *</label>
                 <input
                   type="text"
                   id="capacity"
                   value={capacity}
                   onChange={handleCapacityChange}
-                  className={`form-input ${errors.capacity ? 'error' : ''}`}
+                  className={`${styles.formInput} ${errors.capacity ? styles.error : ''}`}
                   placeholder="Número de personas"
                   disabled={isSubmitting}
                   required
                 />
                 {errors.capacity && (
-                  <span className="error-message">{errors.capacity}</span>
+                  <span className={styles.errorMessage}>{errors.capacity}</span>
                 )}
               </div>
 
-              <div className="modal-buttons">
+              <div className={styles.modalButtons}>
                 <Button
                   type="button"
                   variant="secondary"

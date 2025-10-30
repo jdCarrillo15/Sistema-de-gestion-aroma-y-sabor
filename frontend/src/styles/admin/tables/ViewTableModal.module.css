@@ -1,21 +1,4 @@
-.status-badge.free {
-  background: #d1fae5;
-  color: #065f46;
-}
-
-.status-badge.occupied {
-  background: #fee2e2;
-  color: #991b1b;
-}
-
-.table-details {
-  margin-top: 1.5rem;
-  border: 1px solid #e5e7eb;
-  border-radius: 8px;
-  overflow: hidden;
-}
-
-.modal-backdrop {
+.modalBackdrop {
   position: fixed;
   top: 0;
   left: 0;
@@ -29,7 +12,7 @@
   padding: 1rem;
 }
 
-.modal-container {
+.modalContainer {
   background: white;
   border-radius: 12px;
   width: 100%;
@@ -40,18 +23,18 @@
   box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
 }
 
-.modal-content {
+.modalContent {
   padding: 2rem;
 }
 
 /* Header del modal */
-.modal-header {
+.modalHeader {
   display: flex;
   justify-content: flex-end;
   margin-bottom: 1rem;
 }
 
-.close-button {
+.closeButton {
   background: none;
   border: none;
   padding: 4px;
@@ -61,13 +44,13 @@
   transition: all 0.2s ease;
 }
 
-.close-button:hover {
+.closeButton:hover {
   background: #f3f4f6;
   color: #374151;
 }
 
 /* Icono del modal */
-.modal-icon {
+.modalIcon {
   display: flex;
   justify-content: center;
   margin-bottom: 1rem;
@@ -75,7 +58,7 @@
 }
 
 /* Título y descripción */
-.modal-title {
+.modalTitle {
   font-size: 1.5rem;
   font-weight: 700;
   text-align: center;
@@ -83,7 +66,7 @@
   margin: 0 0 0.5rem 0;
 }
 
-.modal-description {
+.modalDescription {
   text-align: center;
   color: #6b7280;
   margin: 0 0 2rem 0;
@@ -91,15 +74,15 @@
   line-height: 1.5;
 }
 
-/* Detalles del producto */
-.product-details {
+/* Detalles de la tabla */
+.tableDetails {
   margin-top: 1.5rem;
   border: 1px solid #e5e7eb;
   border-radius: 8px;
   overflow: hidden;
 }
 
-.detail-row {
+.detailRow {
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -109,21 +92,21 @@
   transition: background-color 0.2s ease;
 }
 
-.detail-row:hover {
+.detailRow:hover {
   background: #f9fafb;
 }
 
-.detail-row:last-child {
+.detailRow:last-child {
   border-bottom: none;
 }
 
-.detail-label {
+.detailLabel {
   font-weight: 500;
   color: #374151;
   font-size: 14px;
 }
 
-.detail-value {
+.detailValue {
   color: #111827;
   font-weight: 400;
   text-align: right;
@@ -132,7 +115,7 @@
 }
 
 /* Badge de estado */
-.status-badge {
+.statusBadge {
   padding: 4px 12px;
   border-radius: 16px;
   font-size: 12px;
@@ -141,61 +124,61 @@
   letter-spacing: 0.5px;
 }
 
-.status-badge.active {
+.statusBadge.free {
   background: #d1fae5;
   color: #065f46;
 }
 
-.status-badge.inactive {
+.statusBadge.occupied {
   background: #fee2e2;
   color: #991b1b;
 }
 
 /* Responsive */
 @media (max-width: 768px) {
-  .modal-backdrop {
+  .modalBackdrop {
     padding: 0.5rem;
   }
 
-  .modal-content {
+  .modalContent {
     padding: 1.5rem;
   }
 
-  .modal-title {
+  .modalTitle {
     font-size: 1.25rem;
   }
 
-  .detail-row {
+  .detailRow {
     padding: 12px;
     flex-direction: column;
     align-items: flex-start;
     gap: 4px;
   }
 
-  .detail-value {
+  .detailValue {
     text-align: left;
     max-width: 100%;
   }
 }
 
 @media (max-width: 480px) {
-  .modal-content {
+  .modalContent {
     padding: 1rem;
   }
 
-  .modal-title {
+  .modalTitle {
     font-size: 1.125rem;
   }
 
-  .detail-row {
+  .detailRow {
     padding: 10px;
   }
 
-  .detail-label {
+  .detailLabel {
     font-size: 13px;
   }
 
-  .detail-value {
+  .detailValue {
     font-size: 13px;
   }
 }

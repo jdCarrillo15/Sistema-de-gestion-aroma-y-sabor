@@ -3,7 +3,7 @@ import { DollarSign, Clock, Package, AlertCircle } from "lucide-react";
 import { getShifts, type Shift } from "../../services/admin/shiftService";
 import { getUsers } from "../../services/admin/userService";
 import AlertModal from "../../components/common/AlertModal";
-import "../../styles/admin/VentasPage.css";
+import styles from "../../styles/admin/VentasPage.module.css";
 
 const VentasPage: React.FC = () => {
   const [shifts, setShifts] = useState<Shift[]>([]);
@@ -14,7 +14,7 @@ const VentasPage: React.FC = () => {
   const [alertMessage, setAlertMessage] = useState("");
   const [selectedShift, setSelectedShift] = useState<Shift | null>(null);
 
-  // Cargar turnos al montar el componente
+  
   useEffect(() => {
     loadShifts();
   }, []);
@@ -30,7 +30,7 @@ const VentasPage: React.FC = () => {
       const shiftsData = shiftsResponse.shifts || [];
       setShifts(shiftsData);
       
-      // Crear un mapa de user_id -> user_name
+      
       const usersData = usersResponse.users || [];
       const usersMap: Record<string, string> = {};
       usersData.forEach((user: any) => {
@@ -54,19 +54,16 @@ const VentasPage: React.FC = () => {
     
   const totalSales = filteredShifts.reduce((sum, shift) => sum + shift.total_sales, 0);
   const totalBills = filteredShifts.reduce((sum, shift) => sum + shift.total_bills, 0);
-  //const openShifts = filteredShifts.filter(s => s.state === "open").length;
-  //const closedShifts = filteredShifts.filter(s => s.state === "close").length;
 
-  // Formatear fecha
   const formatDate = (dateString: any) => {
     try {
       let date: Date;
       
-      // Si es un objeto Timestamp de Firebase
+      
       if (dateString && typeof dateString === 'object' && '_seconds' in dateString) {
         date = new Date(dateString._seconds * 1000);
       } 
-      // Si es un string
+     
       else if (typeof dateString === 'string') {
         date = new Date(dateString);
       }
@@ -105,20 +102,20 @@ const VentasPage: React.FC = () => {
   };
 
   return (
-    <div className="ventas-page">
+    <div className={styles.ventasPage}>
       {/* Header */}
-      <div className="ventas-header">
+      <div className={styles.ventasHeader}>
         <div>
-          <h1 className="dashboard-title">Ventas por Turnos</h1>
-          <p className="dashboard-sub">Resumen de todos los turnos y ventas</p>
+          <h1 className={styles.dashboardTitle}>Ventas por Turnos</h1>
+          <p className={styles.dashboardSub}>Resumen de todos los turnos y ventas</p>
         </div>
-        <div className="filtro-usuario">
+        <div className={styles.filtroUsuario}>
           <label htmlFor="filtro-usuario">Filtrar por usuario:</label>
           <select 
             id="filtro-usuario"
             value={selectedUserId} 
             onChange={(e) => setSelectedUserId(e.target.value)}
-            className="select-filtro"
+            className={styles.selectFiltro}
           >
             <option value="all">Todos los usuarios</option>
             {Object.entries(users).map(([userId, userName]) => (
@@ -131,97 +128,68 @@ const VentasPage: React.FC = () => {
       </div>
 
       {/* Estadísticas */}
-      <div className="stats-grid">
-        <div className="stat-card">
-          <div className="stat-left">
-            <div className="stat-icon ventas">
+      <div className={styles.statsGrid}>
+        <div className={styles.statCard}>
+          <div className={styles.statLeft}>
+            <div className={`${styles.statIcon} ${styles.ventas}`}>
               <DollarSign size={20} />
             </div>
             <div>
-              <div className="stat-value">{formatCurrency(totalSales)}</div>
-              <div className="stat-label">Ventas Totales</div>
+              <div className={styles.statValue}>{formatCurrency(totalSales)}</div>
+              <div className={styles.statLabel}>Ventas Totales</div>
             </div>
           </div>
         </div>
 
-        <div className="stat-card">
-          <div className="stat-left">
-            <div className="stat-icon facturas">
+        <div className={styles.statCard}>
+          <div className={styles.statLeft}>
+            <div className={`${styles.statIcon} ${styles.facturas}`}>
               <Package size={20} />
             </div>
             <div>
-              <div className="stat-value">{totalBills}</div>
-              <div className="stat-label">Cuentas Totales</div>
+              <div className={styles.statValue}>{totalBills}</div>
+              <div className={styles.statLabel}>Cuentas Totales</div>
             </div>
           </div>
         </div>
-       {/* <div className="stat-card">
-          <div className="stat-left">
-            <div className="stat-icon activos">
-              <Clock size={20} />
-            </div>
-            <div>
-              <div className="stat-value">{openShifts}</div>
-              <div className="stat-label">Turnos Abiertos</div>
-            </div>
-          </div>
-        </div>
-
-        <div className="stat-card">
-          <div className="stat-left">
-            <div className="stat-icon cerrados">
-              <TrendingUp size={20} />
-            </div>
-            <div>
-              <div className="stat-value">{closedShifts}</div>
-              <div className="stat-label">Turnos Cerrados</div>
-            </div>
-          </div>
-        </div>*/}
       </div>
 
       {/* Tabla de turnos */}
-      <div className="ventas-tabla-container">
+      <div className={styles.ventasTablaContainer}>
         {isLoading && filteredShifts.length === 0 ? (
-          <div className="loading-state">
-            <Clock size={48} className="loading-icon" />
+          <div className={styles.loadingState}>
+            <Clock size={48} className={styles.loadingIcon} />
             <p>Cargando turnos...</p>
           </div>
         ) : filteredShifts.length === 0 ? (
-          <div className="empty-state">
-            <AlertCircle size={48} className="empty-icon" />
+          <div className={styles.emptyState}>
+            <AlertCircle size={48} className={styles.emptyIcon} />
             <h3>No hay turnos registrados</h3>
             <p>Los turnos aparecerán aquí una vez que se registren en el sistema</p>
           </div>
         ) : (
-          <table className="ventas-tabla">
+          <table className={styles.ventasTabla}>
             <thead>
               <tr>
                 <th>Usuario</th>
                 <th>Fecha Inicio</th>
                 <th>Fecha Fin</th>
-                {/*<th>Estado</th>*/}
                 <th>Cuentas</th>
                 <th>Total Ventas</th>
-                <th className="acciones-col">Acciones</th>
+                <th className={styles.accionesCol}>Acciones</th>
               </tr>
             </thead>
             <tbody>
               {filteredShifts.map((shift) => (
                 <tr key={shift.id}>
-                  <td className="usuario-nombre">{users[shift.user_id] || "Sin asignar"}</td>
+                  <td className={styles.usuarioNombre}>{users[shift.user_id] || "Sin asignar"}</td>
                   <td>{formatDate(shift.started_at)}</td>
                   <td>{shift.finished_at ? formatDate(shift.finished_at) : "-"}</td>
-                  {/*<td>
-                    <span className={`estado ${shift.state === "open" ? "abierto" : "cerrado"}`}>
-                      {shift.state === "open" ? "Abierto" : "Cerrado"}
-                    </span>
-                  </td>*/}
-                  <td className="text-center">{shift.total_bills}</td>
-                  <td className="ventas-amount">{formatCurrency(shift.total_sales)}</td>
-                  <td className="text-center">
+                  <td className={styles.textCenter}>{shift.total_bills}</td>
+                  <td className={styles.ventasAmount}>{formatCurrency(shift.total_sales)}</td>
+                  <td className={styles.textCenter}>
                     <button
-                      className="btn-ver-detalles"
+                      className={styles.btnVerDetalles}
                       onClick={() => handleViewDetails(shift)}
                     >
                       Ver Detalles
@@ -236,12 +204,12 @@ const VentasPage: React.FC = () => {
 
       {/* Modal de detalles del turno */}
       {selectedShift && (
-        <div className="modal-backdrop" onClick={() => setSelectedShift(null)}>
-          <div className="modal-container" onClick={(e) => e.stopPropagation()}>
-            <div className="modal-content">
-              <div className="modal-header">
+        <div className={styles.modalBackdrop} onClick={() => setSelectedShift(null)}>
+          <div className={styles.modalContainer} onClick={(e) => e.stopPropagation()}>
+            <div className={styles.modalContent}>
+              <div className={styles.modalHeader}>
                 <button
-                  className="close-button"
+                  className={styles.closeButton}
                   onClick={() => setSelectedShift(null)}
                   aria-label="Cerrar"
                 >
@@ -252,57 +220,51 @@ const VentasPage: React.FC = () => {
                 </button>
               </div>
 
-              <div className="modal-icon">
+              <div className={styles.modalIcon}>
                 <DollarSign size={64} />
               </div>
 
-              <h2 className="modal-title">Detalles del Turno</h2>
-              <p className="modal-description">
+              <h2 className={styles.modalTitle}>Detalles del Turno</h2>
+              <p className={styles.modalDescription}>
                 Información detallada sobre el turno seleccionado
               </p>
 
-              <div className="shift-details">
-                <div className="detail-row">
-                  <span className="detail-label">Usuario:</span>
-                  <span className="detail-value">{users[selectedShift.user_id] || "Sin asignar"}</span>
+              <div className={styles.shiftDetails}>
+                <div className={styles.detailRow}>
+                  <span className={styles.detailLabel}>Usuario:</span>
+                  <span className={styles.detailValue}>{users[selectedShift.user_id] || "Sin asignar"}</span>
                 </div>
-                {/*<div className="detail-row">
-                  <span className="detail-label">Estado:</span>
-                  <span className={`estado ${selectedShift.state === "open" ? "abierto" : "cerrado"}`}>
-                    {selectedShift.state === "open" ? "Abierto" : "Cerrado"}
-                  </span>
-                </div>*/}
-                <div className="detail-row">
-                  <span className="detail-label">Fecha Inicio:</span>
-                  <span className="detail-value">{formatDate(selectedShift.started_at)}</span>
+                <div className={styles.detailRow}>
+                  <span className={styles.detailLabel}>Fecha Inicio:</span>
+                  <span className={styles.detailValue}>{formatDate(selectedShift.started_at)}</span>
                 </div>
                 {selectedShift.finished_at && (
-                  <div className="detail-row">
-                    <span className="detail-label">Fecha Fin:</span>
-                    <span className="detail-value">{formatDate(selectedShift.finished_at)}</span>
+                  <div className={styles.detailRow}>
+                    <span className={styles.detailLabel}>Fecha Fin:</span>
+                    <span className={styles.detailValue}>{formatDate(selectedShift.finished_at)}</span>
                   </div>
                 )}
-                <div className="detail-row">
-                  <span className="detail-label">Total Cuentas:</span>
-                  <span className="detail-value">{selectedShift.total_bills}</span>
+                <div className={styles.detailRow}>
+                  <span className={styles.detailLabel}>Total Cuentas:</span>
+                  <span className={styles.detailValue}>{selectedShift.total_bills}</span>
                 </div>
-                <div className="detail-row">
-                  <span className="detail-label">Total Ventas:</span>
-                  <span className="detail-value ventas-highlight">
+                <div className={styles.detailRow}>
+                  <span className={styles.detailLabel}>Total Ventas:</span>
+                  <span className={`${styles.detailValue} ${styles.ventasHighlight}`}>
                     {formatCurrency(selectedShift.total_sales)}
                   </span>
                 </div>
 
                 {Object.keys(selectedShift.products_summary).length > 0 && (
                   <>
-                    <div className="detail-divider">
+                    <div className={styles.detailDivider}>
                       <h3>Resumen de Productos</h3>
                     </div>
-                    <div className="products-summary">
+                    <div className={styles.productsSummary}>
                       {Object.entries(selectedShift.products_summary).map(([productName, quantity]) => (
-                        <div key={productName} className="product-summary-row">
-                          <span className="product-name">{productName}</span>
-                          <span className="product-quantity">x{quantity}</span>
+                        <div key={productName} className={styles.productSummaryRow}>
+                          <span className={styles.productName}>{productName}</span>
+                          <span className={styles.productQuantity}>x{quantity}</span>
                         </div>
                       ))}
                     </div>
