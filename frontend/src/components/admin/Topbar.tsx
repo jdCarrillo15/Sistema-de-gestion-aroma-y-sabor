@@ -1,5 +1,5 @@
 import React from "react";
-import { Search, Calendar } from "lucide-react";
+import { Search  } from "lucide-react";
 import "../../styles/admin/Topbar.css";
 
 const Topbar: React.FC = () => {
@@ -18,9 +18,7 @@ const Topbar: React.FC = () => {
         {/* Sección derecha */}
         <div className="topbar-right">
           {/* Botón calendario */}
-          <button className="topbar-calendar-button">
-            <Calendar className="topbar-icon" />
-          </button>
+         
 
           {/* Usuario */}
           <div className="topbar-user">

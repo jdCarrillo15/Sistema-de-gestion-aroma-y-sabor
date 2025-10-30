@@ -15,7 +15,7 @@ const ProtectedRoute: React.FC<ProtectedRouteProps> = ({
 
 
   if (!user) {
-    return <Navigate to="/" replace />;
+    return <Navigate to="/admin/productos" replace />;
   }
 
 

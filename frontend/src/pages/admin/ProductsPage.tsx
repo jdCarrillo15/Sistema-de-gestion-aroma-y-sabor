@@ -177,14 +177,17 @@ const ProductsPage: React.FC = () => {
         <div>
           <h1 className="dashboard-title">Gestión de Productos</h1>
         </div>
-        <Button
-          className="primary-btn"
-          onClick={() => setIsModalOpen(true)}
-          disabled={isLoading}
-        >
-          <Plus className="icono" />
-          Nuevo Producto
-        </Button>
+
+        <div className="contenedor-boton">
+          <Button
+            className="btnNuevoProducto"
+            onClick={() => setIsModalOpen(true)}
+            disabled={isLoading}
+          >
+            <Plus className="icono" />
+            Nuevo Producto
+          </Button>
+        </div>
       </div>
 
       <div className="stats-grid">
@@ -264,14 +267,6 @@ const ProductsPage: React.FC = () => {
             <Package size={48} className="empty-icon" />
             <h3>No hay productos</h3>
             <p>Crea tu primer producto para comenzar</p>
-            <Button
-              className="primary-btn"
-              onClick={() => setIsModalOpen(true)}
-              disabled={isLoading}
-            >
-              <Plus className="icono" />
-              Crear Producto
-            </Button>
           </div>
         )}
       </div>

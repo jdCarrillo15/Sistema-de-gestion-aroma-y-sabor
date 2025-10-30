@@ -2,7 +2,7 @@ import React, { useEffect } from "react";
 import Button from "../common/Button";
 import "../../styles/admin/ConfirmModal.css";
 
-interface ConfirmModalProps {
+interface ConfirmModalProps { 
   isOpen: boolean;
   onClose: () => void;
   title?: string;

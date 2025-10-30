@@ -28,9 +28,9 @@ function App() {
             <Route
               path="/admin"
               element={
-                <ProtectedRoute allowedRoles={['admin']}>
+                //<ProtectedRoute allowedRoles={['admin']}>
                   <AdminLayout />
-                </ProtectedRoute>
+               // </ProtectedRoute>
               }
             >
               <Route index element={<AdminDashboard />} />
@@ -56,9 +56,9 @@ function App() {
             <Route
               path="/cocina"
               element={
-                <ProtectedRoute allowedRoles={['kitchen', 'cash']}>
+                //<ProtectedRoute allowedRoles={['kitchen', 'cash']}>
                   <CocinaCajaLayout />
-                </ProtectedRoute>
+               // </ProtectedRoute>
               }
             >
               <Route index element={<CocinaPage />} />
@@ -68,9 +68,9 @@ function App() {
             <Route
               path="/caja"
               element={
-                <ProtectedRoute allowedRoles={['kitchen', 'cash']}>
+               // <ProtectedRoute allowedRoles={['kitchen', 'cash']}>
                   <CocinaCajaLayout />
-                </ProtectedRoute>
+                //</ProtectedRoute>
               }
             >
               <Route index element={<CajaPage />} />

@@ -26,7 +26,6 @@ export function connectSocket(): Socket {
     });
 
     socket.on("connect", () => {
-      console.log("Conectado al servidor:", socket?.id);
       const userData = localStorage.getItem("user");
       if (userData) {
         const { role, email, name } = JSON.parse(userData);
@@ -34,15 +33,12 @@ export function connectSocket(): Socket {
       }
     });
 
-    socket.on("disconnect", () => {
-      console.log("Socket desconectado:", socket?.id);
-    });
+    socket.on("disconnect", () => {});
 
     window.__socket = socket;
     // ensure module-level `socket` points to the same instance
     socket = window.__socket;
   } else {
-    console.log("Reusando socket existente:", window.__socket.id);
     const userData = localStorage.getItem("user");
     if (userData) {
       const { role, email, name } = JSON.parse(userData);
@@ -68,7 +64,7 @@ export function getSocket(): Socket {
 }
 
 /**
- * Cierra la conexión del socket 
+ * Cierra la conexión del socket
  */
 export function disconnectSocket() {
   // Prefer the module-level socket, but fall back to the global window.__socket

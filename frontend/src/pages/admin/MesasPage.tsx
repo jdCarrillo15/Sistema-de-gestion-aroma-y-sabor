@@ -1,13 +1,13 @@
 import React, { useState, useEffect } from "react";
 import { Plus, Edit3, Trash2, Eye, UtensilsCrossed } from "lucide-react";
 import Button from "../../components/common/Button";
+import LoadingSpinner from "../../components/common/LoadingSpinner";
 import CreateTableModal from "../../components/admin/tables/CreateTableModal";
 import EditTableModal from "../../components/admin/tables/EditTableModal";
 import ConfirmModal from "../../components/admin/ConfirmModal";
 import AlertModal from "../../components/common/AlertModal";
 import ViewTableModal from "../../components/admin/tables/ViewTableModal";
-import "../../styles/admin/products/ProductsPage.css";
-import meseroStyles from "../../styles/mesero/MesasPage.module.css";
+import styles from "../../styles/admin/tables/TablesPage.module.css";
 import { getTables, createTable, updateTable, deleteTable } from "../../services/admin/tableService";
 
 export type Table = {
@@ -169,17 +169,17 @@ const MesasPage: React.FC = () => {
 
   return (
     <div className="dashboard-page">
-      <div className="dashboard-header">
+      <div className={styles.dashboardHeader}>
         <div>
           <h1 className="dashboard-title">Gestión de Mesas</h1>
         </div>
         <Button
-        className="primary-btn btn-compact"
-        onClick={() => setIsModalOpen(true)}
-        disabled={isLoading}
+          className="primary-btn btn-compact"
+          onClick={() => setIsModalOpen(true)}
+          disabled={isLoading}
         >
-        <Plus className="icono" />
-        Nueva Mesa
+          <Plus className="icono" />
+          Nueva Mesa
         </Button>
       </div>
 
@@ -197,32 +197,32 @@ const MesasPage: React.FC = () => {
         </div>
       </div>
 
-      <div className="productos-grid">
-          {isLoading && tables.length === 0 && (
-            <div className={meseroStyles.loadingState}>
-              <div className={meseroStyles.spinner}></div>
-              <p>Cargando mesas...</p>
-            </div>
-          )}
+      <div className={styles.productosGrid}>
+        {isLoading && tables.length === 0 && (
+          <div className={styles.loadingSpinner}>
+            <LoadingSpinner message="Cargando mesas..." />
+          </div>
+        )}
 
         {tables.map((table) => (
-          <div key={table.id} className="product-card">
-            <div className="product-card-header">
-              <h3 className="product-name">Mesa {table.number}</h3>
+          <div key={table.id} className={styles.productCard}>
+            <div className={styles.productCardHeader}>
+              <h3 className={styles.productName}>Mesa {table.number}</h3>
               <span
-                className={`product-status ${table.status === "free" ? "status-active" : "status-inactive"
-                  }`}
+                className={`${styles.productStatus} ${
+                  table.status === "free" ? styles.statusActive : styles.statusInactive
+                }`}
               >
                 {table.status === "free" ? "Libre" : "Ocupada"}
               </span>
             </div>
 
-            <div className="product-card-body">
-              <div className="product-price">
+            <div className={styles.productCardBody}>
+              <div className={styles.productPrice}>
                 {table.capacity} personas
               </div>
 
-              <div className="product-actions">
+              <div className={styles.productActions}>
                 <Button
                   type="button"
                   variant="secondary"
@@ -256,8 +256,8 @@ const MesasPage: React.FC = () => {
         ))}
 
         {!isLoading && tables.length === 0 && (
-          <div className="empty-state">
-            <UtensilsCrossed size={48} className="empty-icon" />
+          <div className={styles.emptyState}>
+            <UtensilsCrossed size={48} className={styles.emptyIcon} />
             <h3>No hay mesas</h3>
             <p>Crea tu primera mesa para comenzar</p>
             <Button

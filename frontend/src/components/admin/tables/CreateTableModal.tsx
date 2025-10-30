@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import Button from "../../common/Button";
 import { UtensilsCrossed } from "lucide-react";
-import "../../../styles/admin/products/CreateProductModal.css";
+import styles from "../../../styles/admin/tables/CreateTableModal.module.css";
 
 interface CreateTableModalProps {
   isOpen: boolean;
@@ -110,15 +110,15 @@ const CreateTableModal: React.FC<CreateTableModalProps> = ({
 
   return (
     <div
-      className="modal-backdrop"
+      className={styles.modalBackdrop}
       onKeyDown={handleKeyDown}
       tabIndex={-1}
     >
-      <div className="modal-container">
-        <div className="modal-content">
-          <div className="modal-header">
+      <div className={styles.modalContainer}>
+        <div className={styles.modalContent}>
+          <div className={styles.modalHeader}>
             <button
-              className="close-button"
+              className={styles.closeButton}
               onClick={onClose}
               aria-label="Cerrar"
               disabled={isLoading}
@@ -137,51 +137,51 @@ const CreateTableModal: React.FC<CreateTableModalProps> = ({
             </button>
           </div>
 
-          <div className="modal-icon">
+          <div className={styles.modalIcon}>
             <UtensilsCrossed size={64} />
           </div>
 
-          <h2 className="modal-title">Nueva Mesa</h2>
-          <p className="modal-description">
+          <h2 className={styles.modalTitle}>Nueva Mesa</h2>
+          <p className={styles.modalDescription}>
             Completa los siguientes campos para crear una nueva mesa en el sistema.
           </p>
 
-          <form onSubmit={handleSubmit} className="modal-form">
-            <div className="form-group">
-              <label htmlFor="number" className="form-label">Número de mesa</label>
+          <form onSubmit={handleSubmit} className={styles.modalForm}>
+            <div className={styles.formGroup}>
+              <label htmlFor="number" className={styles.formLabel}>Número de mesa</label>
               <input
                 type="text"
                 id="number"
                 value={number}
                 onChange={handleNumberChange}
-                className={`form-input ${errors.number ? 'error' : ''}`}
+                className={`${styles.formInput} ${errors.number ? styles.error : ''}`}
                 placeholder="Ej: 7"
                 disabled={isLoading}
                 required
               />
               {errors.number && (
-                <span className="error-message">{errors.number}</span>
+                <span className={styles.errorMessage}>{errors.number}</span>
               )}
             </div>
 
-            <div className="form-group">
-              <label htmlFor="capacity" className="form-label">Capacidad (personas)</label>
+            <div className={styles.formGroup}>
+              <label htmlFor="capacity" className={styles.formLabel}>Capacidad (personas)</label>
               <input
                 type="text"
                 id="capacity"
                 value={capacity}
                 onChange={handleCapacityChange}
-                className={`form-input ${errors.capacity ? 'error' : ''}`}
+                className={`${styles.formInput} ${errors.capacity ? styles.error : ''}`}
                 placeholder="Ej: 4"
                 disabled={isLoading}
                 required
               />
               {errors.capacity && (
-                <span className="error-message">{errors.capacity}</span>
+                <span className={styles.errorMessage}>{errors.capacity}</span>
               )}
             </div>
 
-            <div className="modal-buttons">
+            <div className={styles.modalButtons}>
               <Button 
                 type="button" 
                 variant="secondary" 
@@ -197,7 +197,7 @@ const CreateTableModal: React.FC<CreateTableModalProps> = ({
               >
                 {isLoading ? (
                   <>
-                    <div className="spinner-small"></div>
+                    <div className={styles.spinnerSmall}></div>
                     Creando...
                   </>
                 ) : (

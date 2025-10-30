@@ -113,6 +113,7 @@ const ViewUserModal: React.FC<ViewUserModalProps> = ({
             </svg>
           </div>
 
+          
           <h2 className="modal-title">Información del Usuario</h2>
           <p className="modal-description">
             Detalles completos del usuario seleccionado.
@@ -155,9 +156,12 @@ const ViewUserModal: React.FC<ViewUserModalProps> = ({
             </div>
 
             {user.person && (
-              <div className="details-section">
-                <h3 className="section-title">Información Personal</h3>
 
+              
+              <div className="details-section">
+                
+                <br /><br />
+                <h3 className="section-title">Información Personal</h3>
                 <div className="detail-row">
                   <span className="detail-label">Nombre completo:</span>
                   <span className="detail-value">

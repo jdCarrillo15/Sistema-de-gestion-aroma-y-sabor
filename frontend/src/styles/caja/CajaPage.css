@@ -6,11 +6,38 @@
 
 /* Layout Principal */
 .caja-page {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  max-height: 100vh;
+  overflow-y: auto;
+  overflow-x: hidden;
   padding: 1.5rem 1rem;
   padding-bottom: 5rem;
   max-width: 100%;
-  min-height: calc(100vh - 60px);
   background: #f9fafb;
+  /* Smooth scrolling */
+  scroll-behavior: smooth;
+  -webkit-overflow-scrolling: touch;
+}
+
+.contenedor-boton {
+  display: flex;
+  justify-content: flex-end;
+  margin-bottom: 1rem;
+  flex-shrink: 0;
+}
+
+.btnVolver {
+  width: fit-content;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  background-color: #a0522d;
+  color: white;
+  border-radius: 7px;
+  padding: 0.5rem 1rem;
 }
 
 .caja-more-items-btn {
@@ -34,6 +61,7 @@
   align-items: flex-start;
   gap: 1rem;
   flex-wrap: wrap;
+  flex-shrink: 0;
 }
 
 .caja-view-header-text {
@@ -124,6 +152,7 @@
   transform: translateY(-2px);
   box-shadow: var(--caja-shadow-md);
 }
+
 .summary-card-green {
   box-shadow: #f97316;
 }
@@ -134,7 +163,6 @@
   gap: 0.75rem;
   width: 100%;
   box-shadow: #f97316;
-
 }
 
 .caja-summary-card-icon {
@@ -398,14 +426,12 @@
   font-weight: 700;
   color: #111827;
   margin: 0 0 1rem 0;
-
 }
 
 .caja-history-list {
   display: flex;
   flex-direction: column;
   gap: 0.75rem;
-
 }
 
 .caja-history-item {
@@ -538,7 +564,6 @@
     opacity: 0;
     transform: translateY(10px);
   }
-
   to {
     opacity: 1;
     transform: translateY(0);
@@ -549,13 +574,32 @@
   animation: caja-fadeIn 0.3s ease-out;
 }
 
+/* Customización de scrollbar */
+.caja-page::-webkit-scrollbar {
+  width: 8px;
+}
+
+.caja-page::-webkit-scrollbar-track {
+  background: #f1f5f9;
+  border-radius: 4px;
+}
+
+.caja-page::-webkit-scrollbar-thumb {
+  background: #cbd5e1;
+  border-radius: 4px;
+}
+
+.caja-page::-webkit-scrollbar-thumb:hover {
+  background: #94a3b8;
+}
+
 /* Responsive Styles */
 
 /* Mobile pequeño */
 @media (max-width: 480px) {
   .caja-page {
     padding: 1rem 0.75rem;
-    padding-bottom: 4.5rem;
+    padding-bottom: 5rem;
   }
 
   .caja-view-title {
@@ -628,6 +672,7 @@
 @media (min-width: 768px) {
   .caja-page {
     padding: 2rem 1.5rem;
+    padding-bottom: 2rem;
   }
 
   .caja-view-header {
@@ -722,7 +767,6 @@
 
 /* Print styles */
 @media print {
-
   .btn-report,
   .btn-back,
   .btn-pay {
@@ -739,7 +783,6 @@
     break-inside: avoid;
     box-shadow: none;
     border: 1px solid #d1d5db;
-
   }
 
   .caja-sales-card {

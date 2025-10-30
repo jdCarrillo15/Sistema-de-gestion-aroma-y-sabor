@@ -330,10 +330,13 @@ const CajaPage: React.FC = () => {
               <div className="caja-view-header-text">
                 <h1 className="caja-view-title">Panel de Caja</h1>
               </div>
-              <Button className="btn-report" onClick={() => setShowReport(true)}>
-                <FileText className="btn-icon" />
-                <span>Reporte</span>
-              </Button>
+
+              <div className="contenedor-boton">
+                <Button className="btnReporte" onClick={() => setShowReport(true)}>
+                  <FileText className="btn-icon" />
+                  <span>Reporte</span>
+                </Button>
+              </div>
             </div>
 
             {/* Mensaje de error */}
@@ -461,10 +464,12 @@ const CajaPage: React.FC = () => {
               <div className="caja-view-header-text">
                 <h1 className="caja-view-title">Panel de Caja</h1>
               </div>
-              <Button className="btn-back" onClick={() => setShowReport(false)}>
-                <ArrowLeft className="btn-icon" />
-                <span>Volver</span>
-              </Button>
+              <div className="contenedor-boton">
+                <Button className="btnVolver" onClick={() => setShowReport(false)}>
+                  <ArrowLeft className="btn-icon" />
+                  <span>Volver</span>
+                </Button>
+              </div>
             </div>
 
             {/* Tarjeta de ventas del día */}

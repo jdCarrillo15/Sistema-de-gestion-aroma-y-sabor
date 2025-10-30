@@ -47,7 +47,6 @@ const AdminDashboard: React.FC = () => {
           <h1 className="dashboard-title">Dashboard</h1>
           <p className="dashboard-sub">Bienvenido de vuelta, Admin</p>
         </div>
-        <button className="primary-btn">+ Nuevo Producto</button>
       </div>
 
       {/* Notificaciones */}
