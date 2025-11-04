@@ -181,7 +181,7 @@ const EditTableModal: React.FC<EditTableModalProps> = ({
                   value={number}
                   onChange={handleNumberChange}
                   className={`${styles.formInput} ${errors.number ? styles.error : ''}`}
-                  disabled={isSubmitting}
+                  disabled={true}
                   required
                 />
                 {errors.number && (
