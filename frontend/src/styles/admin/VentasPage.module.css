@@ -42,12 +42,13 @@
 .selectFiltro {
   padding: 0.5rem 0.75rem;
   border: 1px solid #d1d5db;
-  border-radius: 6px;
+  border-radius: 8px;
   font-size: 0.9rem;
   color: #374151;
   background-color: white;
   cursor: pointer;
   min-width: 200px;
+  max-width: 300px; /* NUEVO: limitar ancho máximo */
   transition: all 0.2s ease;
 }
 
@@ -475,13 +476,22 @@
   
   .filtroUsuario {
     width: 100%;
-    flex-direction: column;
-    align-items: stretch;
+    display: grid;
+    grid-template-columns: auto 1fr;
+    gap: 0.5rem;
+    align-items: center;
+  }
+
+  .filtroUsuario label {
+    font-size: 0.85rem;
   }
   
   .selectFiltro {
     width: 100%;
     min-width: auto;
+    max-width: 100%;
+    padding: 0.5rem 0.6rem;
+    font-size: 0.85rem;
   }
 
   .statsGrid {
@@ -510,6 +520,21 @@
 @media (max-width: 480px) {
   .ventasPage {
     padding: 0.75rem;
+  }
+  
+  
+  .filtroUsuario {
+    grid-template-columns: 1fr;
+    gap: 0.5rem;
+  }
+  
+  .filtroUsuario label {
+    font-size: 0.8rem;
+  }
+  
+  .selectFiltro {
+    padding: 0.5rem;
+    font-size: 0.8rem;
   }
   
   .ventasTablaContainer {

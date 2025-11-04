@@ -7,14 +7,16 @@ interface CreateTableModalProps {
   isOpen: boolean;
   onClose: () => void;
   onSubmit: (table: { number: number; capacity: number }) => void;
-  isLoading?: boolean; 
+  isLoading?: boolean;
+  existingTableNumbers?: number[]; 
 }
 
 const CreateTableModal: React.FC<CreateTableModalProps> = ({
   isOpen,
   onClose,
   onSubmit,
-  isLoading = false, 
+  isLoading = false,
+  existingTableNumbers = [], 
 }) => {
   const [number, setNumber] = useState("");
   const [capacity, setCapacity] = useState("");
@@ -38,6 +40,7 @@ const CreateTableModal: React.FC<CreateTableModalProps> = ({
     };
   }, [isOpen]);
 
+  
   const validateNumber = (num: string) => {
     if (!num.trim()) {
       return "El número de mesa es requerido";
@@ -45,6 +48,10 @@ const CreateTableModal: React.FC<CreateTableModalProps> = ({
     const numValue = parseInt(num);
     if (isNaN(numValue) || numValue < 1) {
       return "Ingresa un número válido mayor a 0";
+    }
+    
+    if (existingTableNumbers.includes(numValue)) {
+      return `La mesa ${numValue} ya existe. Elige otro número`;
     }
     return "";
   };
@@ -103,7 +110,6 @@ const CreateTableModal: React.FC<CreateTableModalProps> = ({
       number: parseInt(number),
       capacity: parseInt(capacity),
     });
-    
   };
 
   if (!isOpen) return null;
@@ -160,7 +166,7 @@ const CreateTableModal: React.FC<CreateTableModalProps> = ({
                 required
               />
               {errors.number && (
-                <span className={styles.errorMessage}>{errors.number}</span>
+                <span className={styles.errorMessage}> {errors.number}</span>
               )}
             </div>
 
@@ -177,7 +183,7 @@ const CreateTableModal: React.FC<CreateTableModalProps> = ({
                 required
               />
               {errors.capacity && (
-                <span className={styles.errorMessage}>{errors.capacity}</span>
+                <span className={styles.errorMessage}> {errors.capacity}</span>
               )}
             </div>
 
@@ -193,7 +199,7 @@ const CreateTableModal: React.FC<CreateTableModalProps> = ({
               <Button 
                 type="submit" 
                 variant="primary"
-                disabled={isLoading}
+                disabled={isLoading || !!errors.number || !!errors.capacity}
               >
                 {isLoading ? (
                   <>

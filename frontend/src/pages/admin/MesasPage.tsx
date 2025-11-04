@@ -74,6 +74,16 @@ const MesasPage: React.FC = () => {
         throw new Error("Faltan campos obligatorios");
       }
 
+      const tableExists = tables.some(
+        table => Number(table.number) === Number(tableData.number)
+      );
+      if (tableExists) {
+        setAlertMessage(`La mesa ${tableData.number} ya existe. Elige otro número`);
+        setIsAlertOpen(true);
+        setIsLoading(false);
+        return;
+      }
+
       await createTable({
         number: tableData.number,
         capacity: tableData.capacity,
@@ -277,6 +287,7 @@ const MesasPage: React.FC = () => {
         onClose={() => setIsModalOpen(false)}
         onSubmit={handleAddTable}
         isLoading={isLoading}
+        existingTableNumbers={tables.map(t => t.number)}
       />
 
       {selectedTable && (

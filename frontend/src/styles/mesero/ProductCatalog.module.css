@@ -215,14 +215,14 @@
 /* Product Badge */
 .productBadge {
   position: absolute;
-  top: 0.75rem;
-  right: 0.75rem;
+  top: 0;
+  right: 0;
   background: #d1fae5;
   color: #065f46;
-  font-size: 0.7rem;
+  font-size: 0.65rem;
   font-weight: 600;
-  padding: 2px 8px;
-  border-radius: 8px;
+  padding: 4px 10px;
+  border-radius: 0 12px 0 8px; /* Esquina redondeada solo en la parte inferior izquierda */
   text-transform: uppercase;
 }
 
@@ -412,9 +412,9 @@
     padding: 0.875rem;
   }
 
-  .productCard {
-    padding: 0.75rem;
-  }
+ .productCard {
+  padding: 2.5rem 1rem 1rem 1rem; /* Más espacio arriba */
+}
 
   .productName {
     font-size: 0.9rem;
