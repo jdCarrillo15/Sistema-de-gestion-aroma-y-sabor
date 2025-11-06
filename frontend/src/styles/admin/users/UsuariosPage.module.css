@@ -1,10 +1,10 @@
-.usuarios-page {
+.usuariosPage {
   padding: 2rem;
   background: #fafafa;
   min-height: 100vh;
 }
 
-.contenedor-boton {
+.contenedorBoton {
   display: flex;
   justify-content: flex-end;
   margin-bottom: 1rem;
@@ -22,51 +22,51 @@
 }
 
 /* Header con título + botón */
-.usuarios-header {
+.usuariosHeader {
   display: flex;
   justify-content: space-between;
   align-items: center;
   margin-bottom: 1.5rem;
 }
 
-.usuarios-header h1 {
+.usuariosHeader h1 {
   font-size: 1.8rem;
   font-weight: 700;
   color: #111827;
 }
 
 /* Tabla Container */
-.usuarios-tabla-container {
+.usuariosTablaContainer {
   background: #fff;
   border-radius: 12px;
   padding: 1rem;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
 }
 
-.usuarios-tabla {
+.usuariosTabla {
   width: 100%;
   border-collapse: collapse;
   font-size: 0.95rem;
 }
 
-.usuarios-tabla th,
-.usuarios-tabla td {
+.usuariosTabla th,
+.usuariosTabla td {
   padding: 0.9rem;
   text-align: left;
 }
 
-.usuarios-tabla th {
+.usuariosTabla th {
   font-weight: 600;
   color: #374151;
   font-size: 0.9rem;
   border-bottom: 2px solid #e5e7eb;
 }
 
-.usuarios-tabla tr {
+.usuariosTabla tr {
   transition: background 0.2s ease;
 }
 
-.usuarios-tabla tbody tr:hover {
+.usuariosTabla tbody tr:hover {
   background: #f9fafb;
 }
 
@@ -101,51 +101,59 @@
   gap: 0.5rem;
 }
 
-.acciones-col {
+.accionesCol {
   text-align: center;
 }
 
-.usuarios-tabla td,
-.usuarios-tabla th {
+.usuariosTabla td,
+.usuariosTabla th {
   color: #111827;
 }
 
-.custom-button {
+.customButton {
   display: inline-flex;
   align-items: center;
   justify-content: center;
   padding: 0.5rem 1rem;
   border-radius: 8px;
   cursor: pointer;
-  width: auto;
+  width: 40px;
   max-width: max-content;
 }
 
-.product-actions .btn-icon.ver:hover {
+.productActions {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 8px;
+}
+
+
+.productActions .btnIcon.ver:hover {
   background: #eff6ff;
   border-color: #3b82f6;
   color: #3b82f6;
 }
 
-.product-actions .btn-icon.editar:hover {
+.productActions .btnIcon.editar:hover {
   background: #fef3c7;
   border-color: #f59e0b;
   color: #f59e0b;
 }
 
-.product-actions .btn-icon.eliminar:hover {
+.productActions .btnIcon.eliminar:hover {
   background: #fef2f2;
   border-color: #ef4444;
   color: #ef4444;
 }
 
-.product-actions .btn-icon:hover {
+.productActions .btnIcon:hover {
   transform: scale(1.04);
 }
 
 /* Estados de carga y vacío */
-.loading-state,
-.empty-state {
+.loadingState,
+.emptyState {
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -155,46 +163,47 @@
   text-align: center;
 }
 
-.loading-icon,
-.empty-icon {
+.loadingIcon,
+.emptyIcon {
   color: #9ca3af;
   margin-bottom: 1rem;
 }
 
-.empty-state h3 {
+.emptyState h3 {
   font-size: 1.25rem;
   font-weight: 600;
   color: #374151;
   margin: 0.5rem 0;
 }
 
-.empty-state p {
+.emptyState p {
   margin-bottom: 1.5rem;
 }
 
 /* Vista de Cards para móvil (oculta por defecto) */
-.usuarios-cards {
+.usuariosCards {
   display: none;
 }
 
 /* RESPONSIVE DESIGN */
 @media (max-width: 768px) {
-  .usuarios-page {
+  .usuariosPage {
     padding: 1rem;
-    padding-bottom: 5rem; /* Espacio para mobile nav */
+    padding-bottom: 5rem;
+    /* Espacio para mobile nav */
   }
 
-  .usuarios-header {
+  .usuariosHeader {
     flex-direction: column;
     align-items: flex-start;
     gap: 1rem;
   }
 
-  .usuarios-header h1 {
+  .usuariosHeader h1 {
     font-size: 1.5rem;
   }
 
-  .contenedor-boton {
+  .contenedorBoton {
     width: 100%;
     justify-content: stretch;
   }
@@ -204,24 +213,24 @@
     justify-content: center;
   }
 
-  .usuarios-tabla-container {
+  .usuariosTablaContainer {
     padding: 0.75rem;
     border-radius: 8px;
   }
 
   /* Ocultar tabla en móvil */
-  .usuarios-tabla {
+  .usuariosTabla {
     display: none;
   }
 
   /* Mostrar cards en móvil */
-  .usuarios-cards {
+  .usuariosCards {
     display: flex;
     flex-direction: column;
     gap: 0.75rem;
   }
 
-  .user-card {
+  .userCard {
     background: #fff;
     border: 1px solid #e5e7eb;
     border-radius: 12px;
@@ -231,30 +240,30 @@
     gap: 0.75rem;
   }
 
-  .user-card-header {
+  .userCardHeader {
     display: flex;
     justify-content: space-between;
     align-items: flex-start;
     gap: 0.5rem;
   }
 
-  .user-card-info {
+  .userCardInfo {
     flex: 1;
   }
 
-  .user-card-name {
+  .userCardName {
     font-weight: 600;
     font-size: 1rem;
     color: #111827;
     margin-bottom: 0.25rem;
   }
 
-  .user-card-email {
+  .userCardEmail {
     font-size: 0.85rem;
     color: #6b7280;
   }
 
-  .user-card-details {
+  .userCardDetails {
     display: grid;
     grid-template-columns: 1fr 1fr;
     gap: 0.75rem;
@@ -262,40 +271,114 @@
     border-top: 1px solid #f3f4f6;
   }
 
-  .user-card-detail {
+  .userCardDetail {
     display: flex;
     flex-direction: column;
     gap: 0.25rem;
   }
 
-  .user-card-label {
+  .userCardLabel {
     font-size: 0.75rem;
     color: #6b7280;
     font-weight: 500;
   }
 
-  .user-card-value {
+  .userCardValue {
     font-size: 0.9rem;
     color: #111827;
   }
 
-  .user-card-actions {
+  .userCardActions {
     display: flex;
     gap: 0.5rem;
     padding-top: 0.75rem;
     border-top: 1px solid #f3f4f6;
+    width: 18px;
+    height: 50px;
+    padding: 4px;
   }
 
-  .user-card-actions .btn-icon {
-    flex: 1;
-    justify-content: center;
-  }
-
-  /* Ajustar estado en cards */
-  .user-card .estado {
+  .userCard .estado {
     font-size: 0.75rem;
     padding: 3px 10px;
     min-width: auto;
     width: fit-content;
   }
+}
+
+/* Estilos para las tarjetas de estadísticas */
+.statsGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+}
+
+.statCard {
+  background: #fff;
+  border-radius: 12px;
+  padding: 1.5rem;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+}
+
+.statLeft {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.statIcon {
+  width: 48px;
+  height: 48px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.statIcon.usuarios {
+  background-color: #dbeafe;
+  color: #3b82f6;
+}
+
+.statIcon.activos {
+  background-color: #d1fae5;
+  color: #10b981;
+}
+
+.statIcon.inactivos {
+  background-color: #fee2e2;
+  color: #ef4444;
+}
+
+.statIcon.roles {
+  background-color: #fef3c7;
+  color: #f59e0b;
+}
+
+.statValue {
+  font-size: 1.75rem;
+  font-weight: 700;
+  color: #111827;
+}
+
+.statLabel {
+  font-size: 0.875rem;
+  color: #6b7280;
+  margin-top: 0.25rem;
+}
+
+.dashboardTitle {
+  font-size: 1.8rem;
+  font-weight: 700;
+  color: #111827;
+}
+
+.icono {
+  width: 20px;
+  height: 20px;
+}
+
+.role {
+  text-transform: capitalize;
 }

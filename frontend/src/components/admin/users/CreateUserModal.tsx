@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import Button from "../../common/Button";
-import "../../../styles/admin/users/CreateUserModal.css";
+import styles from "../../../styles/admin/users/CreateUserModal.module.css";
 
 interface CreateUserModalProps {
   isOpen: boolean;
@@ -267,15 +267,15 @@ const CreateUserModal: React.FC<CreateUserModalProps> = ({
 
   return (
     <div
-      className="modal-backdrop"
+      className={styles.modalBackdrop}
       onKeyDown={handleKeyDown}
       tabIndex={-1}
     >
-      <div className="modal-container">
-        <div className="modal-content">
-          <div className="modal-header">
+      <div className={styles.modalContainer}>
+        <div className={styles.modalContent}>
+          <div className={styles.modalHeader}>
             <button
-              className="close-button"
+              className={styles.closeButton}
               onClick={onClose}
               aria-label="Cerrar"
               disabled={isSubmitting}
@@ -294,7 +294,7 @@ const CreateUserModal: React.FC<CreateUserModalProps> = ({
             </button>
           </div>
 
-          <div className="modal-icon">
+          <div className={styles.modalIcon}>
             <svg
               width="64"
               height="64"
@@ -308,131 +308,131 @@ const CreateUserModal: React.FC<CreateUserModalProps> = ({
             </svg>
           </div>
 
-          <h2 className="modal-title">Nuevo Usuario</h2>
-          <p className="modal-description">
+          <h2 className={styles.modalTitle}>Nuevo Usuario</h2>
+          <p className={styles.modalDescription}>
             Completa los siguientes campos para crear un nuevo usuario en el sistema.
           </p>
 
-          <form onSubmit={handleSubmit} className="modal-form">
-            <div className="form-group">
-              <label htmlFor="userName" className="form-label">Nombre de usuario *</label>
+          <form onSubmit={handleSubmit} className={styles.modalForm}>
+            <div className={styles.formGroup}>
+              <label htmlFor="userName" className={styles.formLabel}>Nombre de usuario *</label>
               <input
                 type="text"
                 id="userName"
                 value={userName}
                 onChange={handleUserNameChange}
-                className={`form-input ${errors.userName ? 'error' : ''}`}
+                className={`${styles.formInput} ${errors.userName ? styles.error : ''}`}
                 disabled={isSubmitting}
                 required
               />
               {errors.userName && (
-                <span className="error-message">{errors.userName}</span>
+                <span className={styles.errorMessage}>{errors.userName}</span>
               )}
             </div>
 
-            <div className="form-group">
-              <label htmlFor="firstName" className="form-label">Nombre *</label>
+            <div className={styles.formGroup}>
+              <label htmlFor="firstName" className={styles.formLabel}>Nombre *</label>
               <input
                 type="text"
                 id="firstName"
                 value={firstName}
                 onChange={handleFirstNameChange}
-                className={`form-input ${errors.firstName ? 'error' : ''}`}
+                className={`${styles.formInput} ${errors.firstName ? styles.error : ''}`}
                 disabled={isSubmitting}
                 required
               />
               {errors.firstName && (
-                <span className="error-message">{errors.firstName}</span>
+                <span className={styles.errorMessage}>{errors.firstName}</span>
               )}
             </div>
 
-            <div className="form-group">
-              <label htmlFor="lastName" className="form-label">Apellido *</label>
+            <div className={styles.formGroup}>
+              <label htmlFor="lastName" className={styles.formLabel}>Apellido *</label>
               <input
                 type="text"
                 id="lastName"
                 value={lastName}
                 onChange={handleLastNameChange}
-                className={`form-input ${errors.lastName ? 'error' : ''}`}
+                className={`${styles.formInput} ${errors.lastName ? styles.error : ''}`}
                 disabled={isSubmitting}
                 required
               />
               {errors.lastName && (
-                <span className="error-message">{errors.lastName}</span>
+                <span className={styles.errorMessage}>{errors.lastName}</span>
               )}
             </div>
 
-            <div className="form-group">
-              <label htmlFor="documentId" className="form-label">Documento (opcional)</label>
+            <div className={styles.formGroup}>
+              <label htmlFor="documentId" className={styles.formLabel}>Documento (opcional)</label>
               <input
                 type="text"
                 id="documentId"
                 value={documentId}
                 onChange={handleDocumentChange}
-                className={`form-input ${errors.documentId ? 'error' : ''}`}
+                className={`${styles.formInput} ${errors.documentId ? styles.error : ''}`}
                 placeholder="Máximo 10 dígitos"
                 maxLength={10}
                 disabled={isSubmitting}
               />
               {errors.documentId && (
-                <span className="error-message">{errors.documentId}</span>
+                <span className={styles.errorMessage}>{errors.documentId}</span>
               )}
             </div>
 
-            <div className="form-group">
-              <label htmlFor="birthdate" className="form-label">Fecha de nacimiento (opcional)</label>
+            <div className={styles.formGroup}>
+              <label htmlFor="birthdate" className={styles.formLabel}>Fecha de nacimiento (opcional)</label>
               <input
                 type="date"
                 id="birthdate"
                 value={birthdate}
                 onChange={handleBirthdateChange}
-                className={`form-input ${errors.birthdate ? 'error' : ''}`}
+                className={`${styles.formInput} ${errors.birthdate ? styles.error : ''}`}
                 disabled={isSubmitting}
               />
               {errors.birthdate && (
-                <span className="error-message">{errors.birthdate}</span>
+                <span className={styles.errorMessage}>{errors.birthdate}</span>
               )}
             </div>
 
-            <div className="form-group">
-              <label htmlFor="email" className="form-label">Correo Electrónico *</label>
+            <div className={styles.formGroup}>
+              <label htmlFor="email" className={styles.formLabel}>Correo Electrónico *</label>
               <input
                 type="email"
                 id="email"
                 value={email}
                 onChange={handleEmailChange}
-                className={`form-input ${errors.email ? 'error' : ''}`}
+                className={`${styles.formInput} ${errors.email ? styles.error : ''}`}
                 disabled={isSubmitting}
                 required
               />
               {errors.email && (
-                <span className="error-message">{errors.email}</span>
+                <span className={styles.errorMessage}>{errors.email}</span>
               )}
             </div>
 
-            <div className="form-group">
-              <label htmlFor="password" className="form-label">Contraseña *</label>
+            <div className={styles.formGroup}>
+              <label htmlFor="password" className={styles.formLabel}>Contraseña *</label>
               <input
                 type="password"
                 id="password"
                 value={password}
                 onChange={handlePasswordChange}
-                className={`form-input ${errors.password ? 'error' : ''}`}
+                className={`${styles.formInput} ${errors.password ? styles.error : ''}`}
                 disabled={isSubmitting}
                 required
               />
               {errors.password && (
-                <span className="error-message">{errors.password}</span>
+                <span className={styles.errorMessage}>{errors.password}</span>
               )}
             </div>
 
-            <div className="form-group">
-              <label htmlFor="role" className="form-label">Rol *</label>
+            <div className={styles.formGroup}>
+              <label htmlFor="role" className={styles.formLabel}>Rol *</label>
               <select
                 id="role"
                 value={role}
                 onChange={(e) => setRole(e.target.value)}
-                className="form-input"
+                className={styles.formInput}
                 disabled={isSubmitting}
               >
                 <option value="kitchen">Cocinero</option>
@@ -442,13 +442,13 @@ const CreateUserModal: React.FC<CreateUserModalProps> = ({
               </select>
             </div>
 
-            <div className="form-group">
-              <label htmlFor="status" className="form-label">Estado *</label>
+            <div className={styles.formGroup}>
+              <label htmlFor="status" className={styles.formLabel}>Estado *</label>
               <select
                 id="status"
                 value={status}
                 onChange={(e) => setState(e.target.value)}
-                className="form-input"
+                className={styles.formInput}
                 disabled={isSubmitting}
               >
                 <option value="active">Activo</option>
@@ -456,7 +456,7 @@ const CreateUserModal: React.FC<CreateUserModalProps> = ({
               </select>
             </div>
 
-            <div className="modal-buttons">
+            <div className={styles.modalButtons}>
               <Button
                 type="button"
                 variant="secondary"
