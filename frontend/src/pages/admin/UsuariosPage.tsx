@@ -7,7 +7,7 @@ import ConfirmModal from "../../components/admin/ConfirmModal";
 import AlertModal from "../../components/common/AlertModal";
 import ViewUserModal from "../../components/admin/users/ViewUserModal";
 import { getUsers, createUser, updateUser, hardDeleteUser } from "../../services/admin/userService";
-import "../../styles/admin/users/UsuariosPage.css";
+import styles from "../../styles/admin/users/UsuariosPage.module.css";
 
 export type User = {
   id: string;
@@ -243,92 +243,92 @@ const UsuariosPage: React.FC = () => {
   }, []);
 
   return (
-    <div className="usuarios-page">
-      <div className="usuarios-header">
+    <div className={styles.usuariosPage}>
+      <div className={styles.usuariosHeader}>
         <div>
-          <h1 className="dashboard-title">Gestión de Usuarios</h1>
+          <h1 className={styles.dashboardTitle}>Gestión de Usuarios</h1>
         </div>
-        <div className="contenedor-boton">
+        <div className={styles.contenedorBoton}>
           <Button
-            className="btnNuevoUsuario"
+            className={styles.btnNuevoUsuario}
             onClick={() => setIsModalOpen(true)}
             disabled={isLoading}
           >
-            <Plus className="icono" />
+            <Plus className={styles.icono} />
             Nuevo Usuario
           </Button>
         </div>
       </div>
 
       {/* Estadísticas */}
-      <div className="stats-grid">
-        <div className="stat-card">
-          <div className="stat-left">
-            <div className="stat-icon usuarios">
+      <div className={styles.statsGrid}>
+        <div className={styles.statCard}>
+          <div className={styles.statLeft}>
+            <div className={`${styles.statIcon} ${styles.usuarios}`}>
               <Users size={20} />
             </div>
             <div>
-              <div className="stat-value">{totalUsers}</div>
-              <div className="stat-label">Usuarios Totales</div>
+              <div className={styles.statValue}>{totalUsers}</div>
+              <div className={styles.statLabel}>Usuarios Totales</div>
             </div>
           </div>
         </div>
 
-        <div className="stat-card">
-          <div className="stat-left">
-            <div className="stat-icon activos">
+        <div className={styles.statCard}>
+          <div className={styles.statLeft}>
+            <div className={`${styles.statIcon} ${styles.activos}`}>
               <UserCheck size={20} />
             </div>
             <div>
-              <div className="stat-value">{activeUsers}</div>
-              <div className="stat-label">Usuarios Activos</div>
+              <div className={styles.statValue}>{activeUsers}</div>
+              <div className={styles.statLabel}>Usuarios Activos</div>
             </div>
           </div>
         </div>
 
-        <div className="stat-card">
-          <div className="stat-left">
-            <div className="stat-icon inactivos">
+        <div className={styles.statCard}>
+          <div className={styles.statLeft}>
+            <div className={`${styles.statIcon} ${styles.inactivos}`}>
               <UserX size={20} />
             </div>
             <div>
-              <div className="stat-value">{inactiveUsers}</div>
-              <div className="stat-label">Usuarios Inactivos</div>
+              <div className={styles.statValue}>{inactiveUsers}</div>
+              <div className={styles.statLabel}>Usuarios Inactivos</div>
             </div>
           </div>
         </div>
 
-        <div className="stat-card">
-          <div className="stat-left">
-            <div className="stat-icon roles">
+        <div className={styles.statCard}>
+          <div className={styles.statLeft}>
+            <div className={`${styles.statIcon} ${styles.roles}`}>
               <Activity size={20} />
             </div>
             <div>
-              <div className="stat-value">{Object.keys(roleStats).length}</div>
-              <div className="stat-label">Roles Diferentes</div>
+              <div className={styles.statValue}>{Object.keys(roleStats).length}</div>
+              <div className={styles.statLabel}>Roles Diferentes</div>
             </div>
           </div>
         </div>
       </div>
 
-      <div className="usuarios-tabla-container">
+      <div className={styles.usuariosTablaContainer}>
         {isLoading && users.length === 0 && (
-          <div className="loading-state">
-            <Users size={48} className="loading-icon" />
+          <div className={styles.loadingState}>
+            <Users size={48} className={styles.loadingIcon} />
             <p>Cargando usuarios...</p>
           </div>
         )}
 
         {!isLoading && users.length === 0 && (
-          <div className="empty-state">
-            <Users size={48} className="empty-icon" />
+          <div className={styles.emptyState}>
+            <Users size={48} className={styles.emptyIcon} />
             <h3>No hay usuarios</h3>
             <p>Crea tu primer usuario para comenzar</p>
           </div>
         )}
 
         {users.length > 0 && (
-          <table className="usuarios-tabla">
+          <table className={styles.usuariosTabla}>
             <thead>
               <tr>
                 <th>Nombre de usuario</th>
@@ -336,28 +336,28 @@ const UsuariosPage: React.FC = () => {
                 <th>Rol</th>
                 <th>Estado</th>
                 <th>Fecha de inicio</th>
-                <th className="acciones-col">Acciones</th>
+                <th className={styles.accionesCol}>Acciones</th>
               </tr>
             </thead>
             <tbody>
               {users.map((u) => (
                 <tr key={u.id}>
-                  <td className="nombre">{u.user_name}</td>
+                  <td className={styles.nombre}>{u.user_name}</td>
                   <td>{u.email}</td>
-                  <td className="role">{u.role}</td>
+                  <td className={styles.role}>{u.role}</td>
                   <td>
                     <span
-                      className={`estado ${u.status.toLowerCase() === "activo" ? "activo" : "inactivo"}`}
+                      className={`${styles.estado} ${u.status.toLowerCase() === "activo" ? styles.activo : styles.inactivo}`}
                     >
                       {u.status}
                     </span>
                   </td>
                   <td>{new Date(u.created_at).toLocaleDateString("es-ES")}</td>
-                  <td className="product-actions">
+                  <td className={styles.productActions}>
                     <Button
                       type="button"
                       variant="secondary"
-                      className="btn-icon ver"
+                      className={`${styles.btnIcon} ${styles.ver}`}
                       onClick={() => openViewModal(u)}
                       disabled={isLoading}
                     >
@@ -366,7 +366,7 @@ const UsuariosPage: React.FC = () => {
                     <Button
                       type="button"
                       variant="secondary"
-                      className="btn-icon editar"
+                      className={`${styles.btnIcon} ${styles.editar}`}
                       onClick={() => openEditModal(u)}
                       disabled={isLoading}
                     >
@@ -375,7 +375,7 @@ const UsuariosPage: React.FC = () => {
                     <Button
                       type="button"
                       variant="secondary"
-                      className="btn-icon eliminar"
+                      className={`${styles.btnIcon} ${styles.eliminar}`}
                       onClick={() => handleDeleteClick(u.id)}
                       disabled={isLoading}
                     >
@@ -390,39 +390,39 @@ const UsuariosPage: React.FC = () => {
 
         {/* Vista de Cards para Móvil */}
         {users.length > 0 && (
-          <div className="usuarios-cards">
+          <div className={styles.usuariosCards}>
             {users.map((u) => (
-              <div key={u.id} className="user-card">
-                <div className="user-card-header">
-                  <div className="user-card-info">
-                    <div className="user-card-name">{u.user_name}</div>
-                    <div className="user-card-email">{u.email}</div>
+              <div key={u.id} className={styles.userCard}>
+                <div className={styles.userCardHeader}>
+                  <div className={styles.userCardInfo}>
+                    <div className={styles.userCardName}>{u.user_name}</div>
+                    <div className={styles.userCardEmail}>{u.email}</div>
                   </div>
                   <span
-                    className={`estado ${u.status.toLowerCase() === "activo" ? "activo" : "inactivo"}`}
+                    className={`${styles.estado} ${u.status.toLowerCase() === "activo" ? styles.activo : styles.inactivo}`}
                   >
                     {u.status}
                   </span>
                 </div>
 
-                <div className="user-card-details">
-                  <div className="user-card-detail">
-                    <span className="user-card-label">Rol</span>
-                    <span className="user-card-value">{u.role}</span>
+                <div className={styles.userCardDetails}>
+                  <div className={styles.userCardDetail}>
+                    <span className={styles.userCardLabel}>Rol</span>
+                    <span className={styles.userCardValue}>{u.role}</span>
                   </div>
-                  <div className="user-card-detail">
-                    <span className="user-card-label">Fecha de inicio</span>
-                    <span className="user-card-value">
+                  <div className={styles.userCardDetail}>
+                    <span className={styles.userCardLabel}>Fecha de inicio</span>
+                    <span className={styles.userCardValue}>
                       {new Date(u.created_at).toLocaleDateString("es-ES")}
                     </span>
                   </div>
                 </div>
 
-                <div className="user-card-actions">
+                <div className={styles.userCardActions}>
                   <Button
                     type="button"
                     variant="secondary"
-                    className="btn-icon ver"
+                    className={`${styles.btnIcon} ${styles.ver}`}
                     onClick={() => openViewModal(u)}
                     disabled={isLoading}
                   >
@@ -431,7 +431,7 @@ const UsuariosPage: React.FC = () => {
                   <Button
                     type="button"
                     variant="secondary"
-                    className="btn-icon editar"
+                    className={`${styles.btnIcon} ${styles.editar}`}
                     onClick={() => openEditModal(u)}
                     disabled={isLoading}
                   >
@@ -440,7 +440,7 @@ const UsuariosPage: React.FC = () => {
                   <Button
                     type="button"
                     variant="secondary"
-                    className="btn-icon eliminar"
+                    className={`${styles.btnIcon} ${styles.eliminar}`}
                     onClick={() => handleDeleteClick(u.id)}
                     disabled={isLoading}
                   >

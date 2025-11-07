@@ -1,5 +1,5 @@
 import React from "react";
-import "../../styles/admin/AdminDashboard.css";
+import styles from "../../styles/admin/AdminDashboard.module.css";
 import { Package, Users, DollarSign, AlertTriangle } from "lucide-react";
 import { useSocket } from "../../context/socketContext";
 
@@ -13,17 +13,17 @@ interface StatCardProps {
 
 const StatCard: React.FC<StatCardProps> = ({ label, value, change, icon: Icon, bgColor }) => {
   return (
-    <div className="stat-card">
-      <div className="stat-left">
-        <div className="stat-icon" style={{ backgroundColor: bgColor }}>
+    <div className={styles.statCard}>
+      <div className={styles.statLeft}>
+        <div className={styles.statIcon} style={{ backgroundColor: bgColor }}>
           <Icon size={22} color="#333" />
         </div>
         <div>
-          <h3 className="stat-value">{value}</h3>
-          <p className="stat-label">{label}</p>
+          <h3 className={styles.statValue}>{value}</h3>
+          <p className={styles.statLabel}>{label}</p>
         </div>
       </div>
-      <div className={`stat-change ${change.startsWith("-") ? "negative" : "positive"}`}>
+      <div className={`${styles.statChange} ${change.startsWith("-") ? styles.negative : styles.positive}`}>
         {change}
       </div>
     </div>
@@ -40,18 +40,18 @@ const AdminDashboard: React.FC = () => {
   ];
 
   return (
-    <section className="dashboard-page">
+    <section className={styles.dashboardPage}>
       {/* Header */}
-      <div className="dashboard-header">
+      <div className={styles.dashboardHeader}>
         <div>
-          <h1 className="dashboard-title">Dashboard</h1>
-          <p className="dashboard-sub">Bienvenido de vuelta, Admin</p>
+          <h1 className={styles.dashboardTitle}>Dashboard</h1>
+          <p className={styles.dashboardSub}>Bienvenido de vuelta, Admin</p>
         </div>
       </div>
 
       {/* Notificaciones */}
       {connectedUsers.length > 0 && (
-        <div className="admin-notif">
+        <div className={styles.adminNotif}>
           <h4>Últimas conexiones</h4>
           <ul>
             {connectedUsers.slice(-5).map((u, i) => {
@@ -68,7 +68,7 @@ const AdminDashboard: React.FC = () => {
       )}
 
       {/* Stats */}
-      <div className="stats-grid">
+      <div className={styles.statsGrid}>
         {stats.map((stat, index) => (
           <StatCard
             key={index}

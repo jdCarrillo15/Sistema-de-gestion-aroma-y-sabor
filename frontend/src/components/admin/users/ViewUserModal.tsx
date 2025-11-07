@@ -1,6 +1,6 @@
 import React, { useEffect } from "react";
 import Button from "../../common/Button";
-import "../../../styles/admin/users/CreateUserModal.css";
+import "../../../styles/admin/users/CreateUserModal.module.css";
 
 interface ViewUserModalProps {
   isOpen: boolean;
