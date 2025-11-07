@@ -1,35 +1,17 @@
 import { admin, db } from "../config/firebase.js";
 import { getResourceDoc } from "../services/resourceService.js";
+import { getOrSetCache, invalidateCache } from "../services/cacheService.js";
 
 export async function getProducts(req, res) {
   try {
-    const product = await db.collection("products").get();
-
-    if (product.empty) {
-      return res.json({ products: [] });
-    }
-
-    const products = await Promise.all(
-      product.docs.map(async (doc) => {
-        const data = doc.data();
-
-
-        return {
-          id: doc.id,
-          name: data.name,
-          price: data.price,
-          status: data.status,
-          stock: data.stock,
-          type: data.type,
-        };
-      })
-    );
+    const products = await getOrSetCache("products:list", async () => {
+      const snapshot = await db.collection("products").get();
+      return snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
+    });
 
     res.json({ products });
   } catch (err) {
-    res
-      .status(500)
-      .json({ error: "Error obteniendo productos", details: err.message });
+    res.status(500).json({ error: "Error obteniendo productos", details: err.message });
   }
 }
 
@@ -42,7 +24,7 @@ export async function createProduct(req, res) {
   try {
 
     if (data.type == "") {
-        data.type = "nonprepared";
+      data.type = "nonprepared";
     }
 
     // 1. Crear documento en "products"
@@ -56,6 +38,8 @@ export async function createProduct(req, res) {
         type: data.type || "nonprepared",
         created_at: admin.firestore.FieldValue.serverTimestamp()
       });
+
+    await invalidateCache("products:list");
 
     res.status(201).json({
       message: "Producto creado correctamente"
@@ -77,13 +61,13 @@ export async function getProductById(req, res) {
       return res.status(404).json({ error: "Producto no encontrado" });
 
     return res.json({
-        id: productDoc.id,
-        name: productDoc.name,
-        price: productDoc.price,
-        status: productDoc.status,
-        stock: productDoc.stock,
-        type: productDoc.type,
-        created_at: admin.firestore.FieldValue.serverTimestamp()
+      id: productDoc.id,
+      name: productDoc.name,
+      price: productDoc.price,
+      status: productDoc.status,
+      stock: productDoc.stock,
+      type: productDoc.type,
+      created_at: admin.firestore.FieldValue.serverTimestamp()
     });
   } catch (err) {
     res
@@ -107,6 +91,7 @@ export async function updateProductById(req, res) {
     }
 
     await db.collection("products").doc(req.params.id).update(data);
+    await invalidateCache("products:list");
     res.status(200).json({ message: "Producto actualizado correctamente" });
   } catch (err) {
     res
@@ -132,7 +117,8 @@ export async function hardDeleteProduct(req, res) {
 
       // Eliminar el doc de products
       await productRef.delete();
-    }else{
+      await invalidateCache("products:list")
+    } else {
       return res.status(404).json({ error: "Producto no encontrado" });
     }
 

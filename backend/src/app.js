@@ -15,6 +15,7 @@ import express from "express";
 import dotenv from "dotenv";
 import http from "http";
 import cors from "cors";
+import { log } from "console";
 
 dotenv.config();
 
@@ -50,6 +51,16 @@ app.use(cors({
 }));
 
 app.use(metricsMiddleware);
+
+app.use((req, res, next) => {
+  const start = Date.now();
+  const requestTime = new Date().toISOString();
+  res.on("finish", () => {
+    const ms = Date.now() - start;
+    console.log(`[${requestTime}] [${req.method}] ${req.originalUrl} → ${res.statusCode} (${ms} ms)`);
+  });
+  next();
+});
 
 app.use("/roles", rolesRoutes);
 app.use("/auth", authRoutes);

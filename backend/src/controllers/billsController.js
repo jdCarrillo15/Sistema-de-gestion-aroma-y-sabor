@@ -1,4 +1,5 @@
 import { admin, db } from "../config/firebase.js";
+import { invalidateCache, getOrSetCache } from "../services/cacheService.js";
 import { getIO } from "../sockets/socket.js";
 
 function computeProductDiff(oldProducts = [], newProducts = []) {
@@ -10,42 +11,24 @@ function computeProductDiff(oldProducts = [], newProducts = []) {
 
 export async function getBills(req, res) {
   try {
-    const bill = await db.collection("bills").get();
+    const bills = await getOrSetCache("bills:all", async () => {
+      const billsSnap = await db.collection("bills").get();
+      const usersSnap = await db.collection("users").get();
+      const usersMap = new Map(usersSnap.docs.map(d => [d.id, d.data()]));
 
-    if (bill.empty) {
-      return res.json({ bills: [] });
-    }
-
-    const bills = await Promise.all(
-      bill.docs.map(async (doc) => {
-        const data = doc.data();
-        let user = null;
-
-        const userDoc = await db.collection("users").doc(data.user_id).get();
-
-        if (userDoc.exists) {
-          user = { id: userDoc.id, ...userDoc.data() };
-        }
-
-        return {
-          status: data.status,
-          total: data.total,
-          table: data.table,
-          created_at: data.created_at,
-          user: user,
-          products: data.products || [],
-          id: doc.id,
-        };
-      })
-    );
+      return billsSnap.docs.map(doc => ({
+        ...doc.data(),
+        id: doc.id,
+        user: usersMap.get(doc.data().user_id) || null,
+      }));
+    }, 120); // cache 2 minutos
 
     res.json({ bills });
   } catch (err) {
-    res
-      .status(500)
-      .json({ error: "Error al solicitar la cuenta", details: err.message });
+    res.status(500).json({ error: "Error al solicitar la cuenta", details: err.message });
   }
 }
+
 
 export async function createBill(req, res) {
   const data = req.body;
@@ -120,6 +103,9 @@ export async function createBill(req, res) {
     }
 
     const billRef = await billsRef.add(billData);
+    await invalidateCache("bills:all");
+    await invalidateCache("bills:active");
+    await invalidateCache("reports:all");
 
     // Actualizar la mesa correspondiente
     const tablesRef = db.collection("tables");
@@ -201,18 +187,21 @@ export async function getBillById(req, res) {
 
 export async function getActiveBills(req, res) {
   try {
-    const billsSnap = await db.collection("bills")
-      .where("status", "==", "open")
-      .get();
+    const bills = await getOrSetCache("bills:active", async () => {
+      const billsSnap = await db
+        .collection("bills")
+        .where("status", "==", "open")
+        .get();
 
-    if (billsSnap.empty) {
-      return res.json({ bills: [] });
-    }
+      if (billsSnap.empty) {
+        return [];
+      }
 
-    const bills = billsSnap.docs.map(doc => ({
-      id: doc.id,
-      ...doc.data(),
-    }));
+      return billsSnap.docs.map((doc) => ({
+        id: doc.id,
+        ...doc.data(),
+      }));
+    });
 
     return res.json({ bills });
   } catch (error) {
@@ -248,22 +237,27 @@ export async function updateBillById(req, res) {
 
     await billRef.update(updateData);
 
-    if (newBill.shift_id) {
-      const shiftRef = db.collection("shifts").doc(newBill.shift_id);
-      const productDiff = computeProductDiff(oldBill.products, newBill.products || []);
-      const totalDiff = (newBill.total || 0) - (oldBill.total || 0);
+    if (oldBill.shift_id) {
+      const shiftRef = db.collection("shifts").doc(oldBill.shift_id);
+      const productDiff = computeProductDiff(oldBill.products, updateData.products || []);
+      const totalDiff = (updateData.total || 0) - (oldBill.total || 0);
 
-      const updates = { total_sales: admin.firestore.FieldValue.increment(totalDiff) };
-      for (const [name, qty] of Object.entries(productDiff)) {
-        updates[`products_summary.${name}`] = admin.firestore.FieldValue.increment(qty);
+      if (totalDiff !== 0 || Object.keys(productDiff).length > 0) {
+        const updates = { total_sales: admin.firestore.FieldValue.increment(totalDiff) };
+        for (const [name, qty] of Object.entries(productDiff)) {
+          updates[`products_summary.${name}`] = admin.firestore.FieldValue.increment(qty);
+        }
+        await shiftRef.update(updates);
       }
-      await shiftRef.update(updates);
     }
+
 
     const io = getIO();
 
     //Si el estado pasa a 'paid' o 'closed', se libera la mesa
     if (updateData.status === "paid" || updateData.status === "closed") {
+      await invalidateCache("bills:active");
+      await invalidateCache("bills:all");
       const tablesRef = db.collection("tables");
       const tableQuery = await tablesRef
         .where("number", "==", Number(oldBill.table))
@@ -277,6 +271,10 @@ export async function updateBillById(req, res) {
           current_bill_id: null,
         });
       }
+      if (updateData.total !== undefined || updateData.products) {
+        await invalidateCache("reports:all");
+      }
+
       io.to("cash").emit("cuentaEliminada", { id: billId });
       io.to("waiter").emit("cuentaEliminada", { id: billId });
       io.to("kitchen").emit("cuentaEliminada", { id: billId });
@@ -328,6 +326,7 @@ export async function hardDeleteBill(req, res) {
         updates[`products_summary.${p.name}`] = admin.firestore.FieldValue.increment(-p.units);
       });
       await shiftRef.update(updates);
+
     }
 
     // Liberar la mesa asociada
@@ -346,6 +345,10 @@ export async function hardDeleteBill(req, res) {
     }
 
     await billRef.delete();
+    await invalidateCache("bills:active");
+    await invalidateCache("bills:all");
+    await invalidateCache("reports:all");
+
 
     const io = getIO();
     io.to("cash").emit("cuentaEliminada", { id });
@@ -373,39 +376,57 @@ export async function addProductToBill(req, res) {
   try {
     const enrichedProducts = [];
 
-    for (const item of products) {
-      const productDoc = await db.collection("products").doc(item.id).get();
+    // Solo leer los productos cuando sea necesario (por tipo o stock)
+    const idsToCheck = products.map(p => p.id);
+    const chunks = [];
+    while (idsToCheck.length) chunks.push(idsToCheck.splice(0, 10)); // Firestore 'in' máx 10
 
-      if (!productDoc.exists) {
+    const productsMap = new Map();
+
+    for (const chunk of chunks) {
+      const snap = await db.collection("products")
+        .where(admin.firestore.FieldPath.documentId(), "in", chunk)
+        .get();
+
+      snap.docs.forEach(doc => {
+        productsMap.set(doc.id, doc.data());
+      });
+    }
+
+    // Validación y actualización de stock
+    for (const item of products) {
+      const productData = productsMap.get(item.id);
+
+      if (!productData) {
         return res.status(404).json({ error: `El producto ${item.id} no existe.` });
       }
 
-      const productData = productDoc.data();
-
+      // Si es un producto no preparado, controla el stock
       if (productData.type === "nonprepared") {
         if (productData.stock < item.units) {
           return res.status(400).json({
             error: `No hay suficiente stock para ${productData.name}. Stock disponible: ${productData.stock}`,
           });
         }
+
+        await db.collection("products").doc(item.id).update({
+          stock: admin.firestore.FieldValue.increment(-item.units),
+          status: productData.stock - item.units <= 0 ? "inactive" : "active",
+        });
       }
 
-      await db.collection("products").doc(item.id).update({
-        stock: admin.firestore.FieldValue.increment(-item.units),
-      });
-
-      if ((productData.stock - item.units) === 0) {
-        await db.collection("products").doc(item.id).update({ status: "inactive" });
-      }
-
+      // Copiamos precio y nombre locales para mantener consistencia histórica
       enrichedProducts.push({
         id: item.id,
         name: productData.name,
         units: item.units,
         price: productData.price || 0,
+        process: item.process || "pending",
+        type: productData.type,
       });
     }
 
+    // Actualizar cuenta
     const billRef = db.collection("bills").doc(id);
     const billSnap = await billRef.get();
 
@@ -415,50 +436,46 @@ export async function addProductToBill(req, res) {
 
     const billData = billSnap.data();
     const updatedProducts = [...(billData.products || []), ...enrichedProducts];
+
     const total = await calculateTotal(updatedProducts);
 
     await billRef.update({
       products: updatedProducts,
       total,
       units_total: updatedProducts.reduce((acc, p) => acc + (Number(p.units) || 0), 0),
-      product_ids: admin.firestore.FieldValue.arrayUnion(...enrichedProducts.map(p => p.id).filter(Boolean)),
+      product_ids: admin.firestore.FieldValue.arrayUnion(...enrichedProducts.map(p => p.id)),
     });
 
-    const updatedBillSnap = await billRef.get();
-    const updatedBill = updatedBillSnap.data();
+    await invalidateCache("bills:active");
+    await invalidateCache("bills:all");
+    await invalidateCache("reports:all");
 
-    //Actualizar el turno asociado
+
+    // Actualizar turno si existe
     if (billData.shift_id) {
       const shiftRef = db.collection("shifts").doc(billData.shift_id);
-
       const shiftUpdates = {
-        total_sales: admin.firestore.FieldValue.increment(total - (billData.total || 0)),
+        total_sales: admin.firestore.FieldValue.increment(
+          enrichedProducts.reduce((acc, p) => acc + p.price * p.units, 0)
+        ),
       };
-
       enrichedProducts.forEach((p) => {
         shiftUpdates[`products_summary.${p.name}`] =
           admin.firestore.FieldValue.increment(p.units);
       });
-
       await shiftRef.update(shiftUpdates);
-      console.log(`Turno ${billData.shift_id} actualizado tras agregar productos.`);
     }
 
-    const kitchenPayload = enrichedProducts.map((p) => ({
-      id: p.id,
-      name: p.name,
-      units: p.units,
-      process: p.process || "pending",
-      table: updatedBill.table,
-      billId: id,
-      created_at: updatedBill.created_at,
-    }));
-
     const io = getIO();
-    io.to("kitchen").emit("nuevoProducto", kitchenPayload);
+    io.to("kitchen").emit("nuevoProducto", enrichedProducts.map(p => ({
+      ...p,
+      table: billData.table,
+      billId: id,
+      created_at: billData.created_at,
+    })));
     io.to("cash").emit("cuentaActualizada", {
       id,
-      data: { products: updatedBill.products, total },
+      data: { products: updatedProducts, total },
     });
 
     res.status(201).json({
@@ -494,6 +511,10 @@ export async function removeProductFromBill(req, res) {
       units_total: updatedProducts.reduce((acc, p) => acc + (Number(p.units) || 0), 0),
       product_ids: Array.from(new Set(updatedProducts.map(p => p.id))).filter(Boolean),
     });
+
+    await invalidateCache("bills:active");
+    await invalidateCache("reports:all");
+
 
     const io = getIO();
 
@@ -571,6 +592,10 @@ export async function updateProductsInBill(req, res) {
       product_ids: Array.from(new Set(currentProducts.map(p => p.id))).filter(Boolean),
     });
 
+    await invalidateCache("bills:active");
+    await invalidateCache("reports:all");
+
+
     const io = getIO();
     io.to("cash").emit("cuentaActualizada", { id, data: { products: currentProducts, total } });
     io.to("kitchen").emit("pedidoActualizado", {
@@ -613,6 +638,9 @@ export async function closeBillIfEmpty(req, res) {
 
     if (!billData.products || billData.products.length === 0) {
       await billRef.update({ status: "closed" });
+      await invalidateCache("bills:active");
+      await invalidateCache("bills:all");
+
 
       //Liberar la mesa asociada
       const tablesRef = db.collection("tables");
@@ -662,6 +690,7 @@ export async function calculateBillTotal(req, res) {
     const total = await calculateTotal(billData.products || []);
 
     await billRef.update({ total });
+    await invalidateCache("reports:all");
 
     res.status(200).json({ total });
   } catch (err) {
@@ -672,20 +701,19 @@ export async function calculateBillTotal(req, res) {
   }
 }
 
-async function calculateTotal(products) {
-  let total = 0;
+async function calculateTotal(products = []) {
+  if (!Array.isArray(products) || products.length === 0) return 0;
 
-  for (const item of products) {
-    const productDoc = await db.collection("products").doc(item.id).get();
+  // Calcular el total directamente con los precios ya guardados en los productos
+  const total = products.reduce((acc, p) => {
+    const price = Number(p.price) || 0;
+    const units = Number(p.units) || 0;
+    return acc + price * units;
+  }, 0);
 
-    if (productDoc.exists) {
-      const productData = productDoc.data();
-      total += productData.price * item.units;
-    }
-  }
-
-  return total;
+  return Number(total.toFixed(2)); // redondeo a 2 decimales
 }
+
 
 export async function changeProductStateInBill(req, res) {
   try {
