@@ -136,7 +136,7 @@
 }
 
 
-@media (max-width: 1024px) {
+@media (max-width: 768px) {
   .sidebar {
     transform: translateX(-100%);
     width: 240px;
@@ -154,7 +154,7 @@
 }
 
 
-@media (max-width: 1024px) {
+@media (max-width: 768px) {
   .sidebar {
     transform: translateX(-100%);
     width: 240px;

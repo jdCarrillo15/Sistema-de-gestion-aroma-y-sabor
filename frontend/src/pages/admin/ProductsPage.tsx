@@ -216,9 +216,9 @@ const ProductsPage: React.FC = () => {
               <div className={styles.productCardHeader}>
                 <h3 className={styles.productName}>{product.name}</h3>
                 <span
-                  className={`${styles.productStatus} ${product.status === "active" ? styles.statusActive : styles.statusInactive}`}
+                  className={`${styles.productStatus} ${product.status.toLowerCase() === "active" ? styles.activo : styles.inactivo}`}
                 >
-                  {product.status === "active" ? "Activo" : "Inactivo"}
+                  {product.status === "active" ? "Disponible" : "No disponible"}
                 </span>
               </div>
 
