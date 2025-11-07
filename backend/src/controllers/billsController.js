@@ -103,7 +103,6 @@ export async function createBill(req, res) {
     }
 
     const billRef = await billsRef.add(billData);
-    await invalidateCache("bills:all");
     await invalidateCache("bills:active");
     await invalidateCache("reports:all");
 
@@ -152,31 +151,35 @@ export async function createBill(req, res) {
 export async function getBillById(req, res) {
   try {
     const { id } = req.params;
-    const billDoc = await db.collection("bills").doc(id).get();
+    const bill = await getOrSetCache(`bill:${id}`, async () => {
+      console.log(`[Firestore] Reading bill ${id}`);
 
-    if (!billDoc.exists) {
-      return res.status(404).json({ error: "Cuenta no encontrada" });
-    }
+      const billDoc = await db.collection("bills").doc(id).get();
+      if (!billDoc.exists) return null;
 
-    const billData = billDoc.data();
-    let user = null;
+      const billData = billDoc.data();
+      let user = null;
 
-    if (billData.user_id) {
-      const userData = await db.collection("users").doc(billData.user_id).get();
-      if (userData.exists) {
-        user = { id: billData.user_id, ...userData.data() };
+      if (billData.user_id) {
+        const userData = await db.collection("users").doc(billData.user_id).get();
+        if (userData.exists) {
+          user = { id: billData.user_id, ...userData.data() };
+        }
       }
-    }
 
-    return res.json({
-      id: id,
-      status: billData.status,
-      total: billData.total,
-      table: billData.table,
-      user,
-      products: billData.products || [],
-      created_at: billData.created_at,
-    });
+      return {
+        id,
+        status: billData.status,
+        total: billData.total,
+        table: billData.table,
+        user,
+        products: billData.products || [],
+        created_at: billData.created_at,
+      };
+    }, 90); // cache 90 segundos
+
+    if (!bill) return res.status(404).json({ error: "Cuenta no encontrada" });
+    res.json(bill);
   } catch (err) {
     res.status(500).json({
       error: "Error obteniendo cuenta",
@@ -184,6 +187,7 @@ export async function getBillById(req, res) {
     });
   }
 }
+
 
 export async function getActiveBills(req, res) {
   try {
@@ -228,6 +232,7 @@ export async function updateBillById(req, res) {
 
     const oldBill = billSnap.data();
 
+    // Calcular units_total si se actualizan productos
     if (Array.isArray(updateData.products)) {
       updateData.units_total = updateData.products.reduce(
         (acc, p) => acc + (Number(p.units) || 0),
@@ -235,29 +240,33 @@ export async function updateBillById(req, res) {
       );
     }
 
+    // Actualizar la cuenta
     await billRef.update(updateData);
 
-    if (oldBill.shift_id) {
-      const shiftRef = db.collection("shifts").doc(oldBill.shift_id);
-      const productDiff = computeProductDiff(oldBill.products, updateData.products || []);
-      const totalDiff = (updateData.total || 0) - (oldBill.total || 0);
+    // OBTENER LOS DATOS ACTUALIZADOS
+    const updatedBillSnap = await billRef.get();
+    const newBill = updatedBillSnap.data();
 
-      if (totalDiff !== 0 || Object.keys(productDiff).length > 0) {
-        const updates = { total_sales: admin.firestore.FieldValue.increment(totalDiff) };
-        for (const [name, qty] of Object.entries(productDiff)) {
-          updates[`products_summary.${name}`] = admin.firestore.FieldValue.increment(qty);
-        }
-        await shiftRef.update(updates);
+    // Actualizar el turno asociado si existe
+    if (newBill.shift_id) {
+      const shiftRef = db.collection("shifts").doc(newBill.shift_id);
+      const productDiff = computeProductDiff(oldBill.products || [], newBill.products || []);
+      const totalDiff = (newBill.total || 0) - (oldBill.total || 0);
+
+      const updates = { total_sales: admin.firestore.FieldValue.increment(totalDiff) };
+      for (const [name, qty] of Object.entries(productDiff)) {
+        updates[`products_summary.${name}`] = admin.firestore.FieldValue.increment(qty);
       }
+      await shiftRef.update(updates);
     }
-
 
     const io = getIO();
 
-    //Si el estado pasa a 'paid' o 'closed', se libera la mesa
+    // Si el estado pasa a 'paid' o 'closed', se libera la mesa
     if (updateData.status === "paid" || updateData.status === "closed") {
       await invalidateCache("bills:active");
       await invalidateCache("bills:all");
+
       const tablesRef = db.collection("tables");
       const tableQuery = await tablesRef
         .where("number", "==", Number(oldBill.table))
@@ -275,11 +284,11 @@ export async function updateBillById(req, res) {
         await invalidateCache("reports:all");
       }
 
+
       io.to("cash").emit("cuentaEliminada", { id: billId });
       io.to("waiter").emit("cuentaEliminada", { id: billId });
       io.to("kitchen").emit("cuentaEliminada", { id: billId });
     }
-
 
     io.to("cash").emit("cuentaActualizada", {
       id: billId,
@@ -292,6 +301,7 @@ export async function updateBillById(req, res) {
 
     return res.status(200).json({ message: "Cuenta actualizada correctamente" });
   } catch (err) {
+    console.error("Error al actualizar cuenta:", err);
     return res.status(500).json({
       error: "Error al actualizar cuenta",
       details: err.message,
@@ -346,7 +356,6 @@ export async function hardDeleteBill(req, res) {
 
     await billRef.delete();
     await invalidateCache("bills:active");
-    await invalidateCache("bills:all");
     await invalidateCache("reports:all");
 
 
@@ -447,7 +456,6 @@ export async function addProductToBill(req, res) {
     });
 
     await invalidateCache("bills:active");
-    await invalidateCache("bills:all");
     await invalidateCache("reports:all");
 
 
@@ -514,7 +522,6 @@ export async function removeProductFromBill(req, res) {
 
     await invalidateCache("bills:active");
     await invalidateCache("reports:all");
-
 
     const io = getIO();
 
@@ -639,7 +646,7 @@ export async function closeBillIfEmpty(req, res) {
     if (!billData.products || billData.products.length === 0) {
       await billRef.update({ status: "closed" });
       await invalidateCache("bills:active");
-      await invalidateCache("bills:all");
+      await invalidateCache("reports:all");
 
 
       //Liberar la mesa asociada
