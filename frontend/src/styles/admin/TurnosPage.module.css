@@ -70,13 +70,19 @@
   box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
 }
 
+
+.statCard:hover .statIcon {
+  transform: scale(1.1) rotate(5deg);
+}
+
 .statIcon {
-  width: 48px;
-  height: 48px;
-  border-radius: 12px;
+  width: 56px;
+  height: 56px;
+  border-radius: 14px;
   display: flex;
   align-items: center;
   justify-content: center;
+  transition: all 0.3s ease;
   flex-shrink: 0;
 }
 
@@ -220,12 +226,11 @@
 }
 
 .calendarDay.today {
-  background: linear-gradient(135deg, #8b4513a5 0%, #ff8c00 100%);
   border-color: #FF8C00;
 }
 
 .calendarDay.today .dayNumber {
-  color: white;
+  color: #D2691E;
   font-weight: 700;
 }
 

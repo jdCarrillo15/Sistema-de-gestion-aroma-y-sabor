@@ -161,21 +161,25 @@
   font-weight: 600;
   padding: 0.25rem 0.625rem;
   border-radius: 6px;
+  background: transparent;
 }
 
 .stockLow {
-  background: #FEE2E2;
+  border: 2px solid #EF4444;
   color: #991B1B;
+  box-shadow: 0 2px 8px rgba(239, 68, 68, 0.25);
 }
 
 .stockMedium {
-  background: #FEF3C7;
+  border: 2px solid #F59E0B;
   color: #92400E;
+  box-shadow: 0 2px 8px rgba(245, 158, 11, 0.25);
 }
 
 .stockHigh {
-  background: #D1FAE5;
+  border: 2px solid #10B981;
   color: #065F46;
+  box-shadow: 0 2px 8px rgba(16, 185, 129, 0.25);
 }
 
 .cardFooter {

@@ -279,26 +279,26 @@
 }
 
 .statIcon.usuarios {
-  background: linear-gradient(135deg, #dbeafe 0%, #bfdbfe 100%);
-  color: #3b82f6;
+  background: linear-gradient(135deg, #4facfe 0%, #00347c 100%);
+  color: white;
   box-shadow: 0 4px 12px rgba(59, 130, 246, 0.2);
 }
 
 .statIcon.activos {
-  background: linear-gradient(135deg, #d1fae5 0%, #a7f3d0 100%);
-  color: #10b981;
+  background: linear-gradient(135deg, #6ffe4f 0%, #007e02 100%);
+  color: white;
   box-shadow: 0 4px 12px rgba(16, 185, 129, 0.2);
 }
 
 .statIcon.inactivos {
-  background: linear-gradient(135deg, #fee2e2 0%, #fecaca 100%);
-  color: #ef4444;
+  background: linear-gradient(135deg, #ff0000 0%, #feccca 100%);
+  color: white;
   box-shadow: 0 4px 12px rgba(239, 68, 68, 0.2);
 }
 
 .statIcon.roles {
-  background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
-  color: #f59e0b;
+  background: linear-gradient(135deg, #ffea00 0%, #FF8C00 100%);
+  color: white;
   box-shadow: 0 4px 12px rgba(245, 158, 11, 0.2);
 }
 

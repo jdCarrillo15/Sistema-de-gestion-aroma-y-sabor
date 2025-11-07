@@ -1,18 +1,46 @@
 /* Mobile Nav - visible solo en móvil */
 .admin-mobile-nav {
-  display: flex;
   position: fixed;
   bottom: 0;
   left: 0;
   right: 0;
   background: white;
   border-top: 1px solid #e5e7eb;
-  padding: 0.5rem 0.25rem;
-  padding-bottom: calc(0.5rem + env(safe-area-inset-bottom));
-  gap: 0.25rem;
   z-index: 50;
   box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.05);
-  justify-content: space-around;
+}
+
+/* Contenedor scrolleable */
+.mobile-nav-scroll {
+  display: flex;
+  gap: 0.5rem;
+  padding: 0.5rem 0.75rem;
+  padding-bottom: calc(0.5rem + env(safe-area-inset-bottom));
+  overflow-x: auto;
+  overflow-y: hidden;
+  scroll-behavior: smooth;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: thin;
+  scrollbar-color: #f97316 #f3f4f6;
+}
+
+/* Scrollbar personalizado para navegadores webkit */
+.mobile-nav-scroll::-webkit-scrollbar {
+  height: 4px;
+}
+
+.mobile-nav-scroll::-webkit-scrollbar-track {
+  background: #f3f4f6;
+  border-radius: 10px;
+}
+
+.mobile-nav-scroll::-webkit-scrollbar-thumb {
+  background: #f97316;
+  border-radius: 10px;
+}
+
+.mobile-nav-scroll::-webkit-scrollbar-thumb:hover {
+  background: #ea580c;
 }
 
 .mobile-nav-btn {
@@ -20,16 +48,17 @@
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: 0.2rem;
-  padding: 0.4rem 0.3rem;
-  flex: 1;
-  max-width: 70px;
+  gap: 0.25rem;
+  padding: 0.4rem 0.6rem;
+  min-width: 70px;
+  flex-shrink: 0;
   text-decoration: none;
   color: #6b7280;
   font-size: 0.65rem;
   font-weight: 500;
   border-radius: 8px;
   transition: all 0.2s ease;
+  white-space: nowrap;
 }
 
 .mobile-nav-btn:active {
@@ -47,8 +76,9 @@
 }
 
 .mobile-nav-btn span {
-  font-size: 0.7rem;
+  font-size: 0.65rem;
   text-align: center;
+  line-height: 1.2;
 }
 
 /* Ocultar en desktop */
@@ -58,20 +88,48 @@
   }
 }
 
-/* Ajustes para pantallas muy pequeñas */
-@media (max-width: 360px) {
-  .admin-mobile-nav {
-    padding: 0.5rem 0.25rem;
+/* Ajustes para pantallas pequeñas */
+@media (max-width: 380px) {
+  .mobile-nav-scroll {
+    gap: 0.4rem;
+    padding: 0.4rem 0.5rem;
+    padding-bottom: calc(0.4rem + env(safe-area-inset-bottom));
   }
 
   .mobile-nav-btn {
-    padding: 0.5rem 0.75rem;
-    min-width: 70px;
-    font-size: 0.6875rem;
+    padding: 0.35rem 0.5rem;
+    min-width: 65px;
   }
 
   .mobile-nav-btn svg {
-    width: 18px;
-    height: 18px;
+    width: 17px;
+    height: 17px;
+  }
+
+  .mobile-nav-btn span {
+    font-size: 0.625rem;
+  }
+}
+
+/* Ajustes para pantallas muy pequeñas */
+@media (max-width: 340px) {
+  .mobile-nav-scroll {
+    gap: 0.3rem;
+    padding: 0.35rem 0.4rem;
+    padding-bottom: calc(0.35rem + env(safe-area-inset-bottom));
+  }
+
+  .mobile-nav-btn {
+    padding: 0.3rem 0.45rem;
+    min-width: 60px;
+  }
+
+  .mobile-nav-btn svg {
+    width: 16px;
+    height: 16px;
+  }
+
+  .mobile-nav-btn span {
+    font-size: 0.6rem;
   }
 }

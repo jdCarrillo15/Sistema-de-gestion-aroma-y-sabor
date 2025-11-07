@@ -109,9 +109,8 @@
   justify-content: center;
   flex-shrink: 0;
   transition: all 0.3s ease;
-  
-  background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
-  color: #f59e0b;
+  background: linear-gradient(135deg, #D2691E 0%, #FF8C00 100%);
+  color: white;
   box-shadow: 0 4px 12px rgba(245, 158, 11, 0.2);
 }
 
@@ -141,7 +140,6 @@
   margin-top: 1.5rem;
   padding: 0;
   overflow: visible;
-
 }
 
 /* Tarjetas de productos */
@@ -157,7 +155,6 @@
   display: flex;
   flex-direction: column;
   height: 100%;
-  transform: translateY(-4px);
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
@@ -178,14 +175,12 @@
 .productCard:hover {
   box-shadow: 0 8px 28px rgba(255, 102, 0, 0.18);
   border-color: #ff8833;
-  transform: translateY(-8px) scale(1.05);
-
+  transform: translateY(-8px) scale(1.0);
+  scale: 1.02;
 }
 
 .productCard:hover::before {
   opacity: 1;
-  transform: scale(1.1) rotate(5deg);
-
 }
 
 .productCard > * {
@@ -492,6 +487,7 @@
 
   .productCard {
     padding: 1.25rem;
+    margin-top: 5rem
   }
 
   .productName {

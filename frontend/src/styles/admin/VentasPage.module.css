@@ -83,6 +83,10 @@
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
 }
 
+.statCard:hover .statIcon {
+  transform: scale(1.1) rotate(5deg);
+}
+
 .statLeft {
   display: flex;
   align-items: center;
@@ -100,12 +104,12 @@
 }
 
 .statIcon.ventas {
-  background: linear-gradient(135deg, #10b981 0%, #059669 100%);
-}
+  background: linear-gradient(135deg, #6ffe4f 0%, #007e02 100%);
+  color: white;}
 
 .statIcon.facturas {
-  background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
-}
+  background: linear-gradient(135deg, #4facfe 0%, #00347c 100%);
+  color: white;}
 
 .statIcon.activos {
   background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
