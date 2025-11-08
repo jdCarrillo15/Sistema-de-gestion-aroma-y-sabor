@@ -1,31 +1,40 @@
 import { admin, db } from "../config/firebase.js";
 import { getResourceDoc } from "../services/resourceService.js";
-
+import { getOrSetCache, deleteCache } from "../config/redis.js";
 
 /**
  * Obtener todas las mesas
  */
 export async function getTables(req, res) {
-    try {
+  try {
+    const CACHE_KEY = "tables:all";
+    const TTL = 60; 
+
+    const tables = await getOrSetCache(
+      CACHE_KEY,
+      async () => {
         const snapshot = await db.collection("tables").get();
 
         if (snapshot.empty) {
-            return res.json({ tables: [] });
+          return [];
         }
 
-        const tables = snapshot.docs.map((doc) => ({
-            id: doc.id,
-            ...doc.data(),
+        return snapshot.docs.map((doc) => ({
+          id: doc.id,
+          ...doc.data(),
         }));
+      },
+      TTL
+    );
 
-        res.json({ tables });
-    } catch (err) {
-        console.error("Error obteniendo mesas:", err);
-        res.status(500).json({
-            error: "Error al obtener mesas",
-            details: err.message,
-        });
-    }
+    res.json({ tables });
+  } catch (err) {
+    console.error("Error obteniendo mesas:", err);
+    res.status(500).json({
+      error: "Error al obtener mesas",
+      details: err.message,
+    });
+  }
 }
 
 /**
@@ -44,6 +53,9 @@ export async function updateTable(req, res) {
         }
 
         await tableRef.update(updates);
+
+        await deleteCache("tables:all");
+        await deleteCache(`table:${id}`);
 
         res.json({ message: "Mesa actualizada correctamente" });
     } catch (err) {
@@ -73,7 +85,8 @@ export async function freeTable(req, res) {
             status: "free",
             current_bill_id: null,
         });
-
+        await deleteCache("tables:all");
+        await deleteCache(`table:${id}`);
         res.json({ message: "Mesa liberada correctamente" });
     } catch (err) {
         console.error("Error liberando mesa:", err);
@@ -124,7 +137,8 @@ export async function createTable(req, res) {
         };
 
         const tableRef = await db.collection("tables").add(newTable);
-
+        await deleteCache("tables:all");
+        await deleteCache(`table:${tableRef.id}`);    
         res.status(201).json({ message: "Mesa creada correctamente", id: tableRef.id });
     } catch (err) {
         res.status(500).json({ error: "Error creando la mesa", details: err.message });
@@ -148,7 +162,8 @@ export async function changeTableStatus(req, res) {
             status: status || tableSnap.data().status,
             current_bill_id: current_bill_id ?? null,
         });
-
+        await deleteCache("tables:all");
+        await deleteCache(`table:${id}`);
         res.json({ message: "Estado de la mesa actualizado correctamente" });
     } catch (err) {
         res.status(500).json({ error: "Error actualizando estado de mesa", details: err.message });
@@ -167,7 +182,8 @@ export async function deleteTable(req, res) {
         }
 
         await tableRef.delete();
-
+        await deleteCache("tables:all");
+        await deleteCache(`table:${id}`);
         res.json({ message: "Mesa eliminada correctamente" });
     } catch (err) {
         res.status(500).json({ error: "Error eliminando la mesa", details: err.message });
