@@ -146,22 +146,28 @@ export async function payBill(
 
 export async function getPaidBills(): Promise<BillsResponse> {
     try {
-        console.log("Obteniendo historial de pagos...");
 
-        const response = await getAllBills();
+        const response = await fetch(`${API_BASE_URL}/bills/getBillsByCurrentDay`, {
+            method: "GET",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            credentials: "include",
+        });
 
-        const paidBills = response.bills.filter(
-            (bill: Bill) => bill.status === 'paid'
-        );
+        if (!response.ok) {
+            const errorData = await response.json();
+            throw new Error(errorData.error || "Error obteniendo cuentas pagadas del día actual");
+        }
 
-        console.log(`${paidBills.length} cuentas pagadas encontradas`);
-        return { bills: paidBills };
+        const data: BillsResponse = await response.json();
+
+        return data;
     } catch (error) {
         console.error("Error in getPaidBills service:", error);
         throw error;
     }
 }
-
 
 export async function updateBill(
     billId: string,

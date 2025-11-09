@@ -236,9 +236,11 @@ const CajaPage: React.FC = () => {
       const response = await getPaidBills();
 
       const transformedHistory: PaymentHistoryItem[] = response.bills.map((bill: Bill) => {
-        const tableName = bill.table.startsWith('Mesa')
-          ? bill.table
-          : `Mesa ${bill.table}`;
+       
+        const tableValue = String(bill.table);
+        const tableName = tableValue.startsWith('Mesa')
+          ? tableValue
+          : `Mesa ${tableValue}`;
 
         return {
           id: bill.id,
