@@ -64,16 +64,25 @@ export async function getActiveBills(): Promise<BillsResponse> {
     try {
         console.log("Obteniendo cuentas activas...");
 
-        const response = await getAllBills();
+        
+        const response = await fetch(`${API_BASE_URL}/bills/activeBills`, {
+            method: "GET",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            credentials: "include",
+        });
 
-        const activeBills = response.bills.filter(
-            (bill: Bill) => bill.status === 'open'
-        );
+        if (!response.ok) {
+            const errorData = await response.json();
+            throw new Error(errorData.error || "Error obteniendo cuentas activas");
+        }
 
-        console.log(`${activeBills.length} cuentas activas encontradas`);
-        return { bills: activeBills };
+        const data = await response.json();
+        console.log(`${data.bills.length} cuentas activas encontradas`);
+        return data;
     } catch (error) {
-        console.error(" Error in getActiveBills service:", error);
+        console.error("Error in getActiveBills service:", error);
         throw error;
     }
 }
