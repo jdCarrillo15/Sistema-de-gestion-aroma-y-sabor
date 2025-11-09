@@ -141,7 +141,8 @@
 /* Responsive */
 @media (max-width: 768px) {
   .mesasPage {
-    padding: 1rem;
+    padding: 1rem 0.75rem;
+    padding-top: 4rem;
   }
 
   .statsGrid {
