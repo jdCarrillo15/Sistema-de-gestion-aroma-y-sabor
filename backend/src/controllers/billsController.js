@@ -1,6 +1,8 @@
 import { admin, db } from "../config/firebase.js";
 import { getIO } from "../sockets/socket.js";
 import { getOrSetCache, deleteCache, deleteCachePattern } from "../config/redis.js";
+import { Timestamp } from "firebase-admin/firestore";
+
 function computeProductDiff(oldProducts = [], newProducts = []) {
   const diff = {};
   for (const p of oldProducts) diff[p.name] = (diff[p.name] || 0) - p.quantity;
@@ -58,6 +60,46 @@ export async function getBills(req, res) {
     res.status(500).json({
       error: "Error al solicitar la cuenta",
       details: err.message,
+    });
+  }
+}
+
+export async function getBillsByCurrentDay(req, res) {
+  try {
+    // Obtenemos la fecha actual
+    const now = new Date();
+
+    // Inicio del día (00:00:00)
+    const startOfDay = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+    // Fin del día (23:59:59)
+    const endOfDay = new Date(now.getFullYear(), now.getMonth(), now.getDate() + 1);
+
+    // Convertimos a Timestamp de Firestore
+    const startTimestamp = Timestamp.fromDate(startOfDay);
+    const endTimestamp = Timestamp.fromDate(endOfDay);
+
+    // Consulta de facturas creadas hoy
+    const billsSnap = await db.collection("bills")
+      .where("created_at", ">=", startTimestamp)
+      .where("created_at", "<", endTimestamp)
+      .where("status", "==", "paid")
+      .get();
+
+    if (billsSnap.empty) {
+      return res.json({ bills: [] });
+    }
+
+    const bills = billsSnap.docs.map(doc => ({
+      id: doc.id,
+      ...doc.data(),
+    }));
+
+    return res.json({ bills });
+  } catch (error) {
+    console.error("Error al obtener cuentas del día:", error);
+    res.status(500).json({
+      error: "Error al obtener las cuentas del día",
+      details: error.message,
     });
   }
 }
@@ -516,6 +558,7 @@ export async function addProductToBill(req, res) {
 
     deleteCache("bills:all");
     deleteCache(`bill:${id}`);
+    deleteCachePattern("products:*");
 
     res.status(201).json({
       message: "Producto agregado a la cuenta correctamente",

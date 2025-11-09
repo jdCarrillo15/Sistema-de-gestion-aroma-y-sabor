@@ -119,7 +119,7 @@ export async function updateProductById(req, res) {
     await db.collection("products").doc(req.params.id).update(data);
 
     await deleteCache("products:all");
-    await deleteCache(`product:${productId}`);
+    await deleteCache(`product:${req.params.id}`);
 
     res.status(200).json({ message: "Producto actualizado correctamente" });
   } catch (err) {
