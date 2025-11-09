@@ -1,5 +1,5 @@
 import express from "express";
-import { createBill, getBillById, getBills, updateBillById, hardDeleteBill, addProductToBill, removeProductFromBill, updateProductsInBill, closeBillIfEmpty, calculateBillTotal, changeProductStateInBill, getActiveBills } from "../controllers/billsController.js";
+import { createBill, getBillById,getBillsByCurrentDay, getBills, updateBillById, hardDeleteBill, addProductToBill, removeProductFromBill, updateProductsInBill, closeBillIfEmpty, calculateBillTotal, changeProductStateInBill, getActiveBills } from "../controllers/billsController.js";
 import { authenticate, authorize, loadResourceState } from "../middleware/auth.js";
 
 const router = express.Router();
@@ -7,6 +7,7 @@ const router = express.Router();
 router.get("/getBills", authenticate, authorize("read", "bills"), getBills);
 router.post("/createBill", authenticate, authorize("create", "bills"), createBill);
 router.get("/getBill/:id", authenticate, authorize("read", "bills"), getBillById);
+router.get("/getBillsByCurrentDay", authenticate, authorize("read", "bills"), getBillsByCurrentDay);
 router.get("/activeBills", authenticate, authorize("read", "bills"), getActiveBills);
 router.put("/updateBill/:id", authenticate, loadResourceState("bills"), authorize("update", "bills"), updateBillById);
 router.delete("/harddeleteBill/:id", authenticate, authorize("delete", "bills"), hardDeleteBill);

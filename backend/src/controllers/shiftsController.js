@@ -31,7 +31,7 @@ import { getOrSetCache, deleteCache, deleteCachePattern } from "../config/redis.
 export async function getShifts(req, res) {
   try {
     const CACHE_KEY = "shifts:all";
-    const TTL = 3600; // 1 hora
+    const TTL = 3600;
 
     const shifts = await getOrSetCache(
       CACHE_KEY,
@@ -45,23 +45,20 @@ export async function getShifts(req, res) {
           return [];
         }
 
-        const shifts = await Promise.all(
-          snapshot.docs.map(async (doc) => {
-            const base = doc.data();
-            const agg = await aggregateShiftData(doc.id); 
-
-            return {
-              id: doc.id,
-              user_id: base.user_id || null,
-              state: base.state || "open",
-              started_at: base.started_at || null,
-              finished_at: base.finished_at || null,
-              total_bills: agg.total_bills,
-              total_sales: agg.total_sales,
-              products_summary: agg.products_summary,
-            };
-          })
-        );
+        const shifts = snapshot.docs.map((doc) => {
+          const data = doc.data();
+          
+          return {
+            id: doc.id,
+            user_id: data.user_id || null,
+            state: data.state || "open",
+            started_at: data.started_at || null,
+            finished_at: data.finished_at || null,
+            total_bills: data.total_bills || 0,
+            total_sales: data.total_sales || 0,
+            products_summary: data.products_summary || {},
+          };
+        });
 
         return shifts;
       },
@@ -70,6 +67,7 @@ export async function getShifts(req, res) {
 
     return res.json({ shifts });
   } catch (err) {
+    console.error("Error en getShifts:", err);
     return res.status(500).json({
       error: "Error al obtener turnos",
       details: err.message,
