@@ -1,5 +1,7 @@
 import { admin, db } from "../config/firebase.js";
 import { getIO } from "../sockets/socket.js";
+import { getOrSetCache, deleteCache, deleteCachePattern } from "../config/redis.js";
+import { Timestamp } from "firebase-admin/firestore";
 
 function computeProductDiff(oldProducts = [], newProducts = []) {
   const diff = {};
@@ -10,40 +12,95 @@ function computeProductDiff(oldProducts = [], newProducts = []) {
 
 export async function getBills(req, res) {
   try {
-    const bill = await db.collection("bills").get();
+    const CACHE_KEY = "bills:all";
+    const TTL = 180; // 3 minutos
 
-    if (bill.empty) {
-      return res.json({ bills: [] });
-    }
+    const bills = await getOrSetCache(
+      CACHE_KEY,
+      async () => {
+        const billSnapshot = await db.collection("bills").get();
 
-    const bills = await Promise.all(
-      bill.docs.map(async (doc) => {
-        const data = doc.data();
-        let user = null;
-
-        const userDoc = await db.collection("users").doc(data.user_id).get();
-
-        if (userDoc.exists) {
-          user = { id: userDoc.id, ...userDoc.data() };
+        if (billSnapshot.empty) {
+          return [];
         }
 
-        return {
-          status: data.status,
-          total: data.total,
-          table: data.table,
-          created_at: data.created_at,
-          user: user,
-          products: data.products || [],
-          id: doc.id,
-        };
-      })
+        const bills = await Promise.all(
+          billSnapshot.docs.map(async (doc) => {
+            const data = doc.data();
+            let user = null;
+
+            const userDoc = await db
+              .collection("users")
+              .doc(data.user_id)
+              .get();
+
+            if (userDoc.exists) {
+              user = { id: userDoc.id, ...userDoc.data() };
+            }
+
+            return {
+              id: doc.id,
+              status: data.status,
+              total: data.total,
+              table: data.table,
+              created_at: data.created_at,
+              products: data.products || [],
+              user: user,
+            };
+          })
+        );
+
+        return bills;
+      },
+      TTL
     );
 
     res.json({ bills });
   } catch (err) {
-    res
-      .status(500)
-      .json({ error: "Error al solicitar la cuenta", details: err.message });
+    res.status(500).json({
+      error: "Error al solicitar la cuenta",
+      details: err.message,
+    });
+  }
+}
+
+export async function getBillsByCurrentDay(req, res) {
+  try {
+    // Obtenemos la fecha actual
+    const now = new Date();
+
+    // Inicio del día (00:00:00)
+    const startOfDay = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+    // Fin del día (23:59:59)
+    const endOfDay = new Date(now.getFullYear(), now.getMonth(), now.getDate() + 1);
+
+    // Convertimos a Timestamp de Firestore
+    const startTimestamp = Timestamp.fromDate(startOfDay);
+    const endTimestamp = Timestamp.fromDate(endOfDay);
+
+    // Consulta de facturas creadas hoy
+    const billsSnap = await db.collection("bills")
+      .where("created_at", ">=", startTimestamp)
+      .where("created_at", "<", endTimestamp)
+      .where("status", "==", "paid")
+      .get();
+
+    if (billsSnap.empty) {
+      return res.json({ bills: [] });
+    }
+
+    const bills = billsSnap.docs.map(doc => ({
+      id: doc.id,
+      ...doc.data(),
+    }));
+
+    return res.json({ bills });
+  } catch (error) {
+    console.error("Error al obtener cuentas del día:", error);
+    res.status(500).json({
+      error: "Error al obtener las cuentas del día",
+      details: error.message,
+    });
   }
 }
 
@@ -148,6 +205,18 @@ export async function createBill(req, res) {
 
     io.to("cash").emit("nuevaCuenta", newBillData);
     io.to("kitchen").emit("nuevaCuenta", newBillData);
+    io.to("waiter").emit("nuevaCuenta", newBillData);
+    io.to("waiter").emit("mesaActualizada", {
+      number: data.table,
+      current_bill_id: billRef.id,
+      status: "occupied",
+    });
+
+    deleteCache("bills:all");
+    deleteCache(`bill:${billRef.id}`);
+
+    deleteCache("tables:all");
+    deleteCache(`table:${data.table}`);
 
     return res.status(201).json({
       message: "Cuenta creada correctamente",
@@ -246,11 +315,26 @@ export async function updateBillById(req, res) {
       );
     }
 
+
+    
+    if (Array.isArray(updateData.products)) {
+      updateData.units_total = updateData.products.reduce(
+        (acc, p) => acc + (Number(p.units) || 0),
+        0
+      );
+    }
+
+    
     await billRef.update(updateData);
 
+    
+    const updatedBillSnap = await billRef.get();
+    const newBill = updatedBillSnap.data();
+
+    
     if (newBill.shift_id) {
       const shiftRef = db.collection("shifts").doc(newBill.shift_id);
-      const productDiff = computeProductDiff(oldBill.products, newBill.products || []);
+      const productDiff = computeProductDiff(oldBill.products || [], newBill.products || []);
       const totalDiff = (newBill.total || 0) - (oldBill.total || 0);
 
       const updates = { total_sales: admin.firestore.FieldValue.increment(totalDiff) };
@@ -262,7 +346,7 @@ export async function updateBillById(req, res) {
 
     const io = getIO();
 
-    //Si el estado pasa a 'paid' o 'closed', se libera la mesa
+    
     if (updateData.status === "paid" || updateData.status === "closed") {
       const tablesRef = db.collection("tables");
       const tableQuery = await tablesRef
@@ -280,8 +364,10 @@ export async function updateBillById(req, res) {
       io.to("cash").emit("cuentaEliminada", { id: billId });
       io.to("waiter").emit("cuentaEliminada", { id: billId });
       io.to("kitchen").emit("cuentaEliminada", { id: billId });
-    }
 
+      await deleteCache("tables:all");
+      await deleteCache(`table:${oldBill.table}`);
+    }
 
     io.to("cash").emit("cuentaActualizada", {
       id: billId,
@@ -291,9 +377,12 @@ export async function updateBillById(req, res) {
       id: billId,
       data: updateData,
     });
+    await deleteCache("bills:all");
+    await deleteCache(`bill:${billId}`);
 
     return res.status(200).json({ message: "Cuenta actualizada correctamente" });
   } catch (err) {
+    console.error("Error al actualizar cuenta:", err); 
     return res.status(500).json({
       error: "Error al actualizar cuenta",
       details: err.message,
@@ -313,7 +402,6 @@ export async function hardDeleteBill(req, res) {
     const billSnap = await billRef.get();
     const bill = billSnap.data();
 
-
     if (!billSnap.exists) {
       return res.status(404).json({ error: "Cuenta no encontrada" });
     }
@@ -324,21 +412,28 @@ export async function hardDeleteBill(req, res) {
         total_sales: admin.firestore.FieldValue.increment(-bill.total),
         total_bills: admin.firestore.FieldValue.increment(-1),
       };
+
       (bill.products || []).forEach((p) => {
-        updates[`products_summary.${p.name}`] = admin.firestore.FieldValue.increment(-p.units);
+        updates[`products_summary.${p.name}`] =
+          admin.firestore.FieldValue.increment(-p.units);
       });
+
       await shiftRef.update(updates);
     }
 
-    // Liberar la mesa asociada
+    // Liberar mesa asociada
     const tablesRef = db.collection("tables");
     const tableQuery = await tablesRef
       .where("current_bill_id", "==", id)
       .limit(1)
       .get();
 
+    let tableNumber = null;
+
     if (!tableQuery.empty) {
       const tableDoc = tableQuery.docs[0];
+      tableNumber = tableDoc.data().number;
+
       await tableDoc.ref.update({
         current_bill_id: null,
         status: "free",
@@ -350,8 +445,25 @@ export async function hardDeleteBill(req, res) {
     const io = getIO();
     io.to("cash").emit("cuentaEliminada", { id });
     io.to("kitchen").emit("cuentaEliminada", { id });
+    io.to("waiter").emit("cuentaEliminada", { id });
 
-    res.status(200).json({
+    if (tableNumber !== null) {
+      io.to("waiter").emit("mesaActualizada", {
+        number: tableNumber,
+        current_bill_id: null,
+        status: "free",
+      });
+    }
+    
+    await deleteCache("bills:all");
+    await deleteCache(`bill:${id}`);
+
+    await deleteCache("tables:all");
+    if (tableNumber !== null) {
+      await deleteCache(`table:${tableNumber}`);
+    }
+
+    return res.status(200).json({
       message: "Cuenta eliminada correctamente",
     });
   } catch (err) {
@@ -361,6 +473,7 @@ export async function hardDeleteBill(req, res) {
     });
   }
 }
+
 
 export async function addProductToBill(req, res) {
   const { id } = req.params;
@@ -461,6 +574,10 @@ export async function addProductToBill(req, res) {
       data: { products: updatedBill.products, total },
     });
 
+    deleteCache("bills:all");
+    deleteCache(`bill:${id}`);
+    deleteCachePattern("products:*");
+
     res.status(201).json({
       message: "Producto agregado a la cuenta correctamente",
       total,
@@ -500,6 +617,9 @@ export async function removeProductFromBill(req, res) {
     io.to("kitchen").emit("productoEliminado", { billId: id, productId });
 
     io.to("cash").emit("cuentaActualizada", { id, data: { products: updatedProducts } });
+
+    deleteCache("bills:all");
+    deleteCache(`bill:${id}`);
 
     res.status(200).json({ message: "Producto eliminado correctamente" });
   } catch (err) {
@@ -585,7 +705,8 @@ export async function updateProductsInBill(req, res) {
         created_at: billData.created_at,
       })),
     });
-
+    deleteCache("bills:all");
+    deleteCache(`bill:${id}`);
 
     res.status(200).json({
       message: "Productos de la cuenta actualizados correctamente",
@@ -632,7 +753,17 @@ export async function closeBillIfEmpty(req, res) {
       const io = getIO();
       io.to("cash").emit("cuentaEliminada", { id });
       io.to("kitchen").emit("cuentaEliminada", { id });
-
+      io.to("waiter").emit("cuentaEliminada", { id });
+      io.to("waiter").emit("mesaActualizada", {
+        number: billData.table,
+        current_bill_id: null,
+        status: "free",
+      });
+      
+      await deleteCache("tables:all");
+      await deleteCache(`table:${billData.table}`);
+      await deleteCache("bills:all");
+      await deleteCache(`bill:${id}`);
       return res.status(200).json({ message: "Cuenta cerrada correctamente" });
     } else {
       return res

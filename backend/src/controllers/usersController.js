@@ -1,41 +1,79 @@
 import { admin, db } from "../config/firebase.js";
 import { getResourceDoc } from "../services/resourceService.js";
+import { getOrSetCache, deleteCache} from "../config/redis.js";
 
 export async function getUsers(req, res) {
-    try {
-        const user = await db.collection("users").get();
+  try {
+    const CACHE_KEY = "users:all";
+    const TTL = 86400; // 24 horas ya que los usuarios casi no cambian 
 
-        if (user.empty) {
-            return res.json({ users: [] });
+    // 🚀 Usar caché con patrón Cache-Aside
+    const users = await getOrSetCache(
+      CACHE_KEY,
+      async () => {
+        // Esta función solo se ejecuta si NO hay caché
+        console.log("📡 Obteniendo usuarios de Firebase...");
+        
+        const userSnapshot = await db.collection("users").get();
+
+        if (userSnapshot.empty) {
+          return [];
         }
 
         const users = await Promise.all(
-            user.docs.map(async doc => {
-                const data = doc.data();
-                let person = null;
+          userSnapshot.docs.map(async (doc) => {
+            const data = doc.data();
+            let person = null;
 
-                if (data.person_id) {// Obtiene los datos de persona de cada usuario
-                    const personDoc = await db.collection("persons").doc(data.person_id).get();
-                    if (personDoc.exists) {
-                        person = { id: personDoc.id, ...personDoc.data() };
-                    }
-                }
-                return {
-                    id: doc.id,
-                    user_name: data.user_name,
-                    email: data.email,
-                    role: data.role,
-                    state: data.state,
-                    person,
-                    created_at: data.created_at._seconds*1000 || "",
-                };
-            })
+            if (data.person_id) {
+              const personDoc = await db
+                .collection("persons")
+                .doc(data.person_id)
+                .get();
+              if (personDoc.exists) {
+                person = { id: personDoc.id, ...personDoc.data() };
+              }
+            }
+
+            // Manejo seguro de created_at
+            let createdAtTimestamp;
+            if (data.created_at?._seconds) {
+              createdAtTimestamp = data.created_at._seconds * 1000;
+            } else if (data.created_at?.seconds) {
+              createdAtTimestamp = data.created_at.seconds * 1000;
+            } else if (data.created_at instanceof Date) {
+              createdAtTimestamp = data.created_at.getTime();
+            } else if (typeof data.created_at === "string") {
+              createdAtTimestamp = new Date(data.created_at).getTime();
+            } else {
+              createdAtTimestamp = new Date().getTime();
+            }
+
+            return {
+              id: doc.id,
+              user_name: data.user_name || "",
+              email: data.email || "",
+              role: data.role || "",
+              state: data.state || "inactive",
+              person: person,
+              created_at: createdAtTimestamp,
+            };
+          })
         );
 
-        res.json({ users });
-    } catch (err) {
-        res.status(500).json({ error: "Error obteniendo usuarios", details: err.message });
-    }
+        return users;
+      },
+      TTL
+    );
+
+    res.json({ users });
+  } catch (err) {
+    console.error(" Error en getUsers:", err);
+    res.status(500).json({
+      error: "Error obteniendo usuarios",
+      details: err.message,
+    });
+  }
 }
 
 //CRUD functions
@@ -79,7 +117,7 @@ export async function createUserAndPerson(req, res) {
             state: data.status || data.state || "active",
             created_at: admin.firestore.FieldValue.serverTimestamp()
         });
-
+        await deleteCache("users:all");
         res.status(201).json({
             message: "Usuario creado correctamente",
             userId: authUid
@@ -157,6 +195,8 @@ export async function updateUserById(req, res) {
 
         await db.collection("users").doc(req.params.id).update(data);
         
+        await deleteCache("users:all");
+        await deleteCache(`users:${req.params.id}`);
         res.status(200).json({ message: "Usuario actualizado correctamente" });
 
     } catch (err) {
@@ -212,6 +252,8 @@ export async function hardDeleteUser(req, res) {
 
             // Eliminar el doc de users
             await userRef.delete();
+            await deleteCache("users:all");
+            await deleteCache(`users:${id}`);
         } else {
             return res.status(404).json({ error: "Usuario no encontrado" });
         }

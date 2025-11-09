@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { Plus, Edit3, Trash2, Eye, Package, Users } from "lucide-react";
+import { Plus, Edit3, Trash2, Eye, Package } from "lucide-react";
 import Button from "../../components/common/Button";
 import CreateProductModal from "../../components/admin/products/CreateProductModal";
 import EditProductModal from "../../components/admin/products/EditProductModal";

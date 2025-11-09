@@ -1,6 +1,6 @@
 import { admin, db } from "../config/firebase.js";
 import { getIO } from "../sockets/socket.js";
-
+import { getOrSetCache, deleteCache, deleteCachePattern } from "../config/redis.js";
 /**
  * Obtiene todos los turnos
  * @param {*} req
@@ -30,31 +30,44 @@ import { getIO } from "../sockets/socket.js";
  */
 export async function getShifts(req, res) {
   try {
-    const snapshot = await db
-      .collection("shifts")
-      .orderBy("started_at", "desc")
-      .get();
+    const CACHE_KEY = "shifts:all";
+    const TTL = 3600;
 
-    if (snapshot.empty) {
-      return res.json({ shifts: [] });
-    }
+    const shifts = await getOrSetCache(
+      CACHE_KEY,
+      async () => {
+        const snapshot = await db
+          .collection("shifts")
+          .orderBy("started_at", "desc")
+          .get();
 
-    const shifts = snapshot.docs.map((doc) => {
-      const base = doc.data();
-      return {
-        id: doc.id,
-        user_id: base.user_id || null,
-        state: base.state || "open",
-        started_at: base.started_at || null,
-        finished_at: base.finished_at || null,
-        total_bills: base.total_bills,
-        total_sales: base.total_sales,
-        products_summary: base.products_summary,
-      };
-    });
+        if (snapshot.empty) {
+          return [];
+        }
+
+        const shifts = snapshot.docs.map((doc) => {
+          const data = doc.data();
+          
+          return {
+            id: doc.id,
+            user_id: data.user_id || null,
+            state: data.state || "open",
+            started_at: data.started_at || null,
+            finished_at: data.finished_at || null,
+            total_bills: data.total_bills || 0,
+            total_sales: data.total_sales || 0,
+            products_summary: data.products_summary || {},
+          };
+        });
+
+        return shifts;
+      },
+      TTL
+    );
 
     return res.json({ shifts });
   } catch (err) {
+    console.error("Error en getShifts:", err);
     return res.status(500).json({
       error: "Error al obtener turnos",
       details: err.message,
@@ -105,6 +118,8 @@ export async function createShift(req, res) {
     };
 
     const ref = await db.collection("shifts").add(payload);
+
+    await deleteCachePattern("shifts:*");
 
     const io = getIO();
     io.to("cash").emit("turnoCreado", { id: ref.id, ...payload });
@@ -207,7 +222,7 @@ export async function updateShiftById(req, res) {
           : finished_at;
     }
 
-    // Si el estado cambia a "closed" y no se proporciona finished_at, usar serverTimestamp
+   
     if (update.state === "closed" && update.finished_at === undefined) {
       update.finished_at = admin.firestore.FieldValue.serverTimestamp();
     }
@@ -220,6 +235,9 @@ export async function updateShiftById(req, res) {
       }
       return res.status(500).json({ error: "Error al actualizar turno", details: e.message });
     }
+
+    await deleteCachePattern("shifts:*");
+    await deleteCache(`shift:${id}`);
 
     const io = getIO();
     io.to("cash").emit("turnoActualizado", { id, data: update });
@@ -263,7 +281,8 @@ export async function deleteShift(req, res) {
 
     const io = getIO();
     io.to("cash").emit("turnoEliminado", { id });
-
+    await deleteCachePattern("shifts:*");
+    await deleteCache(`shift:${id}`);
     return res.status(200).json({ message: "Turno eliminado correctamente" });
   } catch (err) {
     return res.status(500).json({

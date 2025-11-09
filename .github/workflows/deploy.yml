@@ -1,5 +1,4 @@
 name: Deploy to VPS
-
 on:
   push:
     branches:
@@ -9,11 +8,10 @@ jobs:
   deploy:
     runs-on: ubuntu-latest
     environment: vps
-
     steps:
       - name: Checkout
         uses: actions/checkout@v3
-
+        
       - name: Setup SSH
         uses: webfactory/ssh-agent@v0.9.0
         with:
@@ -22,24 +20,55 @@ jobs:
       - name: Deploy backend on VPS
         run: |
           ssh -o StrictHostKeyChecking=no ${{ secrets.VPS_USER }}@${{ secrets.VPS_HOST }} "
+            echo ' Iniciando despliegue del backend...'
+            
             cd ${{ secrets.VPS_APP_DIR }}
             git fetch --all
             git reset --hard origin/deploy
+            
+            echo 'Verificando Redis...'
+            if ! systemctl is-active --quiet redis; then
+              echo ' Redis no está corriendo, intentando iniciar...'
+              sudo systemctl start redis
+            fi
+            
+            echo 'Probando conexión a Redis...'
+            redis-cli -a cafe2025_produccion_segura PING || echo ' Error: Redis no responde'
+            
+            echo 'Instalando dependencias del backend...'
             cd backend
             npm install --omit=dev
+            
+            echo 'Reiniciando aplicación...'
             pm2 startOrReload /home/appuser/configs/ecosystem.config.cjs
             pm2 status
+            
+            echo ' Mostrando últimos logs...'
+            sleep 3
+            pm2 logs backend --lines 15 --nostream
+            
+            echo ' Despliegue del backend completado'
           "
 
       - name: Deploy frontend on VPS
         run: |
           ssh -o StrictHostKeyChecking=no ${{ secrets.VPS_USER }}@${{ secrets.VPS_HOST }} "
+            echo 'Iniciando despliegue del frontend...'
+            
             cd ${{ secrets.VPS_APP_DIR }}
             git fetch --all
             git reset --hard origin/deploy
+            
+            echo ' Instalando dependencias del frontend...'
             cd frontend
             npm ci
+            
+            echo 'Construyendo frontend...'
             npm run build
+            
+            echo 'Desplegando archivos...'
             rm -rf /var/www/aroma-sabor/*
             cp -r dist/* /var/www/aroma-sabor/
+            
+            echo 'Despliegue del frontend completado'
           "
