@@ -4,6 +4,8 @@ import { getShifts, type Shift } from "../../services/admin/shiftService";
 import { getUsers } from "../../services/admin/userService";
 import AlertModal from "../../components/common/AlertModal";
 import styles from "../../styles/admin/VentasPage.module.css";
+import Button from "../../components/common/Button";
+
 
 const VentasPage: React.FC = () => {
   const [shifts, setShifts] = useState<Shift[]>([]);
@@ -14,7 +16,7 @@ const VentasPage: React.FC = () => {
   const [alertMessage, setAlertMessage] = useState("");
   const [selectedShift, setSelectedShift] = useState<Shift | null>(null);
 
-  
+
   useEffect(() => {
     loadShifts();
   }, []);
@@ -26,18 +28,18 @@ const VentasPage: React.FC = () => {
         getShifts(),
         getUsers()
       ]);
-      
+
       const shiftsData = shiftsResponse.shifts || [];
       setShifts(shiftsData);
-      
-      
+
+
       const usersData = usersResponse.users || [];
       const usersMap: Record<string, string> = {};
       usersData.forEach((user: any) => {
         usersMap[user.id] = user.user_name;
       });
       setUsers(usersMap);
-      
+
     } catch (error: any) {
       console.error("Error cargando turnos:", error);
       setAlertMessage(error.message || "Error al cargar los turnos");
@@ -48,22 +50,22 @@ const VentasPage: React.FC = () => {
   };
 
   // Calcular estadísticas
-  const filteredShifts = selectedUserId === "all" 
-    ? shifts 
+  const filteredShifts = selectedUserId === "all"
+    ? shifts
     : shifts.filter(shift => shift.user_id === selectedUserId);
-    
+
   const totalSales = filteredShifts.reduce((sum, shift) => sum + shift.total_sales, 0);
   const totalBills = filteredShifts.reduce((sum, shift) => sum + shift.total_bills, 0);
 
   const formatDate = (dateString: any) => {
     try {
       let date: Date;
-      
-      
+
+
       if (dateString && typeof dateString === 'object' && '_seconds' in dateString) {
         date = new Date(dateString._seconds * 1000);
-      } 
-     
+      }
+
       else if (typeof dateString === 'string') {
         date = new Date(dateString);
       }
@@ -74,11 +76,11 @@ const VentasPage: React.FC = () => {
       else {
         return "-";
       }
-      
+
       if (isNaN(date.getTime())) {
         return "-";
       }
-      
+
       return date.toLocaleString("es-ES", {
         year: "numeric",
         month: "2-digit",
@@ -107,13 +109,12 @@ const VentasPage: React.FC = () => {
       <div className={styles.ventasHeader}>
         <div>
           <h1 className={styles.dashboardTitle}>Ventas por Turnos</h1>
-          <p className={styles.dashboardSub}>Resumen de todos los turnos y ventas</p>
         </div>
         <div className={styles.filtroUsuario}>
           <label htmlFor="filtro-usuario">Filtrar por usuario:</label>
-          <select 
+          <select
             id="filtro-usuario"
-            value={selectedUserId} 
+            value={selectedUserId}
             onChange={(e) => setSelectedUserId(e.target.value)}
             className={styles.selectFiltro}
           >
@@ -188,12 +189,13 @@ const VentasPage: React.FC = () => {
                   <td className={styles.textCenter}>{shift.total_bills}</td>
                   <td className={styles.ventasAmount}>{formatCurrency(shift.total_sales)}</td>
                   <td className={styles.textCenter}>
-                    <button
-                      className={styles.btnVerDetalles}
+                    <Button
+                      className={styles.btnNuevoProducto}
                       onClick={() => handleViewDetails(shift)}
+                      disabled={isLoading}
                     >
-                      Ver Detalles
-                    </button>
+                      Detalles
+                    </Button>
                   </td>
                 </tr>
               ))}

@@ -106,7 +106,6 @@ const AdminDashboard: React.FC = () => {
       <div className={styles.dashboardHeader}>
         <div>
           <h1 className={styles.dashboardTitle}>Dashboard</h1>
-          <p className={styles.dashboardSub}>Bienvenido de vuelta, Admin</p>
         </div>
       </div>
 

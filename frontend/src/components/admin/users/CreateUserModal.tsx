@@ -263,31 +263,26 @@ const CreateUserModal: React.FC<CreateUserModalProps> = ({
     }
   };
 
+  const handleBackdropClick = (e: React.MouseEvent<HTMLDivElement>) => {
+    if (e.target === e.currentTarget && !isSubmitting) {
+      onClose();
+    }
+  };
+
   if (!isOpen) return null;
 
   return (
     <div
       className={styles.modalBackdrop}
+      onClick={handleBackdropClick}
       onKeyDown={handleKeyDown}
       tabIndex={-1}
     >
       <div className={styles.modalContainer}>
         <div className={styles.modalContent}>
           <div className={styles.modalHeader}>
-            <button
-              className={styles.closeButton}
-              onClick={onClose}
-              aria-label="Cerrar"
-              disabled={isSubmitting}
-            >
-              <svg
-                width="24"
-                height="24"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="2"
-              >
+            <button className={styles.closeButton} onClick={onClose} aria-label="Cerrar">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                 <line x1="18" y1="6" x2="6" y2="18"></line>
                 <line x1="6" y1="6" x2="18" y2="18"></line>
               </svg>
@@ -296,12 +291,14 @@ const CreateUserModal: React.FC<CreateUserModalProps> = ({
 
           <div className={styles.modalIcon}>
             <svg
-              width="64"
-              height="64"
+              width="80"
+              height="80"
               viewBox="0 0 24 24"
               fill="none"
               stroke="currentColor"
               strokeWidth="1.5"
+              strokeLinecap="round"
+              strokeLinejoin="round"
             >
               <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
               <circle cx="12" cy="7" r="4" />
@@ -315,7 +312,9 @@ const CreateUserModal: React.FC<CreateUserModalProps> = ({
 
           <form onSubmit={handleSubmit} className={styles.modalForm}>
             <div className={styles.formGroup}>
-              <label htmlFor="userName" className={styles.formLabel}>Nombre de usuario *</label>
+              <label htmlFor="userName" className={styles.formLabel}>
+                Nombre de usuario *
+              </label>
               <input
                 type="text"
                 id="userName"
@@ -323,6 +322,8 @@ const CreateUserModal: React.FC<CreateUserModalProps> = ({
                 onChange={handleUserNameChange}
                 className={`${styles.formInput} ${errors.userName ? styles.error : ''}`}
                 disabled={isSubmitting}
+                placeholder="usuario123"
+                autoComplete="username"
                 required
               />
               {errors.userName && (
@@ -331,7 +332,9 @@ const CreateUserModal: React.FC<CreateUserModalProps> = ({
             </div>
 
             <div className={styles.formGroup}>
-              <label htmlFor="firstName" className={styles.formLabel}>Nombre *</label>
+              <label htmlFor="firstName" className={styles.formLabel}>
+                Nombre *
+              </label>
               <input
                 type="text"
                 id="firstName"
@@ -339,6 +342,8 @@ const CreateUserModal: React.FC<CreateUserModalProps> = ({
                 onChange={handleFirstNameChange}
                 className={`${styles.formInput} ${errors.firstName ? styles.error : ''}`}
                 disabled={isSubmitting}
+                placeholder="Juan"
+                autoComplete="given-name"
                 required
               />
               {errors.firstName && (
@@ -347,7 +352,9 @@ const CreateUserModal: React.FC<CreateUserModalProps> = ({
             </div>
 
             <div className={styles.formGroup}>
-              <label htmlFor="lastName" className={styles.formLabel}>Apellido *</label>
+              <label htmlFor="lastName" className={styles.formLabel}>
+                Apellido *
+              </label>
               <input
                 type="text"
                 id="lastName"
@@ -355,6 +362,8 @@ const CreateUserModal: React.FC<CreateUserModalProps> = ({
                 onChange={handleLastNameChange}
                 className={`${styles.formInput} ${errors.lastName ? styles.error : ''}`}
                 disabled={isSubmitting}
+                placeholder="Pérez"
+                autoComplete="family-name"
                 required
               />
               {errors.lastName && (
@@ -363,16 +372,19 @@ const CreateUserModal: React.FC<CreateUserModalProps> = ({
             </div>
 
             <div className={styles.formGroup}>
-              <label htmlFor="documentId" className={styles.formLabel}>Documento (opcional)</label>
+              <label htmlFor="documentId" className={styles.formLabel}>
+                Documento (opcional)
+              </label>
               <input
                 type="text"
                 id="documentId"
                 value={documentId}
                 onChange={handleDocumentChange}
                 className={`${styles.formInput} ${errors.documentId ? styles.error : ''}`}
-                placeholder="Máximo 10 dígitos"
+                placeholder="1234567890"
                 maxLength={10}
                 disabled={isSubmitting}
+                autoComplete="off"
               />
               {errors.documentId && (
                 <span className={styles.errorMessage}>{errors.documentId}</span>
@@ -380,7 +392,9 @@ const CreateUserModal: React.FC<CreateUserModalProps> = ({
             </div>
 
             <div className={styles.formGroup}>
-              <label htmlFor="birthdate" className={styles.formLabel}>Fecha de nacimiento (opcional)</label>
+              <label htmlFor="birthdate" className={styles.formLabel}>
+                Fecha de nacimiento (opcional)
+              </label>
               <input
                 type="date"
                 id="birthdate"
@@ -388,6 +402,7 @@ const CreateUserModal: React.FC<CreateUserModalProps> = ({
                 onChange={handleBirthdateChange}
                 className={`${styles.formInput} ${errors.birthdate ? styles.error : ''}`}
                 disabled={isSubmitting}
+                autoComplete="bday"
               />
               {errors.birthdate && (
                 <span className={styles.errorMessage}>{errors.birthdate}</span>
@@ -395,7 +410,9 @@ const CreateUserModal: React.FC<CreateUserModalProps> = ({
             </div>
 
             <div className={styles.formGroup}>
-              <label htmlFor="email" className={styles.formLabel}>Correo Electrónico *</label>
+              <label htmlFor="email" className={styles.formLabel}>
+                Correo Electrónico *
+              </label>
               <input
                 type="email"
                 id="email"
@@ -403,6 +420,8 @@ const CreateUserModal: React.FC<CreateUserModalProps> = ({
                 onChange={handleEmailChange}
                 className={`${styles.formInput} ${errors.email ? styles.error : ''}`}
                 disabled={isSubmitting}
+                placeholder="correo@ejemplo.com"
+                autoComplete="email"
                 required
               />
               {errors.email && (
@@ -411,7 +430,9 @@ const CreateUserModal: React.FC<CreateUserModalProps> = ({
             </div>
 
             <div className={styles.formGroup}>
-              <label htmlFor="password" className={styles.formLabel}>Contraseña *</label>
+              <label htmlFor="password" className={styles.formLabel}>
+                Contraseña *
+              </label>
               <input
                 type="password"
                 id="password"
@@ -419,6 +440,8 @@ const CreateUserModal: React.FC<CreateUserModalProps> = ({
                 onChange={handlePasswordChange}
                 className={`${styles.formInput} ${errors.password ? styles.error : ''}`}
                 disabled={isSubmitting}
+                placeholder="••••••••"
+                autoComplete="new-password"
                 required
               />
               {errors.password && (
@@ -427,7 +450,9 @@ const CreateUserModal: React.FC<CreateUserModalProps> = ({
             </div>
 
             <div className={styles.formGroup}>
-              <label htmlFor="role" className={styles.formLabel}>Rol *</label>
+              <label htmlFor="role" className={styles.formLabel}>
+                Rol *
+              </label>
               <select
                 id="role"
                 value={role}
@@ -443,7 +468,9 @@ const CreateUserModal: React.FC<CreateUserModalProps> = ({
             </div>
 
             <div className={styles.formGroup}>
-              <label htmlFor="status" className={styles.formLabel}>Estado *</label>
+              <label htmlFor="status" className={styles.formLabel}>
+                Estado *
+              </label>
               <select
                 id="status"
                 value={status}

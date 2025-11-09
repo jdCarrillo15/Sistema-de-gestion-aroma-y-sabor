@@ -1,5 +1,8 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Calendar, Users, ChevronLeft, ChevronRight, Sun, Moon, X, Check } from "lucide-react";
+import { getUsers } from "../../services/admin/userService";
+import { getShifts, createShift, updateShift } from "../../services/admin/turnos/TurnosService";
+import AlertModal from "../../components/common/AlertModal";
 import styles from "../../styles/admin/TurnosPage.module.css";
 
 type ShiftType = "morning" | "afternoon";
@@ -7,10 +10,14 @@ type Role = "waiter" | "cash" | "kitchen";
 
 type User = {
   id: string;
-  name: string;
+  user_name: string;
   email: string;
   role: Role;
-  status: "active" | "inactive";
+  status: string;
+  person?: {
+    first_name: string;
+    last_name: string;
+  };
 };
 
 type Assignment = {
@@ -20,6 +27,7 @@ type Assignment = {
 };
 
 type Shift = {
+  id?: string;
   date: string;
   type: ShiftType;
   assignments: Assignment[];
@@ -33,14 +41,97 @@ const TurnosPage: React.FC = () => {
   const [selectedShiftType, setSelectedShiftType] = useState<ShiftType | null>(null);
   const [shifts, setShifts] = useState<Shift[]>([]);
   const [selectedAssignments, setSelectedAssignments] = useState<Assignment[]>([]);
+  const [users, setUsers] = useState<User[]>([]);
+  const [isLoadingUsers, setIsLoadingUsers] = useState(true);
+  const [isLoadingShifts, setIsLoadingShifts] = useState(true);
+  const [isSaving, setIsSaving] = useState(false);
+  const [isAlertOpen, setIsAlertOpen] = useState(false);
+  const [alertConfig, setAlertConfig] = useState({
+    title: "",
+    message: "",
+    type: "warning" as "success" | "error" | "info" | "warning"
+  });
 
-  const users: User[] = [
-    { id: "1", name: "Diego", email: "diego@mesero.com", role: "waiter", status: "active" },
-    { id: "3", name: "DiegoCaja", email: "diego@caja.com", role: "cash", status: "active" },
-    { id: "4", name: "BrayanMesero", email: "brayan.cifuentes@uptc.edu.co", role: "waiter", status: "active" },
-  ];
+  const normalizeState = (status: string): string => {
+    if (!status) return "activo";
+    const lowerState = status.toLowerCase().trim();
+    if (lowerState === "activo" || lowerState === "active") {
+      return "activo";
+    } else if (lowerState === "inactivo" || lowerState === "inactive") {
+      return "inactivo";
+    }
+    return status.toLowerCase();
+  };
 
-  const activeUsers = users.filter(u => u.status === "active");
+  useEffect(() => {
+    const fetchUsers = async () => {
+      try {
+        setIsLoadingUsers(true);
+        const response = await getUsers();
+        const usersData = Array.isArray(response) ? response : response?.users || [];
+
+        const mappedUsers: User[] = usersData
+          .filter((u: any) => {
+            const role = u.role?.toLowerCase();
+            const status = normalizeState(u.status ?? u.state ?? "");
+            return role !== "admin" && status === "activo";
+          })
+          .map((u: any) => ({
+            id: u.id,
+            user_name: u.user_name,
+            email: u.email,
+            role: u.role as Role,
+            status: normalizeState(u.status ?? u.state ?? ""),
+            person: u.person
+              ? {
+                  first_name: u.person.first_name,
+                  last_name: u.person.last_name,
+                }
+              : undefined,
+          }));
+
+        setUsers(mappedUsers);
+      } catch (error) {
+        console.error("Error al cargar usuarios:", error);
+        setAlertConfig({
+          title: "Error",
+          message: "No se pudieron cargar los usuarios",
+          type: "error"
+        });
+        setIsAlertOpen(true);
+      } finally {
+        setIsLoadingUsers(false);
+      }
+    };
+
+    fetchUsers();
+  }, []);
+
+  useEffect(() => {
+    const fetchShifts = async () => {
+      try {
+        setIsLoadingShifts(true);
+        const shiftsData = await getShifts();
+        const validShifts = Array.isArray(shiftsData) ? shiftsData : [];
+        setShifts(validShifts);
+      } catch (error) {
+        console.error("Error al cargar turnos:", error);
+        setAlertConfig({
+          title: "Error",
+          message: "No se pudieron cargar los turnos",
+          type: "error"
+        });
+        setIsAlertOpen(true);
+        setShifts([]); 
+      } finally {
+        setIsLoadingShifts(false);
+      }
+    };
+
+    fetchShifts();
+  }, [currentDate]); 
+
+  const activeUsers = users;
 
   const roleLabels: Record<Role, string> = {
     waiter: "Mesero",
@@ -95,31 +186,95 @@ const TurnosPage: React.FC = () => {
     if (existingIndex >= 0) {
       setSelectedAssignments(prev => prev.filter((_, i) => i !== existingIndex));
     } else {
+      const displayName = user.person 
+        ? `${user.person.first_name} ${user.person.last_name}` 
+        : user.user_name;
+      
       setSelectedAssignments(prev => [...prev, {
         userId: user.id,
-        userName: user.name,
+        userName: displayName,
         role: role
       }]);
     }
   };
 
-  const handleSaveAssignments = () => {
-    const dateStr = formatDate(selectedDate!);
-    const newShift: Shift = {
-      date: dateStr,
-      type: selectedShiftType!,
-      assignments: selectedAssignments
-    };
+  const handleSaveAssignments = async () => {
+    if (selectedAssignments.length < 2) {
+      setAlertConfig({
+        title: "Requisitos no cumplidos",
+        message: "Debes asignar al menos 2 usuarios por turno.",
+        type: "warning"
+      });
+      setIsAlertOpen(true);
+      return;
+    }
 
-    setShifts(prev => {
-      const filtered = prev.filter(s => !(s.date === dateStr && s.type === selectedShiftType));
-      return [...filtered, newShift];
-    });
+    const hasWaiter = selectedAssignments.some(a => a.role === "waiter");
+    if (!hasWaiter) {
+      setAlertConfig({
+        title: "Requisitos no cumplidos",
+        message: "Debes asignar al menos un usuario con rol de Mesero.",
+        type: "warning"
+      });
+      setIsAlertOpen(true);
+      return;
+    }
 
-    setIsAssignmentModalOpen(false);
-    setSelectedDate(null);
-    setSelectedShiftType(null);
-    setSelectedAssignments([]);
+    const hasCashOrKitchen = selectedAssignments.some(a => a.role === "cash" || a.role === "kitchen");
+    if (!hasCashOrKitchen) {
+      setAlertConfig({
+        title: "Requisitos no cumplidos",
+        message: "Debes asignar al menos un usuario con rol de Cajero o Cocina.",
+        type: "warning"
+      });
+      setIsAlertOpen(true);
+      return;
+    }
+
+    try {
+      setIsSaving(true);
+      const dateStr = formatDate(selectedDate!);
+      
+      const existingShift = shifts.find(s => s.date === dateStr && s.type === selectedShiftType);
+
+      const shiftData: Shift = {
+        date: dateStr,
+        type: selectedShiftType!,
+        assignments: selectedAssignments
+      };
+
+      if (existingShift && existingShift.id) {
+        await updateShift(existingShift.id, shiftData);
+      } else {
+        await createShift(shiftData);
+      }
+
+      const updatedShifts = await getShifts();
+      setShifts(updatedShifts);
+
+      setAlertConfig({
+        title: "Turno asignado",
+        message: "El turno se ha guardado exitosamente.",
+        type: "success"
+      });
+      setIsAlertOpen(true);
+
+      setIsAssignmentModalOpen(false);
+      setSelectedDate(null);
+      setSelectedShiftType(null);
+      setSelectedAssignments([]);
+
+    } catch (error: any) {
+      console.error("Error al guardar turno:", error);
+      setAlertConfig({
+        title: "Error",
+        message: error.message || "No se pudo guardar el turno",
+        type: "error"
+      });
+      setIsAlertOpen(true);
+    } finally {
+      setIsSaving(false);
+    }
   };
 
   const previousMonth = () => {
@@ -166,7 +321,6 @@ const TurnosPage: React.FC = () => {
     <div className={styles.TurnosPage}>
       <div className={styles.pageHeader}>
         <h1 className={styles.pageTitle}>Asignación de Turnos</h1>
-        <p className={styles.pageSubtitle}>Gestiona los turnos de trabajo de tu equipo</p>
       </div>
 
       <div className={styles.statsGrid}>
@@ -231,7 +385,13 @@ const TurnosPage: React.FC = () => {
         </div>
 
         <div className={styles.calendarGrid}>
-          {days}
+          {isLoadingShifts ? (
+            <div style={{ gridColumn: '1 / -1', textAlign: 'center', padding: '20px' }}>
+              Cargando turnos...
+            </div>
+          ) : (
+            days
+          )}
         </div>
       </div>
 
@@ -289,61 +449,87 @@ const TurnosPage: React.FC = () => {
             </div>
 
             <div className={styles.usersList}>
-              {activeUsers.map(user => {
-                const assignment = selectedAssignments.find(a => a.userId === user.id);
-                const isSelected = !!assignment;
-                
-                return (
-                  <div
-                    key={user.id}
-                    className={`${styles.userItem} ${isSelected ? styles.selected : ''}`}
-                    onClick={() => !isSelected && handleToggleAssignment(user, user.role)}
-                  >
-                    <div className={styles.userCheckbox}>
-                      {isSelected && <Check size={16} color="white" />}
+              {isLoadingUsers ? (
+                <div style={{ textAlign: 'center', padding: '20px' }}>
+                  Cargando usuarios...
+                </div>
+              ) : activeUsers.length === 0 ? (
+                <div style={{ textAlign: 'center', padding: '20px' }}>
+                  No hay usuarios activos disponibles
+                </div>
+              ) : (
+                activeUsers.map(user => {
+                  const assignment = selectedAssignments.find(a => a.userId === user.id);
+                  const isSelected = !!assignment;
+                  const displayName = user.person 
+                    ? `${user.person.first_name} ${user.person.last_name}` 
+                    : user.user_name;
+                  
+                  return (
+                    <div
+                      key={user.id}
+                      className={`${styles.userItem} ${isSelected ? styles.selected : ''}`}
+                      onClick={() => !isSelected && handleToggleAssignment(user, user.role)}
+                    >
+                      <div className={styles.userCheckbox}>
+                        {isSelected && <Check size={16} color="white" />}
+                      </div>
+                      <div className={styles.userInfo}>
+                        <div className={styles.userName}>{displayName}</div>
+                        <div className={styles.userEmail}>{user.email}</div>
+                      </div>
+                      {isSelected && (
+                        <select
+                          className={styles.roleSelect}
+                          value={assignment.role}
+                          onChange={(e) => {
+                            const newAssignments = selectedAssignments.map(a =>
+                              a.userId === user.id ? { ...a, role: e.target.value as Role } : a
+                            );
+                            setSelectedAssignments(newAssignments);
+                          }}
+                          onClick={(e) => e.stopPropagation()}
+                        >
+                          {Object.entries(roleLabels).map(([value, label]) => (
+                            <option key={value} value={value}>{label}</option>
+                          ))}
+                        </select>
+                      )}
                     </div>
-                    <div className={styles.userInfo}>
-                      <div className={styles.userName}>{user.name}</div>
-                      <div className={styles.userEmail}>{user.email}</div>
-                    </div>
-                    {isSelected && (
-                      <select
-                        className={styles.roleSelect}
-                        value={assignment.role}
-                        onChange={(e) => {
-                          const newAssignments = selectedAssignments.map(a =>
-                            a.userId === user.id ? { ...a, role: e.target.value as Role } : a
-                          );
-                          setSelectedAssignments(newAssignments);
-                        }}
-                        onClick={(e) => e.stopPropagation()}
-                      >
-                        {Object.entries(roleLabels).map(([value, label]) => (
-                          <option key={value} value={value}>{label}</option>
-                        ))}
-                      </select>
-                    )}
-                  </div>
-                );
-              })}
+                  );
+                })
+              )}
             </div>
 
             <div className={styles.modalActions}>
-              <button className={`${styles.button} ${styles.buttonSecondary}`} onClick={() => setIsAssignmentModalOpen(false)}>
+              <button 
+                className={`${styles.button} ${styles.buttonSecondary}`} 
+                onClick={() => setIsAssignmentModalOpen(false)}
+                disabled={isSaving}
+              >
                 Cancelar
               </button>
               <button 
                 className={`${styles.button} ${styles.buttonPrimary}`}
                 onClick={handleSaveAssignments}
-                disabled={selectedAssignments.length === 0}
+                disabled={selectedAssignments.length === 0 || isSaving}
               >
                 <Check size={20} />
-                Guardar Asignación ({selectedAssignments.length})
+                {isSaving ? 'Guardando...' : `Guardar Asignación (${selectedAssignments.length})`}
               </button>
             </div>
           </div>
         </div>
       )}
+
+      <AlertModal
+        isOpen={isAlertOpen}
+        onClose={() => setIsAlertOpen(false)}
+        title={alertConfig.title}
+        message={alertConfig.message}
+        type={alertConfig.type}
+        buttonText="Entendido"
+      />
     </div>
   );
 };
