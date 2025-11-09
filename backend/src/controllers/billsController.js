@@ -205,9 +205,19 @@ export async function createBill(req, res) {
 
     io.to("cash").emit("nuevaCuenta", newBillData);
     io.to("kitchen").emit("nuevaCuenta", newBillData);
+    io.to("waiter").emit("nuevaCuenta", newBillData);
+    io.to("waiter").emit("mesaActualizada", {
+      number: data.table,
+      current_bill_id: billRef.id,
+      status: "occupied",
+    });
 
     deleteCache("bills:all");
     deleteCache(`bill:${billRef.id}`);
+
+    deleteCache("tables:all");
+    deleteCache(`table:${data.table}`);
+
     return res.status(201).json({
       message: "Cuenta creada correctamente",
       id: billRef.id,
@@ -435,7 +445,15 @@ export async function hardDeleteBill(req, res) {
     const io = getIO();
     io.to("cash").emit("cuentaEliminada", { id });
     io.to("kitchen").emit("cuentaEliminada", { id });
+    io.to("waiter").emit("cuentaEliminada", { id });
 
+    if (tableNumber !== null) {
+      io.to("waiter").emit("mesaActualizada", {
+        number: tableNumber,
+        current_bill_id: null,
+        status: "free",
+      });
+    }
     
     await deleteCache("bills:all");
     await deleteCache(`bill:${id}`);
@@ -735,6 +753,13 @@ export async function closeBillIfEmpty(req, res) {
       const io = getIO();
       io.to("cash").emit("cuentaEliminada", { id });
       io.to("kitchen").emit("cuentaEliminada", { id });
+      io.to("waiter").emit("cuentaEliminada", { id });
+      io.to("waiter").emit("mesaActualizada", {
+        number: billData.table,
+        current_bill_id: null,
+        status: "free",
+      });
+      
       await deleteCache("tables:all");
       await deleteCache(`table:${billData.table}`);
       await deleteCache("bills:all");
