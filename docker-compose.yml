@@ -1,0 +1,28 @@
+version: '3.8'
+
+services:
+  redis:
+    image: redis:7-alpine
+    container_name: cafe-redis
+    restart: unless-stopped
+    ports:
+      - "127.0.0.1:6379:6379"  
+    volumes:
+      - redis-data:/data
+      - ./redis.conf:/usr/local/etc/redis/redis.conf
+    command: redis-server /usr/local/etc/redis/redis.conf
+    healthcheck:
+      test: ["CMD", "redis-cli", "-a", "cafe2025", "ping"]
+      interval: 10s
+      timeout: 3s
+      retries: 3
+    networks:
+      - cafe-network
+
+volumes:
+  redis-data:
+    driver: local
+
+networks:
+  cafe-network:
+    driver: bridge

@@ -1,35 +1,44 @@
 import { admin, db } from "../config/firebase.js";
 import { getResourceDoc } from "../services/resourceService.js";
+import { getOrSetCache, deleteCache, deleteCachePattern } from "../config/redis.js";
 
 export async function getProducts(req, res) {
   try {
-    const product = await db.collection("products").get();
+    const CACHE_KEY = "products:all";
+    const TTL = 3600; // 1 hora
 
-    if (product.empty) {
-      return res.json({ products: [] });
-    }
+    const products = await getOrSetCache(
+      CACHE_KEY,
+      async () => {
+        const productSnapshot = await db.collection("products").get();
 
-    const products = await Promise.all(
-      product.docs.map(async (doc) => {
-        const data = doc.data();
+        if (productSnapshot.empty) {
+          return [];
+        }
 
+        const products = productSnapshot.docs.map((doc) => {
+          const data = doc.data();
+          return {
+            id: doc.id,
+            name: data.name,
+            price: data.price,
+            status: data.status,
+            stock: data.stock,
+            type: data.type,
+          };
+        });
 
-        return {
-          id: doc.id,
-          name: data.name,
-          price: data.price,
-          status: data.status,
-          stock: data.stock,
-          type: data.type,
-        };
-      })
+        return products;
+      },
+      TTL
     );
 
     res.json({ products });
   } catch (err) {
-    res
-      .status(500)
-      .json({ error: "Error obteniendo productos", details: err.message });
+    res.status(500).json({
+      error: "Error obteniendo productos",
+      details: err.message,
+    });
   }
 }
 
@@ -57,6 +66,7 @@ export async function createProduct(req, res) {
         created_at: admin.firestore.FieldValue.serverTimestamp()
       });
 
+    await deleteCache("products:all");  
     res.status(201).json({
       message: "Producto creado correctamente"
     });
@@ -107,6 +117,10 @@ export async function updateProductById(req, res) {
     }
 
     await db.collection("products").doc(req.params.id).update(data);
+
+    await deleteCache("products:all");
+    await deleteCache(`product:${productId}`);
+
     res.status(200).json({ message: "Producto actualizado correctamente" });
   } catch (err) {
     res
@@ -132,6 +146,8 @@ export async function hardDeleteProduct(req, res) {
 
       // Eliminar el doc de products
       await productRef.delete();
+      await deleteCache("products:all");
+      await deleteCache(`product:${id}`);
     }else{
       return res.status(404).json({ error: "Producto no encontrado" });
     }
@@ -140,7 +156,7 @@ export async function hardDeleteProduct(req, res) {
       message: "Producto y datos relacionados eliminados correctamente",
     });
   } catch (err) {
-    // console.error("Error al eliminar producto:", err.message);
+    
     res.status(500).json({
       error: "Error al eliminar producto",
       details: err.message,
