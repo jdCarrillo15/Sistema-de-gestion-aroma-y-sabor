@@ -1,6 +1,6 @@
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
-// Interfaces para las respuestas individuales
+
 export interface Table {
     id: string;
     number: number;
@@ -82,9 +82,7 @@ export interface UserResponse {
     };
 }
 
-/**
- * Obtiene las estadísticas del dashboard desde el endpoint específico
- */
+/*
 export async function getDashboardStats(): Promise<DashboardStatsResponse> {
     try {
         const response = await fetch(`${API_BASE_URL}/dashboard/getstats`, {
@@ -106,10 +104,7 @@ export async function getDashboardStats(): Promise<DashboardStatsResponse> {
         throw error;
     }
 }
-
-/**
- * Obtiene todas las mesas
- */
+*/
 export async function getTables(): Promise<{ tables: Table[] }> {
     try {
         const res = await fetch(`${API_BASE_URL}/tables/getTables`, {
@@ -283,14 +278,14 @@ export async function calculateDashboardStats(): Promise<DashboardStatsResponse>
         let totalTables = 0;
         if (tablesResult.status === "fulfilled") {
             const tablesData = tablesResult.value;
-            console.log("🔍 tablesData:", tablesData);
+            console.log("tablesData:", tablesData);
             const tables = Array.isArray(tablesData) ? tablesData : (tablesData?.tables || []);
-            console.log("📊 Array de tables:", tables);
+            console.log("Array de tables:", tables);
             totalTables = tables.length;
-            console.log("✅ Total mesas:", totalTables);
+            console.log("Total mesas:", totalTables);
         } else {
-            console.error("❌ Error obteniendo mesas:", tablesResult.reason);
-            console.warn("⚠️ Continuando con totalTables = 0");
+            console.error("Error obteniendo mesas:", tablesResult.reason);
+            console.warn("Continuando con totalTables = 0");
         }
 
         let totalProducts = 0;
@@ -298,10 +293,10 @@ export async function calculateDashboardStats(): Promise<DashboardStatsResponse>
             const productsData = productsResult.value;
             const products = Array.isArray(productsData) ? productsData : (productsData?.products || []);
             totalProducts = products.length;
-            console.log("✅ Total productos:", totalProducts);
+            console.log("Total productos:", totalProducts);
         } else {
-            console.error("❌ Error obteniendo productos:", productsResult.reason);
-            console.warn("⚠️ Continuando con totalProducts = 0");
+            console.error(" Error obteniendo productos:", productsResult.reason);
+            console.warn(" Continuando con totalProducts = 0");
         }
 
         let totalUsers = 0;
@@ -309,19 +304,19 @@ export async function calculateDashboardStats(): Promise<DashboardStatsResponse>
             const usersData = usersResult.value;
             const users = Array.isArray(usersData) ? usersData : (usersData?.users || []);
             totalUsers = users.length;
-            console.log("✅ Total usuarios:", totalUsers);
+            console.log("Total usuarios:", totalUsers);
         } else {
-            console.error("❌ Error obteniendo usuarios:", usersResult.reason);
-            console.warn("⚠️ Continuando con totalUsers = 0");
+            console.error("Error obteniendo usuarios:", usersResult.reason);
+            console.warn(" Continuando con totalUsers = 0");
         }
 
         let totalSalesToday = 0;
         if (salesResult.status === "fulfilled") {
             totalSalesToday = salesResult.value || 0;
-            console.log("✅ Ventas del día:", totalSalesToday);
+            console.log(" Ventas del día:", totalSalesToday);
         } else {
-            console.error("❌ Error obteniendo ventas:", salesResult.reason);
-            console.warn("⚠️ Continuando con totalSalesToday = 0");
+            console.error("Error obteniendo ventas:", salesResult.reason);
+            console.warn("Continuando con totalSalesToday = 0");
         }
 
         const stats = {
@@ -331,7 +326,7 @@ export async function calculateDashboardStats(): Promise<DashboardStatsResponse>
             totalTables,
         };
 
-        console.log("=== ✨ Estadísticas calculadas ===", stats);
+        console.log("=== Estadísticas calculadas ===", stats);
         return stats;
     } catch (error) {
         console.error("Error in calculateDashboardStats service:", error);
@@ -344,23 +339,21 @@ export async function calculateDashboardStats(): Promise<DashboardStatsResponse>
  */
 export async function getDashboardStatsWithFallback(): Promise<DashboardStatsResponse> {
     try {
-        console.log("Intentando obtener estadísticas desde endpoint principal...");
-        return await getDashboardStats();
+        
+        const stats = await calculateDashboardStats();
+        return stats;
+        
     } catch (error) {
-        console.warn("Endpoint principal falló, calculando estadísticas desde servicios individuales:", error);
-
-        try {
-            return await calculateDashboardStats();
-        } catch (fallbackError) {
-            console.error("Error en fallback de estadísticas:", fallbackError);
-
-            return {
-                totalProducts: 0,
-                totalUsers: 0,
-                totalSalesToday: 0,
-                totalTables: 0,
-            };
-        }
+        console.error("Error obteniendo estadísticas:", error);
+        
+        
+        console.warn("Retornando valores por defecto");
+        return {
+            totalProducts: 0,
+            totalUsers: 0,
+            totalSalesToday: 0,
+            totalTables: 0,
+        };
     }
 }
 
