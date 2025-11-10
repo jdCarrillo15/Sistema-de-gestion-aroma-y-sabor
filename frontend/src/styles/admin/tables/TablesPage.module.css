@@ -36,6 +36,60 @@
   padding: 0 4px;
 }
 
+
+/*Carta de inicio*/
+.statCard {
+  background: #fff;
+  border-radius: 16px;
+  padding: 1.75rem;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.06);
+  transition: all 0.3s ease;
+  border: 1px solid #f3f4f6;
+}
+
+.statCard:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+}
+
+.statLeft {
+  display: flex;
+  align-items: center;
+  gap: 1.25rem;
+}
+
+.statIcon {
+  width: 56px;
+  height: 56px;
+  border-radius: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  transition: all 0.3s ease;
+  background: linear-gradient(135deg, #ffea00 0%, #FF8C00 100%);
+  color: white;
+  box-shadow: 0 4px 12px rgba(245, 158, 11, 0.2);
+}
+
+.statCard:hover .statIcon {
+  transform: scale(1.1) rotate(5deg);
+}
+
+.statValue {
+  font-size: clamp(1.5rem, 3vw, 2rem);
+  font-weight: 700;
+  color: #111827;
+  line-height: 1.2;
+}
+
+.statLabel {
+  font-size: 0.875rem;
+  color: #6b7280;
+  margin-top: 0.35rem;
+  font-weight: 500;
+}
+
 /* Tarjeta mejorada */
 .productCard {
   background: #ffffff;
@@ -96,24 +150,26 @@
 
 /* Estado mejorado */
 .productStatus {
+ display: inline-block;
   padding: 6px 14px;
   border-radius: 20px;
-  font-size: 11px;
   font-weight: 600;
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
-  flex-shrink: 0;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  font-size: 0.8rem;
+  text-align: center;
+  min-width: 90px;
+  transition: all 0.3s ease;
 }
 
 .statusActive {
-  background: linear-gradient(135deg, #10b981, #059669);
-  color: white;
+  background: linear-gradient(135deg, #d4f8dc 0%, #c6f6d5 100%);
+  color: #1b7a2f;
+  box-shadow: 0 2px 8px rgba(27, 122, 47, 0.2);
 }
 
 .statusInactive {
-  background: linear-gradient(135deg, #ef4444, #dc2626);
-  color: white;
+  background: linear-gradient(135deg, #fee2e2 0%, #fecaca 100%);
+  color: #a71d2a;
+  box-shadow: 0 2px 8px rgba(167, 29, 42, 0.2);
 }
 
 /* Cuerpo */
@@ -157,34 +213,27 @@
   justify-content: center;
 }
 
-.productActions :global(.btn-icon.ver) {
-  color: #3b82f6;
-}
 
 .productActions :global(.btn-icon.ver):hover {
   background: linear-gradient(135deg, #dbeafe, #bfdbfe);
   border-color: #3b82f6;
   transform: translateY(-2px) scale(1.05);
+  color: #3b82f6;
   box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
 }
 
-.productActions :global(.btn-icon.editar) {
-  color: #f59e0b;
-}
 
 .productActions :global(.btn-icon.editar):hover {
   background: linear-gradient(135deg, #fef3c7, #fde68a);
+  color: #f59e0b;
   border-color: #f59e0b;
   transform: translateY(-2px) scale(1.05);
   box-shadow: 0 4px 12px rgba(245, 158, 11, 0.3);
 }
 
-.productActions :global(.btn-icon.eliminar) {
-  color: #ef4444;
-}
-
 .productActions :global(.btn-icon.eliminar):hover {
   background: linear-gradient(135deg, #fee2e2, #fecaca);
+  color: #ef4444;
   border-color: #ef4444;
   transform: translateY(-2px) scale(1.05);
   box-shadow: 0 4px 12px rgba(239, 68, 68, 0.3);

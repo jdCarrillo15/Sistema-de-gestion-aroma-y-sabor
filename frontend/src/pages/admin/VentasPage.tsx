@@ -3,9 +3,9 @@ import { DollarSign, Clock, Package, AlertCircle } from "lucide-react";
 import { getShifts, type Shift } from "../../services/admin/shiftService";
 import { getUsers } from "../../services/admin/userService";
 import AlertModal from "../../components/common/AlertModal";
-import styles from "../../styles/admin/VentasPage.module.css";
 import Button from "../../components/common/Button";
-
+import styles from "../../styles/admin/VentasPage.module.css";
+import modalStyles from "../../styles/admin/users/CreateUserModal.module.css";
 
 const VentasPage: React.FC = () => {
   const [shifts, setShifts] = useState<Shift[]>([]);
@@ -15,7 +15,6 @@ const VentasPage: React.FC = () => {
   const [isAlertOpen, setIsAlertOpen] = useState(false);
   const [alertMessage, setAlertMessage] = useState("");
   const [selectedShift, setSelectedShift] = useState<Shift | null>(null);
-
 
   useEffect(() => {
     loadShifts();
@@ -31,7 +30,6 @@ const VentasPage: React.FC = () => {
 
       const shiftsData = shiftsResponse.shifts || [];
       setShifts(shiftsData);
-
 
       const usersData = usersResponse.users || [];
       const usersMap: Record<string, string> = {};
@@ -49,7 +47,6 @@ const VentasPage: React.FC = () => {
     }
   };
 
-  // Calcular estadísticas
   const filteredShifts = selectedUserId === "all"
     ? shifts
     : shifts.filter(shift => shift.user_id === selectedUserId);
@@ -61,15 +58,12 @@ const VentasPage: React.FC = () => {
     try {
       let date: Date;
 
-
       if (dateString && typeof dateString === 'object' && '_seconds' in dateString) {
         date = new Date(dateString._seconds * 1000);
       }
-
       else if (typeof dateString === 'string') {
         date = new Date(dateString);
       }
-      // Si ya es una fecha
       else if (dateString instanceof Date) {
         date = dateString;
       }
@@ -93,14 +87,24 @@ const VentasPage: React.FC = () => {
     }
   };
 
-  // Formatear moneda
   const formatCurrency = (amount: number) => {
     return `$${amount.toLocaleString("es-ES")}`;
   };
 
-  // Mostrar detalles del turno
   const handleViewDetails = (shift: Shift) => {
     setSelectedShift(shift);
+  };
+
+  const handleKeyDown = (e: React.KeyboardEvent) => {
+    if (e.key === "Escape") {
+      setSelectedShift(null);
+    }
+  };
+
+  const handleBackdropClick = (e: React.MouseEvent<HTMLDivElement>) => {
+    if (e.target === e.currentTarget) {
+      setSelectedShift(null);
+    }
   };
 
   return (
@@ -128,7 +132,6 @@ const VentasPage: React.FC = () => {
         </div>
       </div>
 
-      {/* Estadísticas */}
       <div className={styles.statsGrid}>
         <div className={styles.statCard}>
           <div className={styles.statLeft}>
@@ -206,72 +209,120 @@ const VentasPage: React.FC = () => {
 
       {/* Modal de detalles del turno */}
       {selectedShift && (
-        <div className={styles.modalBackdrop} onClick={() => setSelectedShift(null)}>
-          <div className={styles.modalContainer} onClick={(e) => e.stopPropagation()}>
-            <div className={styles.modalContent}>
-              <div className={styles.modalHeader}>
+        <div
+          className={modalStyles.modalBackdrop}
+          onClick={handleBackdropClick}
+          onKeyDown={handleKeyDown}
+          tabIndex={-1}
+        >
+          <div className={modalStyles.modalContainer}>
+            <div className={modalStyles.modalContent}>
+              <div className={modalStyles.modalHeader}>
+                <div></div>
                 <button
-                  className={styles.closeButton}
+                  className={modalStyles.closeButton}
                   onClick={() => setSelectedShift(null)}
                   aria-label="Cerrar"
+                  type="button"
                 >
-                  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                  <svg
+                    width="20"
+                    height="20"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  >
                     <line x1="18" y1="6" x2="6" y2="18"></line>
                     <line x1="6" y1="6" x2="18" y2="18"></line>
                   </svg>
                 </button>
               </div>
 
-              <div className={styles.modalIcon}>
-                <DollarSign size={64} />
+              <div className={modalStyles.modalIcon}>
+                <svg
+                  width="80"
+                  height="80"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="1.5"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                >
+                  <line x1="12" y1="1" x2="12" y2="23"></line>
+                  <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path>
+                </svg>
               </div>
 
-              <h2 className={styles.modalTitle}>Detalles del Turno</h2>
-              <p className={styles.modalDescription}>
+              <h2 className={modalStyles.modalTitle}>Detalles del Turno</h2>
+              <p className={modalStyles.modalDescription}>
                 Información detallada sobre el turno seleccionado
               </p>
 
-              <div className={styles.shiftDetails}>
-                <div className={styles.detailRow}>
-                  <span className={styles.detailLabel}>Usuario:</span>
-                  <span className={styles.detailValue}>{users[selectedShift.user_id] || "Sin asignar"}</span>
+              <div className={modalStyles.modalForm}>
+                <div className={modalStyles.formGroup}>
+                  <label className={modalStyles.formLabel}>Usuario</label>
+                  <div className={modalStyles.formInput} style={{ backgroundColor: '#F5F5F5', cursor: 'default' }}>
+                    {users[selectedShift.user_id] || "Sin asignar"}
+                  </div>
                 </div>
-                <div className={styles.detailRow}>
-                  <span className={styles.detailLabel}>Fecha Inicio:</span>
-                  <span className={styles.detailValue}>{formatDate(selectedShift.started_at)}</span>
+
+                <div className={modalStyles.formGroup}>
+                  <label className={modalStyles.formLabel}>Fecha Inicio</label>
+                  <div className={modalStyles.formInput} style={{ backgroundColor: '#F5F5F5', cursor: 'default' }}>
+                    {formatDate(selectedShift.started_at)}
+                  </div>
                 </div>
+
                 {selectedShift.finished_at && (
-                  <div className={styles.detailRow}>
-                    <span className={styles.detailLabel}>Fecha Fin:</span>
-                    <span className={styles.detailValue}>{formatDate(selectedShift.finished_at)}</span>
+                  <div className={modalStyles.formGroup}>
+                    <label className={modalStyles.formLabel}>Fecha Fin</label>
+                    <div className={modalStyles.formInput} style={{ backgroundColor: '#F5F5F5', cursor: 'default' }}>
+                      {formatDate(selectedShift.finished_at)}
+                    </div>
                   </div>
                 )}
-                <div className={styles.detailRow}>
-                  <span className={styles.detailLabel}>Total Cuentas:</span>
-                  <span className={styles.detailValue}>{selectedShift.total_bills}</span>
+
+                <div className={modalStyles.formGroup}>
+                  <label className={modalStyles.formLabel}>Total Cuentas</label>
+                  <div className={modalStyles.formInput} style={{ backgroundColor: '#F5F5F5', cursor: 'default' }}>
+                    {selectedShift.total_bills}
+                  </div>
                 </div>
-                <div className={styles.detailRow}>
-                  <span className={styles.detailLabel}>Total Ventas:</span>
-                  <span className={`${styles.detailValue} ${styles.ventasHighlight}`}>
+
+                <div className={modalStyles.formGroup}>
+                  <label className={modalStyles.formLabel}>Total Ventas</label>
+                  <div className={modalStyles.formInput} style={{ backgroundColor: '#F5F5F5', cursor: 'default', fontWeight: '600', color: '#059669' }}>
                     {formatCurrency(selectedShift.total_sales)}
-                  </span>
+                  </div>
                 </div>
 
                 {Object.keys(selectedShift.products_summary).length > 0 && (
                   <>
-                    <div className={styles.detailDivider}>
-                      <h3>Resumen de Productos</h3>
-                    </div>
-                    <div className={styles.productsSummary}>
-                      {Object.entries(selectedShift.products_summary).map(([productName, quantity]) => (
-                        <div key={productName} className={styles.productSummaryRow}>
-                          <span className={styles.productName}>{productName}</span>
-                          <span className={styles.productQuantity}>x{quantity}</span>
-                        </div>
-                      ))}
+                    <div className={modalStyles.formGroup} style={{ marginTop: '1rem' }}>
+                      <label className={modalStyles.formLabel} style={{ fontSize: '1rem', marginBottom: '0.75rem' }}>
+                        Resumen de Productos
+                      </label>
+                      <div className={styles.productsSummaryContainer}>
+                        {Object.entries(selectedShift.products_summary).map(([productName, quantity]) => (
+                          <div key={productName} className={styles.productSummaryItem}>
+                            <span className={styles.productName}>{productName}</span>
+                            <span className={styles.productQuantity}>x{quantity}</span>
+                          </div>
+                        ))}
+                      </div>
                     </div>
                   </>
                 )}
+              </div>
+
+              <div className={modalStyles.modalButtons}>
+                <Button type="button" variant="primary" onClick={() => setSelectedShift(null)}>
+                  Cerrar
+                </Button>
               </div>
             </div>
           </div>

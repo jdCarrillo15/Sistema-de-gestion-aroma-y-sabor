@@ -36,8 +36,6 @@ const ViewUserModal: React.FC<ViewUserModalProps> = ({
     }
   };
 
-  if (!isOpen || !user) return null;
-
   const getFormattedState = (status: string) => {
     if (!status) return "No especificado";
     const lowerState = status.toLowerCase();
@@ -90,7 +88,7 @@ const ViewUserModal: React.FC<ViewUserModalProps> = ({
     return roleMap[role.toLowerCase()] || role;
   };
 
-  const isActive = user.status?.toLowerCase() === "activo" || user.status?.toLowerCase() === "active";
+  if (!isOpen || !user) return null;
 
   return (
     <div
@@ -146,77 +144,76 @@ const ViewUserModal: React.FC<ViewUserModalProps> = ({
             Detalles completos del usuario seleccionado.
           </p>
 
-          <div className={styles.userDetails}>
-            <div className={styles.detailsSection}>
-              <h3 className={styles.sectionTitle}>Datos de Usuario</h3>
-
-              <div className={styles.detailRow}>
-                <span className={styles.detailLabel}>Nombre de usuario:</span>
-                <span className={styles.detailValue}>{user.user_name || "No especificado"}</span>
+          <div className={styles.modalForm}>
+            <div className={styles.formGroup}>
+              <label className={styles.formLabel}>Nombre de usuario</label>
+              <div className={styles.formInput} style={{ backgroundColor: '#F5F5F5', cursor: 'default' }}>
+                {user.user_name || "No especificado"}
               </div>
+            </div>
 
-              <div className={styles.detailRow}>
-                <span className={styles.detailLabel}>Correo electrónico:</span>
-                <span className={styles.detailValue}>{user.email || "No especificado"}</span>
+            <div className={styles.formGroup}>
+              <label className={styles.formLabel}>Correo electrónico</label>
+              <div className={styles.formInput} style={{ backgroundColor: '#F5F5F5', cursor: 'default' }}>
+                {user.email || "No especificado"}
               </div>
+            </div>
 
-              <div className={styles.detailRow}>
-                <span className={styles.detailLabel}>Rol:</span>
-                <span className={styles.detailValue}>{getFormattedRole(user.role)}</span>
+            <div className={styles.formGroup}>
+              <label className={styles.formLabel}>Rol</label>
+              <div className={styles.formInput} style={{ backgroundColor: '#F5F5F5', cursor: 'default' }}>
+                {getFormattedRole(user.role)}
               </div>
+            </div>
 
-              <div className={styles.detailRow}>
-                <span className={styles.detailLabel}>Estado:</span>
-                <span className={`${styles.detailValue} ${styles.statusBadge} ${isActive ? styles.statusActive : styles.statusInactive}`}>
-                  {getFormattedState(user.status)}
-                </span>
+            <div className={styles.formGroup}>
+              <label className={styles.formLabel}>Estado</label>
+              <div className={styles.formInput} style={{ backgroundColor: '#F5F5F5', cursor: 'default' }}>
+                {getFormattedState(user.status)}
               </div>
+            </div>
 
-              <div className={styles.detailRow}>
-                <span className={styles.detailLabel}>Fecha de registro:</span>
-                <span className={styles.detailValue}>{formatDate(user.created_at)}</span>
+            <div className={styles.formGroup}>
+              <label className={styles.formLabel}>Fecha de registro</label>
+              <div className={styles.formInput} style={{ backgroundColor: '#F5F5F5', cursor: 'default' }}>
+                {formatDate(user.created_at)}
               </div>
             </div>
 
             {user.person && (
-              <div className={styles.detailsSection}>
-                <h3 className={styles.sectionTitle}>Información Personal</h3>
-                
-                <div className={styles.detailRow}>
-                  <span className={styles.detailLabel}>Nombre completo:</span>
-                  <span className={styles.detailValue}>
-                    {user.person.first_name && user.person.last_name
-                      ? `${user.person.first_name} ${user.person.last_name}`
-                      : "No especificado"
-                    }
-                  </span>
+              <>
+                <div className={styles.formGroup}>
+                  <label className={styles.formLabel}>Nombre</label>
+                  <div className={styles.formInput} style={{ backgroundColor: '#F5F5F5', cursor: 'default' }}>
+                    {user.person.first_name || "No especificado"}
+                  </div>
                 </div>
 
-                <div className={styles.detailRow}>
-                  <span className={styles.detailLabel}>Nombre:</span>
-                  <span className={styles.detailValue}>{user.person.first_name || "No especificado"}</span>
+                <div className={styles.formGroup}>
+                  <label className={styles.formLabel}>Apellido</label>
+                  <div className={styles.formInput} style={{ backgroundColor: '#F5F5F5', cursor: 'default' }}>
+                    {user.person.last_name || "No especificado"}
+                  </div>
                 </div>
 
-                <div className={styles.detailRow}>
-                  <span className={styles.detailLabel}>Apellido:</span>
-                  <span className={styles.detailValue}>{user.person.last_name || "No especificado"}</span>
+                <div className={styles.formGroup}>
+                  <label className={styles.formLabel}>Documento</label>
+                  <div className={styles.formInput} style={{ backgroundColor: '#F5F5F5', cursor: 'default' }}>
+                    {user.person.document_id || "No especificado"}
+                  </div>
                 </div>
 
-                <div className={styles.detailRow}>
-                  <span className={styles.detailLabel}>Documento:</span>
-                  <span className={styles.detailValue}>{user.person.document_id || "No especificado"}</span>
+                <div className={styles.formGroup}>
+                  <label className={styles.formLabel}>Fecha de nacimiento</label>
+                  <div className={styles.formInput} style={{ backgroundColor: '#F5F5F5', cursor: 'default' }}>
+                    {formatBirthdate(user.person.birthdate)}
+                  </div>
                 </div>
-
-                <div className={styles.detailRow}>
-                  <span className={styles.detailLabel}>Fecha de nacimiento:</span>
-                  <span className={styles.detailValue}>{formatBirthdate(user.person.birthdate)}</span>
-                </div>
-              </div>
+              </>
             )}
 
             {!user.person && (
-              <div className={styles.detailsSection}>
-                <h3 className={styles.sectionTitle}>Información Personal</h3>
+              <div className={styles.formGroup}>
                 <div className={styles.noData}>
                   <p>No hay información personal registrada para este usuario.</p>
                 </div>

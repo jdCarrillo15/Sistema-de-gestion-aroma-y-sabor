@@ -125,8 +125,8 @@ const ViewUserModal: React.FC<ViewUserModalProps> = ({
 
           <div className={styles.modalIcon}>
             <svg
-              width="48"
-              height="48"
+              width="80"
+              height="80"
               viewBox="0 0 24 24"
               fill="none"
               stroke="currentColor"

@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import Button from "../../common/Button";
 import ConfirmModal from "./../ConfirmModal";
-import styles from "../../../styles/admin/tables/EditTableModal.module.css";
+import styles from "../../../styles/admin/users/CreateUserModal.module.css";
 
 interface EditTableModalProps {
   isOpen: boolean;
@@ -81,6 +81,12 @@ const EditTableModal: React.FC<EditTableModalProps> = ({
     }
   };
 
+  const handleBackdropClick = (e: React.MouseEvent<HTMLDivElement>) => {
+    if (e.target === e.currentTarget && !isSubmitting) {
+      onClose();
+    }
+  };
+
   const confirmUpdate = async () => {
     setIsSubmitting(true);
     try {
@@ -127,25 +133,30 @@ const EditTableModal: React.FC<EditTableModalProps> = ({
     <>
       <div
         className={styles.modalBackdrop}
+        onClick={handleBackdropClick}
         onKeyDown={handleKeyDown}
         tabIndex={-1}
       >
         <div className={styles.modalContainer}>
           <div className={styles.modalContent}>
             <div className={styles.modalHeader}>
+              <div></div>
               <button
                 className={styles.closeButton}
                 onClick={onClose}
                 aria-label="Cerrar"
+                type="button"
                 disabled={isSubmitting}
               >
                 <svg
-                  width="24"
-                  height="24"
+                  width="20"
+                  height="20"
                   viewBox="0 0 24 24"
                   fill="none"
                   stroke="currentColor"
                   strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
                 >
                   <line x1="18" y1="6" x2="6" y2="18"></line>
                   <line x1="6" y1="6" x2="18" y2="18"></line>
@@ -155,12 +166,14 @@ const EditTableModal: React.FC<EditTableModalProps> = ({
 
             <div className={styles.modalIcon}>
               <svg
-                width="64"
-                height="64"
+                width="80"
+                height="80"
                 viewBox="0 0 24 24"
                 fill="none"
                 stroke="currentColor"
                 strokeWidth="1.5"
+                strokeLinecap="round"
+                strokeLinejoin="round"
               >
                 <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7" />
                 <path d="m18.5 2.5 a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z" />
@@ -174,7 +187,9 @@ const EditTableModal: React.FC<EditTableModalProps> = ({
 
             <form onSubmit={handleSubmit} className={styles.modalForm}>
               <div className={styles.formGroup}>
-                <label htmlFor="number" className={styles.formLabel}>Número de mesa *</label>
+                <label htmlFor="number" className={styles.formLabel}>
+                  Número de mesa
+                </label>
                 <input
                   type="text"
                   id="number"
@@ -190,7 +205,9 @@ const EditTableModal: React.FC<EditTableModalProps> = ({
               </div>
 
               <div className={styles.formGroup}>
-                <label htmlFor="capacity" className={styles.formLabel}>Capacidad *</label>
+                <label htmlFor="capacity" className={styles.formLabel}>
+                  Capacidad (personas)
+                </label>
                 <input
                   type="text"
                   id="capacity"

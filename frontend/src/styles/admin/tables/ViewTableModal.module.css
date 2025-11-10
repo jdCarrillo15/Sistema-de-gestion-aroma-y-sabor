@@ -1,184 +1,457 @@
+/* Backdrop */
 .modalBackdrop {
   position: fixed;
   top: 0;
   left: 0;
   right: 0;
   bottom: 0;
-  background: rgba(0, 0, 0, 0.5);
+  background: rgba(0, 0, 0, 0.3);
+  backdrop-filter: blur(8px);
   display: flex;
   align-items: center;
   justify-content: center;
-  z-index: 1000;
-  padding: 1rem;
+  z-index: 10000;
+  animation: modalFadeIn 0.3s ease-out;
+  padding: 20px;
 }
 
+@keyframes modalFadeIn {
+  from {
+    opacity: 0;
+    backdrop-filter: blur(0px);
+  }
+  to {
+    opacity: 1;
+    backdrop-filter: blur(8px);
+  }
+}
+
+/* Container */
 .modalContainer {
-  background: white;
-  border-radius: 12px;
-  width: 100%;
+  position: relative;
   max-width: 500px;
+  width: 100%;
+  animation: modalSlideIn 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
   max-height: 90vh;
   overflow-y: auto;
-  position: relative;
-  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
 }
 
+@keyframes modalSlideIn {
+  from {
+    transform: translateY(-50px) scale(0.9);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0) scale(1);
+    opacity: 1;
+  }
+}
+
+/* Content */
 .modalContent {
-  padding: 2rem;
+  background: white;
+  border-radius: 20px;
+  box-shadow: 
+    0 25px 50px -12px rgba(0, 0, 0, 0.25),
+    0 0 0 1px rgba(255, 255, 255, 0.1),
+    inset 0 1px 0 rgba(255, 255, 255, 0.1);
+  padding: 32px;
+  position: relative;
+  overflow: hidden;
 }
 
-/* Header del modal */
+/* Barra superior decorativa */
+.modalContent::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 4px;
+  background: linear-gradient(90deg, #8B4513, #D2691E, #FF8C00);
+  background-size: 200% 100%;
+  animation: modalShimmer 3s ease-in-out infinite;
+}
+
+@keyframes modalShimmer {
+  0%, 100% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+}
+
+/* Header */
 .modalHeader {
   display: flex;
   justify-content: flex-end;
-  margin-bottom: 1rem;
+  margin-bottom: 16px;
 }
+
 
 .closeButton {
   background: none;
   border: none;
-  padding: 4px;
+  color: #A0A0A0;
   cursor: pointer;
-  border-radius: 4px;
-  color: #6b7280;
+  padding: 8px;
+  border-radius: 8px;
   transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .closeButton:hover {
-  background: #f3f4f6;
-  color: #374151;
+  background: #F5F5F5;
+  color: #8B4513;
+  transform: rotate(90deg);
 }
 
-/* Icono del modal */
+.icon {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 24px;
+  animation: alertPulse 2s ease-in-out infinite;
+}
+
+
+.icon {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 24px;
+  animation: alertPulse 2s ease-in-out infinite;
+}
+
+/* Icon */
 .modalIcon {
   display: flex;
   justify-content: center;
-  margin-bottom: 1rem;
-  color: #D2691E;
+  margin-bottom: 24px;
+  animation: modalPulse 2s ease-in-out infinite;
 }
 
-/* Título y descripción */
+@keyframes modalPulse {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.05); }
+}
+
+.modalIcon svg {
+  padding: 16px;
+  border-radius: 20px;
+  color: #8B4513;
+  background: linear-gradient(135deg, #FFF3E0, #FFE0B2);
+  box-shadow: 0 8px 20px rgba(139, 69, 19, 0.2);
+}
+
+/* Title */
 .modalTitle {
-  font-size: 1.5rem;
+  color: #2C2C2C;
+  font-size: 24px;
   font-weight: 700;
+  margin: 0 0 8px 0;
+  letter-spacing: -0.025em;
   text-align: center;
-  color: #111827;
-  margin: 0 0 0.5rem 0;
 }
 
+/* Description */
 .modalDescription {
+  color: #666;
+  font-size: 14px;
+  line-height: 1.6;
+  margin: 0 0 24px 0;
   text-align: center;
-  color: #6b7280;
-  margin: 0 0 2rem 0;
-  font-size: 14px;
-  line-height: 1.5;
 }
 
-/* Detalles de la tabla */
-.tableDetails {
-  margin-top: 1.5rem;
-  border: 1px solid #e5e7eb;
-  border-radius: 8px;
-  overflow: hidden;
-}
-
-.detailRow {
+/* Form */
+.modalForm {
   display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 14px 16px;
-  border-bottom: 1px solid #f3f4f6;
-  background: white;
-  transition: background-color 0.2s ease;
+  flex-direction: column;
+  gap: 20px;
 }
 
-.detailRow:hover {
-  background: #f9fafb;
+.formGroup {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
 }
 
-.detailRow:last-child {
-  border-bottom: none;
-}
-
-.detailLabel {
-  font-weight: 500;
-  color: #374151;
+.formLabel {
+  color: #4a4a4a;
   font-size: 14px;
+  font-weight: 600;
+  letter-spacing: 0.01em;
 }
 
-.detailValue {
-  color: #111827;
-  font-weight: 400;
-  text-align: right;
-  max-width: 60%;
-  word-break: break-word;
+.formInput {
+  width: 100%;
+  padding: 12px 16px;
+  border: 2px solid #E8E8E8;
+  border-radius: 12px;
+  font-size: 15px;
+  outline: none;
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  background-color: #FAFAFA;
+  color: #333;
+  font-family: inherit;
+  box-sizing: border-box;
 }
 
-/* Badge de estado */
-.statusBadge {
-  padding: 4px 12px;
-  border-radius: 16px;
-  font-size: 12px;
-  font-weight: 500;
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
+.formInput::placeholder {
+  color: #999;
 }
 
-.statusBadge.free {
-  background: #d1fae5;
-  color: #065f46;
+.formInput:focus {
+  border-color: #D2691E;
+  box-shadow: 0 0 0 4px rgba(210, 105, 30, 0.1);
+  background-color: #FFFFFF;
+  transform: translateY(-1px);
 }
 
-.statusBadge.occupied {
-  background: #fee2e2;
-  color: #991b1b;
+.formInput.error {
+  border-color: #F44336;
+  box-shadow: 0 0 0 4px rgba(244, 67, 54, 0.1);
 }
 
-/* Responsive */
-@media (max-width: 768px) {
+/* Select dropdown */
+select.formInput {
+  cursor: pointer;
+  appearance: none;
+  background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23666' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6,9 12,15 18,9'%3e%3c/polyline%3e%3c/svg%3e");
+  background-repeat: no-repeat;
+  background-position: right 12px center;
+  background-size: 16px;
+  padding-right: 40px;
+}
+
+select.formInput option {
+  background-color: #ffffff;
+  color: #333;
+  padding: 8px;
+}
+
+/* Date input */
+input[type="date"].formInput {
+  color-scheme: light;
+}
+
+/* Password input */
+input[type="password"].formInput {
+  font-family: text-security-disc;
+}
+
+/* Error message */
+.errorMessage {
+  color: #F44336;
+  font-size: 13px;
+  margin-top: 4px;
+  display: block;
+}
+
+/* Buttons */
+.modalButtons {
+  display: flex;
+  gap: 12px;
+  justify-content: center;
+  margin-top: 8px;
+}
+
+.modalButtons button {
+  min-width: 140px;
+  padding: 12px 24px;
+  font-size: 15px;
+  font-weight: 600;
+  border-radius: 12px;
+  transition: all 0.2s ease;
+  cursor: pointer;
+  border: none;
+  flex: none;
+}
+
+.modalButtons button[variant="primary"] {
+  background: linear-gradient(135deg, #8B4513, #D2691E);
+  color: white;
+  box-shadow: 0 4px 12px rgba(139, 69, 19, 0.2);
+}
+
+.modalButtons button[variant="primary"]:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(139, 69, 19, 0.3);
+}
+
+.modalButtons button[variant="primary"]:active {
+  transform: translateY(0);
+}
+
+.modalButtons button[variant="secondary"] {
+  background: #F5F5F5;
+  color: #666;
+  border: 2px solid #E8E8E8;
+}
+
+.modalButtons button[variant="secondary"]:hover {
+  background: #EBEBEB;
+  border-color: #D2D2D2;
+}
+
+/* Scrollbar */
+.modalContainer::-webkit-scrollbar {
+  width: 8px;
+}
+
+.modalContainer::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.modalContainer::-webkit-scrollbar-thumb {
+  background: #D2D2D2;
+  border-radius: 10px;
+}
+
+.modalContainer::-webkit-scrollbar-thumb:hover {
+  background: #B8B8B8;
+}
+
+/* Responsive - Mobile */
+@media (max-width: 480px) {
   .modalBackdrop {
-    padding: 0.5rem;
+    padding: 16px;
   }
 
-  .modalContent {
-    padding: 1.5rem;
-  }
-
-  .modalTitle {
-    font-size: 1.25rem;
-  }
-
-  .detailRow {
-    padding: 12px;
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 4px;
-  }
-
-  .detailValue {
-    text-align: left;
+  .modalContainer {
     max-width: 100%;
   }
-}
 
-@media (max-width: 480px) {
   .modalContent {
-    padding: 1rem;
+    padding: 24px;
+    border-radius: 16px;
   }
 
   .modalTitle {
-    font-size: 1.125rem;
+    font-size: 20px;
   }
 
-  .detailRow {
-    padding: 10px;
-  }
-
-  .detailLabel {
+  .modalDescription {
     font-size: 13px;
   }
 
-  .detailValue {
+  .modalForm {
+    gap: 16px;
+  }
+
+  .formLabel {
     font-size: 13px;
+  }
+
+  .formInput {
+    padding: 10px 14px;
+    font-size: 14px;
+  }
+
+  .modalButtons {
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .modalButtons button {
+    width: 100%;
+    min-width: unset;
+  }
+}
+
+/* Responsive - Tablet */
+@media (min-width: 481px) and (max-width: 768px) {
+  .modalContainer {
+    max-width: 450px;
+  }
+
+  .modalContent {
+    padding: 28px;
+  }
+}
+
+/* Mobile landscape */
+@media (max-width: 767px) and (orientation: landscape) {
+  .modalBackdrop {
+    align-items: flex-start;
+    overflow-y: auto;
+    padding: 12px;
+  }
+
+  .modalContainer {
+    margin: 12px auto;
+    max-height: 95vh;
+  }
+
+  .modalContent {
+    padding: 20px;
+  }
+
+  .modalTitle {
+    font-size: 18px;
+    margin-bottom: 6px;
+  }
+
+  .modalDescription {
+    font-size: 12px;
+    margin-bottom: 16px;
+  }
+
+  .modalForm {
+    gap: 14px;
+  }
+
+  .modalIcon {
+    margin-bottom: 16px;
+  }
+
+  .modalIcon svg {
+    padding: 12px;
+    width: 40px;
+    height: 40px;
+  }
+}
+
+/* Extra small devices */
+@media (max-width: 360px) {
+  .modalContent {
+    padding: 20px;
+  }
+
+  .modalTitle {
+    font-size: 18px;
+  }
+
+  .formInput {
+    padding: 10px 12px;
+    font-size: 14px;
+  }
+
+  .modalButtons button {
+    padding: 10px 20px;
+    font-size: 14px;
+  }
+}
+
+/* Print styles */
+@media print {
+  .modalBackdrop {
+    position: static;
+    background: none;
+    padding: 0;
+    backdrop-filter: none;
+  }
+
+  .modalContainer {
+    box-shadow: none;
+    animation: none;
+    max-height: none;
+    overflow: visible;
+  }
+
+  .modalContent {
+    border: 1px solid #000;
+  }
+
+  .closeButton,
+  .modalButtons {
+    display: none;
   }
 }
