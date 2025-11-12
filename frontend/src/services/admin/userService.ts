@@ -42,7 +42,6 @@ export interface UserResponse {
 }
 
 export async function createUser(userData: CreateUserRequest): Promise<{ message: string; userId: string }> {
-  console.log("Creating user:", userData);
   try {
     const response = await fetch(`${API_BASE_URL}/users/createuser`, {
       method: "POST",
@@ -85,7 +84,6 @@ export async function getUsers(): Promise<{ users: UserResponse[] }> {
     }
 
     const data = await response.json();
-    console.log("Users data received:", data);
 
     return data;
   } catch (error) {
@@ -117,7 +115,6 @@ export async function getUserById(id: string): Promise<UserResponse> {
 }
 
 export async function updateUser(id: string, userData: UpdateUserRequest): Promise<{ message: string }> {
-  console.log("Updating user:", id, userData);
   try {
     const response = await fetch(`${API_BASE_URL}/users/updateuser/${id}`, {
       method: "PUT",
@@ -141,7 +138,6 @@ export async function updateUser(id: string, userData: UpdateUserRequest): Promi
 }
 
 export async function changeUserState(id: string, status: string): Promise<{ message: string }> {
-  console.log("Changing user state:", id, status);
   try {
     const response = await fetch(`${API_BASE_URL}/users/changeState/${id}`, {
       method: "PUT",
@@ -165,7 +161,6 @@ export async function changeUserState(id: string, status: string): Promise<{ mes
 }
 
 export async function hardDeleteUser(id: string): Promise<{ message: string }> {
-  console.log("Deleting user:", id);
   try {
     const response = await fetch(`${API_BASE_URL}/users/harddeleteuser/${id}`, {
       method: "DELETE",

@@ -68,6 +68,21 @@
   transition: all 0.2s ease;
 }
 
+.item-ready-btn{
+  background-color: #f97316;
+  border: none;
+  color: white;
+  padding: 0.25rem 0.5rem;
+  border-radius: 4px;
+  font-size: 0.75rem;
+  cursor: pointer;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.item-ready-btn:hover {
+  background-color: #ea580c;
+}
+
 .stat-card:hover {
   box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
 }

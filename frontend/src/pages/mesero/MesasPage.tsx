@@ -22,6 +22,8 @@ const MesasPage: React.FC = () => {
 
     socket.off("cuentaActualizada");
     socket.off("cuentaEliminada");
+    socket.off("nuevaCuenta"); 
+    socket.off("mesaActualizada"); 
 
     socket.on("cuentaActualizada", ({ id, data }) => {
       setTables(prev => {
@@ -48,10 +50,48 @@ const MesasPage: React.FC = () => {
       });
     });
 
+    
+    socket.on("nuevaCuenta", ({ table, id }) => {
+      console.log(' Nueva cuenta creada para mesa:', table);
+      setTables(prev => {
+        const updated = prev.map(t =>
+          Number(t.number) === Number(table)
+            ? ({ 
+                ...t, 
+                status: "occupied", 
+                current_bill_id: id 
+              } as Table)
+            : t
+        );
+        updated.sort(compareTables);
+        return updated as Table[];
+      });
+    });
+
+    
+    socket.on("mesaActualizada", ({ table, status, current_bill_id }) => {
+      console.log('📢 Mesa actualizada:', table);
+      setTables(prev => {
+        const updated = prev.map(t =>
+          Number(t.number) === Number(table)
+            ? ({ 
+                ...t, 
+                status, 
+                current_bill_id 
+              } as Table)
+            : t
+        );
+        updated.sort(compareTables);
+        return updated as Table[];
+      });
+    });
+
     return () => {
       socket.emit("leaveRoom", "waiter");
       socket.off("cuentaActualizada");
       socket.off("cuentaEliminada");
+      socket.off("nuevaCuenta"); 
+      socket.off("mesaActualizada"); 
     };
   }, []);
 

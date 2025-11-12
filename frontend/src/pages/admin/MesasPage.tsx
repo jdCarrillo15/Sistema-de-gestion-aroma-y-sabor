@@ -194,17 +194,17 @@ const MesasPage: React.FC = () => {
       </div>
 
       <div className="stats-grid">
-        <div className="stat-card">
-          <div className="stat-left">
-            <div className="stat-icon productos">
-              <UtensilsCrossed size={20} />
-            </div>
-            <div>
-              <div className="stat-value">{totalTables}</div>
-              <div className="stat-label">Mesas Totales</div>
+        <div className={styles.statCard}>
+            <div className={styles.statLeft}>
+              <div className={`${styles.statIcon} ${styles.productos}`}>
+                <UtensilsCrossed size={20} />
+              </div>
+              <div>
+                <div className={styles.statValue}>{totalTables}</div>
+                <div className={styles.statLabel}>Mesas Totales</div>
+              </div>
             </div>
           </div>
-        </div>
       </div>
 
       <div className={styles.productosGrid}>

@@ -160,12 +160,9 @@ const InventarioPage: React.FC = () => {
     <div className={styles.inventarioPage}>
       <div className={styles.header}>
         <div className={styles.titleSection}>
-          <Package className={styles.icon} size={28} />
           <h1 className={styles.title}>Inventario</h1>
         </div>
         <p className={styles.subtitle}>
-          {filteredProducts.length}{" "}
-          {filteredProducts.length === 1 ? "producto" : "productos"}
         </p>
       </div>
 
