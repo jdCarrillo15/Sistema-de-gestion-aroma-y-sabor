@@ -31,7 +31,7 @@ import { getOrSetCache, deleteCache, deleteCachePattern } from "../config/redis.
 export async function getShifts(req, res) {
   try {
     const CACHE_KEY = "shifts:all";
-    const TTL = 3600;
+    const TTL = 360;
 
     const shifts = await getOrSetCache(
       CACHE_KEY,

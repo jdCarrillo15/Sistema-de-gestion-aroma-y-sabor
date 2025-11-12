@@ -218,6 +218,8 @@ export async function createBill(req, res) {
     deleteCache("tables:all");
     deleteCache(`table:${data.table}`);
 
+    
+
     return res.status(201).json({
       message: "Cuenta creada correctamente",
       id: billRef.id,
@@ -367,6 +369,7 @@ export async function updateBillById(req, res) {
 
       await deleteCache("tables:all");
       await deleteCache(`table:${oldBill.table}`);
+      await deleteCache("shifts:all");
     }
 
     io.to("cash").emit("cuentaActualizada", {
